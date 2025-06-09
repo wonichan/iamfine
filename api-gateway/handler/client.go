@@ -1,7 +1,11 @@
 package handler
 
 import (
+	"time"
+
 	"github.com/cloudwego/kitex/client"
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/pkg/transmeta"
 
 	"hupu/kitex_gen/comment/commentservice"
 	"hupu/kitex_gen/follow/followservice"
@@ -10,6 +14,7 @@ import (
 	"hupu/kitex_gen/post/postservice"
 	"hupu/kitex_gen/user/userservice"
 	"hupu/shared/config"
+	"hupu/shared/utils"
 )
 
 var (
@@ -30,11 +35,39 @@ const (
 	commentServiceName = "comment"
 )
 
+func WithCommonOption(clientName string) []client.Option {
+	return []client.Option{
+		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: clientName}),
+		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
+		client.WithTracer(utils.NewKitexClientTracer()),
+		client.WithShortConnection(),
+		client.WithRPCTimeout(time.Minute),
+	}
+}
+
+func WithServiceOptions(addr, clientName string) []client.Option {
+	return append(
+		[]client.Option{client.WithHostPorts(addr)},
+		WithCommonOption(clientName)...,
+	)
+}
+
 func Init() {
-	userClient = userservice.MustNewClient(userServiceName, client.WithHostPorts(config.GlobalConfig.Services.User.Host+":"+config.GlobalConfig.Services.User.Port))
-	postClient = postservice.MustNewClient(postServiceName, client.WithHostPorts(config.GlobalConfig.Services.Post.Host+":"+config.GlobalConfig.Services.Post.Port))
-	notificationClient = notificationservice.MustNewClient(notificationName, client.WithHostPorts(config.GlobalConfig.Services.Notification.Host+":"+config.GlobalConfig.Services.Notification.Port))
-	likeClient = likeservice.MustNewClient(likeServiceName, client.WithHostPorts(config.GlobalConfig.Services.Like.Host+":"+config.GlobalConfig.Services.Like.Port))
-	followClient = followservice.MustNewClient(followServiceName, client.WithHostPorts(config.GlobalConfig.Services.Follow.Host+":"+config.GlobalConfig.Services.Follow.Port))
-	commentClient = commentservice.MustNewClient(commentServiceName, client.WithHostPorts(config.GlobalConfig.Services.Comment.Host+":"+config.GlobalConfig.Services.Comment.Port))
+	userClient = userservice.MustNewClient(userServiceName,
+		WithServiceOptions(config.GlobalConfig.Services.User.Host+":"+config.GlobalConfig.Services.User.Port, "userClient")...)
+
+	postClient = postservice.MustNewClient(postServiceName,
+		WithServiceOptions(config.GlobalConfig.Services.Post.Host+":"+config.GlobalConfig.Services.Post.Port, "postClient")...)
+
+	notificationClient = notificationservice.MustNewClient(notificationName,
+		WithServiceOptions(config.GlobalConfig.Services.Notification.Host+":"+config.GlobalConfig.Services.Notification.Port, "notificationClient")...)
+
+	likeClient = likeservice.MustNewClient(likeServiceName,
+		WithServiceOptions(config.GlobalConfig.Services.Like.Host+":"+config.GlobalConfig.Services.Like.Port, "likeClient")...)
+
+	followClient = followservice.MustNewClient(followServiceName,
+		WithServiceOptions(config.GlobalConfig.Services.Follow.Host+":"+config.GlobalConfig.Services.Follow.Port, "followClient")...)
+
+	commentClient = commentservice.MustNewClient(commentServiceName,
+		WithServiceOptions(config.GlobalConfig.Services.Comment.Host+":"+config.GlobalConfig.Services.Comment.Port, "commentClient")...)
 }
