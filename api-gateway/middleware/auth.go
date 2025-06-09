@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 
+	"hupu/shared/log"
 	"hupu/shared/utils"
 )
 
@@ -40,7 +40,7 @@ func AuthMiddleware() app.HandlerFunc {
 		// 验证token
 		claims, err := utils.ParseToken(tokenString)
 		if err != nil {
-			hlog.Errorf("Parse token error: %v", err)
+			log.GetLogger().Errorf("Parse token error: %v", err)
 			c.JSON(http.StatusUnauthorized, map[string]interface{}{
 				"code":    401,
 				"message": "token无效",

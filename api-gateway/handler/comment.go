@@ -8,7 +8,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/kitex_gen/comment"
-	"hupu/shared/utils"
+	"hupu/shared/log"
 )
 
 // 创建评论
@@ -39,7 +39,7 @@ func CreateComment(ctx context.Context, c *app.RequestContext) {
 	// 调用评论服务
 	resp, err := commentClient.CreateComment(ctx, &req)
 	if err != nil {
-		utils.GetLogger().Errorf("CreateComment error: %v", err)
+		log.GetLogger().Errorf("CreateComment error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "创建评论失败",
@@ -84,7 +84,7 @@ func GetCommentList(ctx context.Context, c *app.RequestContext) {
 	}
 	resp, err := commentClient.GetCommentList(ctx, req)
 	if err != nil {
-		utils.GetLogger().Errorf("GetCommentList error: %v", err)
+		log.GetLogger().Errorf("GetCommentList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取评论列表失败",

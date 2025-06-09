@@ -8,7 +8,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/kitex_gen/like"
-	"hupu/shared/utils"
+	"hupu/shared/log"
 )
 
 // 点赞
@@ -39,7 +39,7 @@ func Like(ctx context.Context, c *app.RequestContext) {
 	// 调用点赞服务
 	resp, err := likeClient.Like(ctx, &req)
 	if err != nil {
-		utils.GetLogger().Errorf("Like error: %v", err)
+		log.GetLogger().Errorf("Like error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "点赞失败",
@@ -78,7 +78,7 @@ func Unlike(ctx context.Context, c *app.RequestContext) {
 	// 调用点赞服务
 	resp, err := likeClient.Unlike(ctx, &req)
 	if err != nil {
-		utils.GetLogger().Errorf("Unlike error: %v", err)
+		log.GetLogger().Errorf("Unlike error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "取消点赞失败",
@@ -123,7 +123,7 @@ func GetLikeList(ctx context.Context, c *app.RequestContext) {
 	}
 	resp, err := likeClient.GetLikeList(ctx, req)
 	if err != nil {
-		utils.GetLogger().Errorf("GetLikeList error: %v", err)
+		log.GetLogger().Errorf("GetLikeList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取点赞列表失败",

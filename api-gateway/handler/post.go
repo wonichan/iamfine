@@ -8,7 +8,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/kitex_gen/post"
-	"hupu/shared/utils"
+	"hupu/shared/log"
 )
 
 // 创建帖子
@@ -39,7 +39,7 @@ func CreatePost(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.CreatePost(ctx, &req)
 	if err != nil {
-		utils.GetLogger().Errorf("CreatePost error: %v", err)
+		log.GetLogger().Errorf("CreatePost error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "创建帖子失败",
@@ -66,7 +66,7 @@ func GetPost(ctx context.Context, c *app.RequestContext) {
 	req := &post.GetPostRequest{PostId: postID}
 	resp, err := postClient.GetPost(ctx, req)
 	if err != nil {
-		utils.GetLogger().Errorf("GetPost error: %v", err)
+		log.GetLogger().Errorf("GetPost error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取帖子失败",
@@ -107,7 +107,7 @@ func GetPostList(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetPostList(ctx, req)
 	if err != nil {
-		utils.GetLogger().Errorf("GetPostList error: %v", err)
+		log.GetLogger().Errorf("GetPostList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取帖子列表失败",

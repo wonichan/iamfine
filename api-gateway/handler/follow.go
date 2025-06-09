@@ -8,7 +8,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/kitex_gen/follow"
-	"hupu/shared/utils"
+	"hupu/shared/log"
 )
 
 // 关注用户
@@ -39,7 +39,7 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 	// 调用关注服务
 	resp, err := followClient.Follow(ctx, &req)
 	if err != nil {
-		utils.GetLogger().Errorf("Follow error: %v", err)
+		log.GetLogger().Errorf("Follow error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "关注失败",
@@ -78,7 +78,7 @@ func Unfollow(ctx context.Context, c *app.RequestContext) {
 	// 调用关注服务
 	resp, err := followClient.Unfollow(ctx, &req)
 	if err != nil {
-		utils.GetLogger().Errorf("Unfollow error: %v", err)
+		log.GetLogger().Errorf("Unfollow error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "取消关注失败",
@@ -123,7 +123,7 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 	}
 	resp, err := followClient.GetFollowList(ctx, req)
 	if err != nil {
-		utils.GetLogger().Errorf("GetFollowList error: %v", err)
+		log.GetLogger().Errorf("GetFollowList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取关注列表失败",
@@ -168,7 +168,7 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 	}
 	resp, err := followClient.GetFollowerList(ctx, req)
 	if err != nil {
-		utils.GetLogger().Errorf("GetFollowerList error: %v", err)
+		log.GetLogger().Errorf("GetFollowerList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取粉丝列表失败",

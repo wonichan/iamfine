@@ -8,7 +8,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/kitex_gen/notification"
-	"hupu/shared/utils"
+	"hupu/shared/log"
 )
 
 // 获取通知列表
@@ -45,7 +45,7 @@ func GetNotificationList(ctx context.Context, c *app.RequestContext) {
 	}
 	resp, err := notificationClient.GetNotificationList(ctx, req)
 	if err != nil {
-		utils.GetLogger().Errorf("GetNotificationList error: %v", err)
+		log.GetLogger().Errorf("GetNotificationList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取通知列表失败",

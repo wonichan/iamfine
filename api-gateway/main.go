@@ -4,7 +4,7 @@ import (
 	"context"
 	"hupu/api-gateway/router"
 	"hupu/shared/config"
-	"hupu/shared/utils"
+	"hupu/shared/log"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
@@ -16,7 +16,7 @@ func main() {
 	config.Init("../config.yaml")
 
 	// 初始化日志
-	utils.InitLogger("api-gateway", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
+	log.InitLogger("api-gateway", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
 
 	// 创建Hertz服务器
 	h := server.Default(
@@ -30,11 +30,11 @@ func main() {
 	router.RegisterRoutes(h)
 	h.Engine.OnRun = append(h.Engine.OnRun, beginStart)
 
-	utils.Logger.Info("API Gateway starting...")
+	log.GetLogger().Info("API Gateway starting...")
 	h.Spin()
 }
 
 func beginStart(ctx context.Context) error {
-	utils.GetLogger().Infof("here we go...")
+	log.GetLogger().Infof("here we go...")
 	return nil
 }

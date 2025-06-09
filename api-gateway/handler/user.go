@@ -7,7 +7,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/kitex_gen/user"
-	"hupu/shared/utils"
+	"hupu/shared/log"
 )
 
 // 用户注册
@@ -25,7 +25,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	// 调用用户服务
 	resp, err := userClient.Register(ctx, &req)
 	if err != nil {
-		utils.GetLogger().Errorf("Register error: %v", err)
+		log.GetLogger().Errorf("Register error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "注册失败",
@@ -51,7 +51,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	// 调用用户服务
 	resp, err := userClient.Login(ctx, &req)
 	if err != nil {
-		utils.GetLogger().Errorf("Login error: %v", err)
+		log.GetLogger().Errorf("Login error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "登录失败",
@@ -78,7 +78,7 @@ func GetUser(ctx context.Context, c *app.RequestContext) {
 	req := &user.GetUserRequest{UserId: userID}
 	resp, err := userClient.GetUser(ctx, req)
 	if err != nil {
-		utils.GetLogger().Errorf("GetUser error: %v", err)
+		log.GetLogger().Errorf("GetUser error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取用户信息失败",
