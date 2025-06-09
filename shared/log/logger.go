@@ -12,13 +12,13 @@ import (
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-var Logger *logrus.Logger
+var logger *logrus.Logger
 
 func InitLogger(name, logPath, logLevel string) {
-	Logger = logrus.New()
+	logger = logrus.New()
 
 	// 设置日志格式
-	Logger.SetFormatter(&logrus.TextFormatter{
+	logger.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp:   true,
 		TimestampFormat: "2006-01-02 15:04:05",
 		ForceColors:     true, // 如果你想在控制台输出颜色，可以设置为true
@@ -32,7 +32,7 @@ func InitLogger(name, logPath, logLevel string) {
 	})
 
 	// 设置报告调用者信息
-	Logger.SetReportCaller(true)
+	logger.SetReportCaller(true)
 
 	// 设置日志输出到 lumberjack，实现日志轮转和压缩
 	lj := &lumberjack.Logger{
@@ -45,33 +45,33 @@ func InitLogger(name, logPath, logLevel string) {
 	}
 
 	// 同时输出到控制台和文件
-	Logger.SetOutput(io.MultiWriter(os.Stdout, lj))
+	logger.SetOutput(io.MultiWriter(os.Stdout, lj))
 
 	// 设置日志级别
 	level, err := logrus.ParseLevel(logLevel)
 	if err != nil {
 		level = logrus.InfoLevel // 默认级别
 	}
-	Logger.SetLevel(level)
+	logger.SetLevel(level)
 
-	Logger.Info("Logger initialized successfully")
+	logger.Info("Logger initialized successfully")
 }
 
 func GetLogger() *logrus.Logger {
-	return Logger
+	return logger
 }
 
 func WithFields(fields logrus.Fields) *logrus.Logger {
-	Logger.WithFields(fields)
-	return Logger
+	logger.WithFields(fields)
+	return logger
 }
 
 func Trace(f interface{}, v ...interface{}) {
-	if Logger == nil {
+	if logger == nil {
 		logrus.Trace(formatLog(f, v...))
 		return
 	}
-	Logger.Trace(formatLog(f, v...))
+	logger.Trace(formatLog(f, v...))
 }
 
 func formatLog(f interface{}, v ...interface{}) string {
