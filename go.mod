@@ -9,6 +9,7 @@ require (
 	github.com/cloudwego/kitex/pkg/protocol/bthrift v0.0.0-20250609063301-b3ca38dbc9cb
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/golang-jwt/jwt/v5 v5.2.0
+	github.com/hertz-contrib/logger/accesslog v0.0.0-20241107070745-e4ce8c54dd97
 	github.com/rs/xid v1.6.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.18.2

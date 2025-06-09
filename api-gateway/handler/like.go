@@ -5,13 +5,10 @@ import (
 	"net/http"
 	"strconv" // 添加这行
 
-	"hupu/kitex_gen/like"
-	"hupu/kitex_gen/like/likeservice"
-	"hupu/shared/config"
-
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/client"
+
+	"hupu/kitex_gen/like"
+	"hupu/shared/utils"
 )
 
 // 点赞
@@ -39,21 +36,10 @@ func Like(ctx context.Context, c *app.RequestContext) {
 	// 设置用户ID
 	req.UserId = userID.(string)
 
-	// 创建点赞服务客户端
-	client, err := likeservice.NewClient("like", client.WithHostPorts(config.GlobalConfig.Services.Like.Host+":"+config.GlobalConfig.Services.Like.Port))
-	if err != nil {
-		hlog.Errorf("Create like client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用点赞服务
-	resp, err := client.Like(ctx, &req)
+	resp, err := likeClient.Like(ctx, &req)
 	if err != nil {
-		hlog.Errorf("Like error: %v", err)
+		utils.GetLogger().Errorf("Like error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "点赞失败",
@@ -89,21 +75,10 @@ func Unlike(ctx context.Context, c *app.RequestContext) {
 	// 设置用户ID
 	req.UserId = userID.(string)
 
-	// 创建点赞服务客户端
-	client, err := likeservice.NewClient("like", client.WithHostPorts(config.GlobalConfig.Services.Like.Host+":"+config.GlobalConfig.Services.Like.Port))
-	if err != nil {
-		hlog.Errorf("Create like client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用点赞服务
-	resp, err := client.Unlike(ctx, &req)
+	resp, err := likeClient.Unlike(ctx, &req)
 	if err != nil {
-		hlog.Errorf("Unlike error: %v", err)
+		utils.GetLogger().Errorf("Unlike error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "取消点赞失败",
@@ -140,26 +115,15 @@ func GetLikeList(ctx context.Context, c *app.RequestContext) {
 		pageSize = 10
 	}
 
-	// 创建点赞服务客户端
-	client, err := likeservice.NewClient("like", client.WithHostPorts(config.GlobalConfig.Services.Like.Host+":"+config.GlobalConfig.Services.Like.Port))
-	if err != nil {
-		hlog.Errorf("Create like client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用点赞服务
 	req := &like.GetLikeListRequest{
 		UserId:   userID.(string),
 		Page:     int32(page),
 		PageSize: int32(pageSize),
 	}
-	resp, err := client.GetLikeList(ctx, req)
+	resp, err := likeClient.GetLikeList(ctx, req)
 	if err != nil {
-		hlog.Errorf("GetLikeList error: %v", err)
+		utils.GetLogger().Errorf("GetLikeList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取点赞列表失败",

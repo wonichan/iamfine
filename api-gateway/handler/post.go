@@ -6,11 +6,9 @@ import (
 	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/client"
+
 	"hupu/kitex_gen/post"
-	"hupu/kitex_gen/post/postservice"
-	"hupu/shared/config"
+	"hupu/shared/utils"
 )
 
 // 创建帖子
@@ -38,21 +36,10 @@ func CreatePost(ctx context.Context, c *app.RequestContext) {
 	// 设置用户ID
 	req.UserId = userID.(string)
 
-	// 创建帖子服务客户端
-	client, err := postservice.NewClient("post", client.WithHostPorts(config.GlobalConfig.Services.Post.Host+":"+config.GlobalConfig.Services.Post.Port))
-	if err != nil {
-		hlog.Errorf("Create post client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用帖子服务
-	resp, err := client.CreatePost(ctx, &req)
+	resp, err := postClient.CreatePost(ctx, &req)
 	if err != nil {
-		hlog.Errorf("CreatePost error: %v", err)
+		utils.GetLogger().Errorf("CreatePost error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "创建帖子失败",
@@ -75,22 +62,11 @@ func GetPost(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// 创建帖子服务客户端
-	client, err := postservice.NewClient("post", client.WithHostPorts(config.GlobalConfig.Services.Post.Host+":"+config.GlobalConfig.Services.Post.Port))
-	if err != nil {
-		hlog.Errorf("Create post client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用帖子服务
 	req := &post.GetPostRequest{PostId: postID}
-	resp, err := client.GetPost(ctx, req)
+	resp, err := postClient.GetPost(ctx, req)
 	if err != nil {
-		hlog.Errorf("GetPost error: %v", err)
+		utils.GetLogger().Errorf("GetPost error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取帖子失败",
@@ -118,17 +94,6 @@ func GetPostList(ctx context.Context, c *app.RequestContext) {
 		pageSize = 10
 	}
 
-	// 创建帖子服务客户端
-	client, err := postservice.NewClient("post", client.WithHostPorts(config.GlobalConfig.Services.Post.Host+":"+config.GlobalConfig.Services.Post.Port))
-	if err != nil {
-		hlog.Errorf("Create post client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 构建请求
 	req := &post.GetPostListRequest{
 		Page:     int32(page),
@@ -140,9 +105,9 @@ func GetPostList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	resp, err := client.GetPostList(ctx, req)
+	resp, err := postClient.GetPostList(ctx, req)
 	if err != nil {
-		hlog.Errorf("GetPostList error: %v", err)
+		utils.GetLogger().Errorf("GetPostList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取帖子列表失败",

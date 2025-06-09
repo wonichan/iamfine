@@ -5,13 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"hupu/kitex_gen/follow"
-	"hupu/kitex_gen/follow/followservice"
-	"hupu/shared/config"
-
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/client"
+
+	"hupu/kitex_gen/follow"
+	"hupu/shared/utils"
 )
 
 // 关注用户
@@ -39,21 +36,10 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 	// 设置关注者ID
 	req.FollowerId = userID.(string)
 
-	// 创建关注服务客户端
-	client, err := followservice.NewClient("follow", client.WithHostPorts(config.GlobalConfig.Services.Follow.Host+":"+config.GlobalConfig.Services.Follow.Port))
-	if err != nil {
-		hlog.Errorf("Create follow client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用关注服务
-	resp, err := client.Follow(ctx, &req)
+	resp, err := followClient.Follow(ctx, &req)
 	if err != nil {
-		hlog.Errorf("Follow error: %v", err)
+		utils.GetLogger().Errorf("Follow error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "关注失败",
@@ -89,21 +75,10 @@ func Unfollow(ctx context.Context, c *app.RequestContext) {
 	// 设置关注者ID
 	req.FollowerId = userID.(string)
 
-	// 创建关注服务客户端
-	client, err := followservice.NewClient("follow", client.WithHostPorts(config.GlobalConfig.Services.Follow.Host+":"+config.GlobalConfig.Services.Follow.Port))
-	if err != nil {
-		hlog.Errorf("Create follow client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用关注服务
-	resp, err := client.Unfollow(ctx, &req)
+	resp, err := followClient.Unfollow(ctx, &req)
 	if err != nil {
-		hlog.Errorf("Unfollow error: %v", err)
+		utils.GetLogger().Errorf("Unfollow error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "取消关注失败",
@@ -140,26 +115,15 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 		pageSize = 10
 	}
 
-	// 创建关注服务客户端
-	client, err := followservice.NewClient("follow", client.WithHostPorts(config.GlobalConfig.Services.Follow.Host+":"+config.GlobalConfig.Services.Follow.Port))
-	if err != nil {
-		hlog.Errorf("Create follow client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用关注服务
 	req := &follow.GetFollowListRequest{
 		UserId:   userID,
 		Page:     int32(page),
 		PageSize: int32(pageSize),
 	}
-	resp, err := client.GetFollowList(ctx, req)
+	resp, err := followClient.GetFollowList(ctx, req)
 	if err != nil {
-		hlog.Errorf("GetFollowList error: %v", err)
+		utils.GetLogger().Errorf("GetFollowList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取关注列表失败",
@@ -196,26 +160,15 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 		pageSize = 10
 	}
 
-	// 创建关注服务客户端
-	client, err := followservice.NewClient("follow", client.WithHostPorts(config.GlobalConfig.Services.Follow.Host+":"+config.GlobalConfig.Services.Follow.Port))
-	if err != nil {
-		hlog.Errorf("Create follow client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用关注服务
 	req := &follow.GetFollowerListRequest{
 		UserId:   userID,
 		Page:     int32(page),
 		PageSize: int32(pageSize),
 	}
-	resp, err := client.GetFollowerList(ctx, req)
+	resp, err := followClient.GetFollowerList(ctx, req)
 	if err != nil {
-		hlog.Errorf("GetFollowerList error: %v", err)
+		utils.GetLogger().Errorf("GetFollowerList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取粉丝列表失败",

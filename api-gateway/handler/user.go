@@ -4,13 +4,10 @@ import (
 	"context"
 	"net/http"
 
-	"hupu/kitex_gen/user"
-	"hupu/kitex_gen/user/userservice"
-	"hupu/shared/config"
-
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/client"
+
+	"hupu/kitex_gen/user"
+	"hupu/shared/utils"
 )
 
 // 用户注册
@@ -25,21 +22,10 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// 创建用户服务客户端
-	client, err := userservice.NewClient("user", client.WithHostPorts(config.GlobalConfig.Services.User.Host+":"+config.GlobalConfig.Services.User.Port))
-	if err != nil {
-		hlog.Errorf("Create user client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用用户服务
-	resp, err := client.Register(ctx, &req)
+	resp, err := userClient.Register(ctx, &req)
 	if err != nil {
-		hlog.Errorf("Register error: %v", err)
+		utils.GetLogger().Errorf("Register error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "注册失败",
@@ -62,21 +48,10 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// 创建用户服务客户端
-	client, err := userservice.NewClient("user", client.WithHostPorts(config.GlobalConfig.Services.User.Host+":"+config.GlobalConfig.Services.User.Port))
-	if err != nil {
-		hlog.Errorf("Create user client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用用户服务
-	resp, err := client.Login(ctx, &req)
+	resp, err := userClient.Login(ctx, &req)
 	if err != nil {
-		hlog.Errorf("Login error: %v", err)
+		utils.GetLogger().Errorf("Login error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "登录失败",
@@ -99,22 +74,11 @@ func GetUser(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// 创建用户服务客户端
-	client, err := userservice.NewClient("user", client.WithHostPorts(config.GlobalConfig.Services.User.Host+":"+config.GlobalConfig.Services.User.Port))
-	if err != nil {
-		hlog.Errorf("Create user client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用用户服务
 	req := &user.GetUserRequest{UserId: userID}
-	resp, err := client.GetUser(ctx, req)
+	resp, err := userClient.GetUser(ctx, req)
 	if err != nil {
-		hlog.Errorf("GetUser error: %v", err)
+		utils.GetLogger().Errorf("GetUser error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取用户信息失败",

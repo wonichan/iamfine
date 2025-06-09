@@ -6,11 +6,9 @@ import (
 	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/client"
+
 	"hupu/kitex_gen/comment"
-	"hupu/kitex_gen/comment/commentservice"
-	"hupu/shared/config"
+	"hupu/shared/utils"
 )
 
 // 创建评论
@@ -38,21 +36,10 @@ func CreateComment(ctx context.Context, c *app.RequestContext) {
 	// 设置用户ID
 	req.UserId = userID.(string)
 
-	// 创建评论服务客户端
-	client, err := commentservice.NewClient("comment", client.WithHostPorts(config.GlobalConfig.Services.Comment.Host+":"+config.GlobalConfig.Services.Comment.Port))
-	if err != nil {
-		hlog.Errorf("Create comment client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用评论服务
-	resp, err := client.CreateComment(ctx, &req)
+	resp, err := commentClient.CreateComment(ctx, &req)
 	if err != nil {
-		hlog.Errorf("CreateComment error: %v", err)
+		utils.GetLogger().Errorf("CreateComment error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "创建评论失败",
@@ -89,26 +76,15 @@ func GetCommentList(ctx context.Context, c *app.RequestContext) {
 		pageSize = 10
 	}
 
-	// 创建评论服务客户端
-	client, err := commentservice.NewClient("comment", client.WithHostPorts(config.GlobalConfig.Services.Comment.Host+":"+config.GlobalConfig.Services.Comment.Port))
-	if err != nil {
-		hlog.Errorf("Create comment client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用评论服务
 	req := &comment.GetCommentListRequest{
 		PostId:   postID,
 		Page:     int32(page),
 		PageSize: int32(pageSize),
 	}
-	resp, err := client.GetCommentList(ctx, req)
+	resp, err := commentClient.GetCommentList(ctx, req)
 	if err != nil {
-		hlog.Errorf("GetCommentList error: %v", err)
+		utils.GetLogger().Errorf("GetCommentList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取评论列表失败",

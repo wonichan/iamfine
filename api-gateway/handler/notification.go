@@ -6,11 +6,9 @@ import (
 	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
-	"github.com/cloudwego/kitex/client"
+
 	"hupu/kitex_gen/notification"
-	"hupu/kitex_gen/notification/notificationservice"
-	"hupu/shared/config"
+	"hupu/shared/utils"
 )
 
 // 获取通知列表
@@ -39,26 +37,15 @@ func GetNotificationList(ctx context.Context, c *app.RequestContext) {
 		pageSize = 10
 	}
 
-	// 创建通知服务客户端
-	client, err := notificationservice.NewClient("notification", client.WithHostPorts(config.GlobalConfig.Services.Notification.Host+":"+config.GlobalConfig.Services.Notification.Port))
-	if err != nil {
-		hlog.Errorf("Create notification client error: %v", err)
-		c.JSON(http.StatusInternalServerError, map[string]interface{}{
-			"code":    500,
-			"message": "服务连接失败",
-		})
-		return
-	}
-
 	// 调用通知服务
 	req := &notification.GetNotificationListRequest{
 		UserId:   userID.(string),
 		Page:     int32(page),
 		PageSize: int32(pageSize),
 	}
-	resp, err := client.GetNotificationList(ctx, req)
+	resp, err := notificationClient.GetNotificationList(ctx, req)
 	if err != nil {
-		hlog.Errorf("GetNotificationList error: %v", err)
+		utils.GetLogger().Errorf("GetNotificationList error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
 			"code":    500,
 			"message": "获取通知列表失败",
