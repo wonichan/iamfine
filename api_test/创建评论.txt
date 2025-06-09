@@ -1,0 +1,9 @@
+POST /api/v1/comment
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "post_id": "post_id",
+  "content": "评论内容",
+  "parent_id": "parent_comment_id" // 可选，回复评论时使用
+}

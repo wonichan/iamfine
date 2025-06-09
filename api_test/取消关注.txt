@@ -1,0 +1,7 @@
+DELETE /api/v1/follow
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "following_id": "user_id"
+}

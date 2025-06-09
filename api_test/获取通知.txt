@@ -1,0 +1,2 @@
+GET /api/v1/notifications?page=1&page_size=10
+Authorization: Bearer {token}

@@ -1,0 +1,19 @@
+hupu/
+├── api-gateway/           # API网关服务
+├── services/              # 微服务目录
+│   ├── user/             # 用户服务
+│   ├── post/             # 帖子服务
+│   ├── comment/          # 评论服务
+│   ├── like/             # 点赞服务
+│   ├── follow/           # 关注服务
+│   └── notification/     # 通知服务
+├── shared/               # 共享代码
+│   ├── config/          # 配置管理
+│   ├── middleware/      # 中间件
+│   ├── utils/           # 工具函数
+│   └── models/          # 数据模型
+├── idl/                 # IDL定义文件
+├── scripts/             # 部署脚本
+├── docker/              # Docker配置
+├── docs/                # 文档
+└── README.md

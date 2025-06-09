@@ -1,0 +1,9 @@
+POST /api/v1/post
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "title": "帖子标题",
+  "content": "帖子内容",
+  "images": ["image1.jpg", "image2.jpg"]
+}

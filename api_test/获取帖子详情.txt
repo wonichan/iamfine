@@ -1,0 +1,2 @@
+GET /api/v1/post/{post_id}
+Authorization: Bearer {token}

@@ -1,0 +1,8 @@
+DELETE /api/v1/like
+Authorization: Bearer {token}
+Content-Type: application/json
+
+{
+  "target_id": "post_or_comment_id",
+  "target_type": 1
+}

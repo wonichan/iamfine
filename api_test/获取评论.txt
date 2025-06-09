@@ -1,0 +1,2 @@
+GET /api/v1/comments/{post_id}?page=1&page_size=10
+Authorization: Bearer {token}

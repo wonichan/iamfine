@@ -1,0 +1,54 @@
+server:
+  host: "0.0.0.0"
+  port: "8080"
+
+mysql:
+  host: "localhost"
+  port: "3306"
+  user: "root"
+  password: "123456"
+  database: "hupu"
+
+redis:
+  host: "localhost"
+  port: "6379"
+  password: ""
+  db: 0
+
+kafka:
+  brokers:
+    - "localhost:9092"
+
+oss:
+  endpoint: "oss-cn-hangzhou.aliyuncs.com"
+  access_key_id: "your_access_key_id"
+  access_key_secret: "your_access_key_secret"
+  bucket_name: "hupu-bucket"
+
+jwt:
+  secret: "hupu_jwt_secret_key"
+  expire: 86400
+
+services:
+  user:
+    host: "localhost"
+    port: "8001"
+  post:
+    host: "localhost"
+    port: "8002"
+  comment:
+    host: "localhost"
+    port: "8003"
+  like:
+    host: "localhost"
+    port: "8004"
+  follow:
+    host: "localhost"
+    port: "8005"
+  notification:
+    host: "localhost"
+    port: "8006"
+
+log:
+  path: "./logs"
+  level: "info"

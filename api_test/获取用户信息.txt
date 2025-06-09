@@ -1,0 +1,2 @@
+GET /api/v1/user/profile/{user_id}
+Authorization: Bearer {token}
