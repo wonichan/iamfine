@@ -96,8 +96,8 @@ func GetPostList(ctx context.Context, c *app.RequestContext) {
 
 	// 构建请求
 	req := &post.GetPostListRequest{
-		Page:     int32(page),
-		PageSize: int32(pageSize),
+		Page:     page,
+		PageSize: pageSize,
 	}
 
 	if userIDStr != "" {

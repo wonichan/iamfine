@@ -2,40 +2,36 @@ package handler
 
 import (
 	"context"
-	"errors"
-	"github.com/go-redis/redis/v8"
-	"github.com/rs/xid"
-	"gorm.io/gorm"
 	"hupu/kitex_gen/post"
+	"hupu/services/post/repository"
 	"hupu/shared/models"
+
+	"github.com/go-redis/redis/v8"
+	"gorm.io/gorm"
 )
 
 type PostHandler struct {
-	db  *gorm.DB
-	rdb *redis.Client
+	db  repository.PostRepository
+	rdb repository.PostRepository
 }
 
 func NewPostHandler(db *gorm.DB, rdb *redis.Client) *PostHandler {
 	return &PostHandler{
-		db:  db,
-		rdb: rdb,
+		db:  repository.NewPostRepository(db),
+		rdb: repository.NewPostRedisRepo(rdb),
 	}
 }
 
 func (h *PostHandler) CreatePost(ctx context.Context, req *post.CreatePostRequest) (*post.CreatePostResponse, error) {
-	// 生成帖子ID
-	postID := xid.New().String()
-
 	// 创建帖子
-	newPost := models.Post{
-		ID:      postID,
+	newPost := &models.Post{
 		UserID:  req.UserId,
 		Title:   req.Title,
 		Content: req.Content,
 		Images:  models.StringArray(req.Images),
 	}
 
-	err := h.db.Create(&newPost).Error
+	err := h.rdb.CreatePost(ctx, newPost)
 	if err != nil {
 		return &post.CreatePostResponse{
 			Code:    500,
@@ -44,7 +40,7 @@ func (h *PostHandler) CreatePost(ctx context.Context, req *post.CreatePostReques
 	}
 
 	return &post.CreatePostResponse{
-		Code:    200,
+		Code:    0,
 		Message: "创建成功",
 		Post: &post.Post{
 			Id:           newPost.ID,
@@ -61,10 +57,9 @@ func (h *PostHandler) CreatePost(ctx context.Context, req *post.CreatePostReques
 }
 
 func (h *PostHandler) GetPost(ctx context.Context, req *post.GetPostRequest) (*post.GetPostResponse, error) {
-	var postModel models.Post
-	err := h.db.Where("id = ?", req.PostId).First(&postModel).Error
+	postModel, err := h.rdb.GetPost(ctx, req.PostId)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
+		if err.Error() == "帖子不存在" {
 			return &post.GetPostResponse{
 				Code:    404,
 				Message: "帖子不存在",
@@ -94,26 +89,17 @@ func (h *PostHandler) GetPost(ctx context.Context, req *post.GetPostRequest) (*p
 }
 
 func (h *PostHandler) GetPostList(ctx context.Context, req *post.GetPostListRequest) (*post.GetPostListResponse, error) {
-	var posts []models.Post
-	var total int64
+	var posts []*models.Post
+	var err error
 
-	query := h.db.Model(&models.Post{})
 	if req.UserId != nil {
-		query = query.Where("user_id = ?", *req.UserId)
+		// 根据用户ID获取帖子列表
+		posts, err = h.rdb.GetPostsByUserID(ctx, *req.UserId, req.Page, req.PageSize)
+	} else {
+		// 获取全部帖子列表
+		posts, err = h.rdb.GetPostList(ctx, req.Page, req.PageSize)
 	}
 
-	// 获取总数
-	err := query.Count(&total).Error
-	if err != nil {
-		return &post.GetPostListResponse{
-			Code:    500,
-			Message: "查询失败",
-		}, err
-	}
-
-	// 分页查询
-	offset := (req.Page - 1) * req.PageSize
-	err = query.Offset(int(offset)).Limit(int(req.PageSize)).Order("created_at DESC").Find(&posts).Error
 	if err != nil {
 		return &post.GetPostListResponse{
 			Code:    500,
@@ -141,6 +127,6 @@ func (h *PostHandler) GetPostList(ctx context.Context, req *post.GetPostListRequ
 		Code:    200,
 		Message: "查询成功",
 		Posts:   postList,
-		Total:   int32(total),
+		Total:   int32(len(postList)),
 	}, nil
 }

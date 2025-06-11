@@ -36,8 +36,8 @@ struct GetPostResponse {
 }
 
 struct GetPostListRequest {
-    1: i32 page
-    2: i32 page_size
+    1: i64 page
+    2: i64 page_size
     3: optional string user_id
 }
 

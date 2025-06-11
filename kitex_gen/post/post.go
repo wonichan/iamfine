@@ -1779,8 +1779,8 @@ func (p *GetPostResponse) Field3DeepEqual(src *Post) bool {
 }
 
 type GetPostListRequest struct {
-	Page     int32   `thrift:"page,1" frugal:"1,default,i32" json:"page"`
-	PageSize int32   `thrift:"page_size,2" frugal:"2,default,i32" json:"page_size"`
+	Page     int64   `thrift:"page,1" frugal:"1,default,i64" json:"page"`
+	PageSize int64   `thrift:"page_size,2" frugal:"2,default,i64" json:"page_size"`
 	UserId   *string `thrift:"user_id,3,optional" frugal:"3,optional,string" json:"user_id,omitempty"`
 }
 
@@ -1791,11 +1791,11 @@ func NewGetPostListRequest() *GetPostListRequest {
 func (p *GetPostListRequest) InitDefault() {
 }
 
-func (p *GetPostListRequest) GetPage() (v int32) {
+func (p *GetPostListRequest) GetPage() (v int64) {
 	return p.Page
 }
 
-func (p *GetPostListRequest) GetPageSize() (v int32) {
+func (p *GetPostListRequest) GetPageSize() (v int64) {
 	return p.PageSize
 }
 
@@ -1807,10 +1807,10 @@ func (p *GetPostListRequest) GetUserId() (v string) {
 	}
 	return *p.UserId
 }
-func (p *GetPostListRequest) SetPage(val int32) {
+func (p *GetPostListRequest) SetPage(val int64) {
 	p.Page = val
 }
-func (p *GetPostListRequest) SetPageSize(val int32) {
+func (p *GetPostListRequest) SetPageSize(val int64) {
 	p.PageSize = val
 }
 func (p *GetPostListRequest) SetUserId(val *string) {
@@ -1847,7 +1847,7 @@ func (p *GetPostListRequest) Read(iprot thrift.TProtocol) (err error) {
 
 		switch fieldId {
 		case 1:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField1(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1855,7 +1855,7 @@ func (p *GetPostListRequest) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1901,8 +1901,8 @@ ReadStructEndError:
 
 func (p *GetPostListRequest) ReadField1(iprot thrift.TProtocol) error {
 
-	var _field int32
-	if v, err := iprot.ReadI32(); err != nil {
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -1912,8 +1912,8 @@ func (p *GetPostListRequest) ReadField1(iprot thrift.TProtocol) error {
 }
 func (p *GetPostListRequest) ReadField2(iprot thrift.TProtocol) error {
 
-	var _field int32
-	if v, err := iprot.ReadI32(); err != nil {
+	var _field int64
+	if v, err := iprot.ReadI64(); err != nil {
 		return err
 	} else {
 		_field = v
@@ -1971,10 +1971,10 @@ WriteStructEndError:
 }
 
 func (p *GetPostListRequest) writeField1(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page", thrift.I32, 1); err != nil {
+	if err = oprot.WriteFieldBegin("page", thrift.I64, 1); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.Page); err != nil {
+	if err := oprot.WriteI64(p.Page); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1988,10 +1988,10 @@ WriteFieldEndError:
 }
 
 func (p *GetPostListRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 2); err != nil {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I64, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.PageSize); err != nil {
+	if err := oprot.WriteI64(p.PageSize); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2049,14 +2049,14 @@ func (p *GetPostListRequest) DeepEqual(ano *GetPostListRequest) bool {
 	return true
 }
 
-func (p *GetPostListRequest) Field1DeepEqual(src int32) bool {
+func (p *GetPostListRequest) Field1DeepEqual(src int64) bool {
 
 	if p.Page != src {
 		return false
 	}
 	return true
 }
-func (p *GetPostListRequest) Field2DeepEqual(src int32) bool {
+func (p *GetPostListRequest) Field2DeepEqual(src int64) bool {
 
 	if p.PageSize != src {
 		return false

@@ -1,13 +1,18 @@
 package main
 
 import (
-	"log"
 	"net"
+	"time"
 
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/pkg/transmeta"
 	"github.com/cloudwego/kitex/server"
+
 	"hupu/kitex_gen/follow/followservice"
 	"hupu/services/follow/handler"
 	"hupu/shared/config"
+	"hupu/shared/log"
+	"hupu/shared/middleware"
 	"hupu/shared/utils"
 )
 
@@ -16,18 +21,18 @@ func main() {
 	config.Init("../../config.yaml")
 
 	// 初始化日志
-	utils.InitLogger()
+	log.InitLogger("follow", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
 
 	// 初始化数据库
 	db, err := utils.InitDB()
 	if err != nil {
-		log.Fatalf("Failed to init database: %v", err)
+		log.GetLogger().Fatalf("Failed to init database: %v", err)
 	}
 
 	// 初始化Redis
 	rdb, err := utils.InitRedis()
 	if err != nil {
-		log.Fatalf("Failed to init redis: %v", err)
+		log.GetLogger().Fatalf("Failed to init redis: %v", err)
 	}
 
 	// 创建服务处理器
@@ -35,11 +40,17 @@ func main() {
 
 	// 创建服务器
 	addr, _ := net.ResolveTCPAddr("tcp", config.GlobalConfig.Services.Follow.Host+":"+config.GlobalConfig.Services.Follow.Port)
-	svr := followservice.NewServer(followHandler, server.WithServiceAddr(addr))
+	svr := followservice.NewServer(followHandler,
+		server.WithServiceAddr(addr),
+		server.WithReadWriteTimeout(time.Minute),
+		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "follow"}),
+		server.WithMetaHandler(transmeta.ServerTTHeaderHandler),
+		server.WithMiddleware(middleware.TraceIdMiddleWare()),
+	)
 
-	utils.Logger.Info("Follow service starting...")
+	log.GetLogger().Info("Follow service starting...")
 	err = svr.Run()
 	if err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+		log.GetLogger().Fatalf("Failed to start server: %v", err)
 	}
 }

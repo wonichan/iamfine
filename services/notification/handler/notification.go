@@ -2,11 +2,12 @@ package handler
 
 import (
 	"context"
+	"hupu/kitex_gen/notification"
+	"hupu/shared/models"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/rs/xid"
 	"gorm.io/gorm"
-	"hupu/kitex_gen/notification"
-	"hupu/shared/models"
 )
 
 type NotificationHandler struct {
@@ -56,7 +57,6 @@ func (h *NotificationHandler) CreateNotification(ctx context.Context, req *notif
 			TargetId:  newNotification.TargetID,
 			IsRead:    newNotification.IsRead,
 			CreatedAt: newNotification.CreatedAt.Unix(),
-			UpdatedAt: newNotification.UpdatedAt.Unix(),
 		},
 	}, nil
 }
@@ -84,7 +84,6 @@ func (h *NotificationHandler) GetNotificationList(ctx context.Context, req *noti
 			TargetId:  n.TargetID,
 			IsRead:    n.IsRead,
 			CreatedAt: n.CreatedAt.Unix(),
-			UpdatedAt: n.UpdatedAt.Unix(),
 		})
 	}
 

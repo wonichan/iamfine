@@ -26,8 +26,9 @@ struct CreateCommentResponse {
 
 struct GetCommentListRequest {
     1: string post_id
-    2: i32 page
-    3: i32 page_size
+    2: optional string parent_id
+    3: i32 page
+    4: i32 page_size
 }
 
 struct GetCommentListResponse {

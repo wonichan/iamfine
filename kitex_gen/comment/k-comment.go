@@ -883,7 +883,7 @@ func (p *GetCommentListRequest) FastRead(buf []byte) (int, error) {
 				}
 			}
 		case 2:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				l, err = p.FastReadField2(buf[offset:])
 				offset += l
 				if err != nil {
@@ -899,6 +899,20 @@ func (p *GetCommentListRequest) FastRead(buf []byte) (int, error) {
 		case 3:
 			if fieldTypeId == thrift.I32 {
 				l, err = p.FastReadField3(buf[offset:])
+				offset += l
+				if err != nil {
+					goto ReadFieldError
+				}
+			} else {
+				l, err = thrift.Binary.Skip(buf[offset:], fieldTypeId)
+				offset += l
+				if err != nil {
+					goto SkipFieldError
+				}
+			}
+		case 4:
+			if fieldTypeId == thrift.I32 {
+				l, err = p.FastReadField4(buf[offset:])
 				offset += l
 				if err != nil {
 					goto ReadFieldError
@@ -945,6 +959,20 @@ func (p *GetCommentListRequest) FastReadField1(buf []byte) (int, error) {
 func (p *GetCommentListRequest) FastReadField2(buf []byte) (int, error) {
 	offset := 0
 
+	var _field *string
+	if v, l, err := thrift.Binary.ReadString(buf[offset:]); err != nil {
+		return offset, err
+	} else {
+		offset += l
+		_field = &v
+	}
+	p.ParentId = _field
+	return offset, nil
+}
+
+func (p *GetCommentListRequest) FastReadField3(buf []byte) (int, error) {
+	offset := 0
+
 	var _field int32
 	if v, l, err := thrift.Binary.ReadI32(buf[offset:]); err != nil {
 		return offset, err
@@ -956,7 +984,7 @@ func (p *GetCommentListRequest) FastReadField2(buf []byte) (int, error) {
 	return offset, nil
 }
 
-func (p *GetCommentListRequest) FastReadField3(buf []byte) (int, error) {
+func (p *GetCommentListRequest) FastReadField4(buf []byte) (int, error) {
 	offset := 0
 
 	var _field int32
@@ -977,9 +1005,10 @@ func (p *GetCommentListRequest) FastWrite(buf []byte) int {
 func (p *GetCommentListRequest) FastWriteNocopy(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	if p != nil {
-		offset += p.fastWriteField2(buf[offset:], w)
 		offset += p.fastWriteField3(buf[offset:], w)
+		offset += p.fastWriteField4(buf[offset:], w)
 		offset += p.fastWriteField1(buf[offset:], w)
+		offset += p.fastWriteField2(buf[offset:], w)
 	}
 	offset += thrift.Binary.WriteFieldStop(buf[offset:])
 	return offset
@@ -991,6 +1020,7 @@ func (p *GetCommentListRequest) BLength() int {
 		l += p.field1Length()
 		l += p.field2Length()
 		l += p.field3Length()
+		l += p.field4Length()
 	}
 	l += thrift.Binary.FieldStopLength()
 	return l
@@ -1005,14 +1035,23 @@ func (p *GetCommentListRequest) fastWriteField1(buf []byte, w thrift.NocopyWrite
 
 func (p *GetCommentListRequest) fastWriteField2(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
-	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 2)
-	offset += thrift.Binary.WriteI32(buf[offset:], p.Page)
+	if p.IsSetParentId() {
+		offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.STRING, 2)
+		offset += thrift.Binary.WriteStringNocopy(buf[offset:], w, *p.ParentId)
+	}
 	return offset
 }
 
 func (p *GetCommentListRequest) fastWriteField3(buf []byte, w thrift.NocopyWriter) int {
 	offset := 0
 	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 3)
+	offset += thrift.Binary.WriteI32(buf[offset:], p.Page)
+	return offset
+}
+
+func (p *GetCommentListRequest) fastWriteField4(buf []byte, w thrift.NocopyWriter) int {
+	offset := 0
+	offset += thrift.Binary.WriteFieldBegin(buf[offset:], thrift.I32, 4)
 	offset += thrift.Binary.WriteI32(buf[offset:], p.PageSize)
 	return offset
 }
@@ -1026,12 +1065,21 @@ func (p *GetCommentListRequest) field1Length() int {
 
 func (p *GetCommentListRequest) field2Length() int {
 	l := 0
+	if p.IsSetParentId() {
+		l += thrift.Binary.FieldBeginLength()
+		l += thrift.Binary.StringLengthNocopy(*p.ParentId)
+	}
+	return l
+}
+
+func (p *GetCommentListRequest) field3Length() int {
+	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I32Length()
 	return l
 }
 
-func (p *GetCommentListRequest) field3Length() int {
+func (p *GetCommentListRequest) field4Length() int {
 	l := 0
 	l += thrift.Binary.FieldBeginLength()
 	l += thrift.Binary.I32Length()

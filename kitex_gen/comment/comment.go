@@ -1248,9 +1248,10 @@ func (p *CreateCommentResponse) Field3DeepEqual(src *Comment) bool {
 }
 
 type GetCommentListRequest struct {
-	PostId   string `thrift:"post_id,1" frugal:"1,default,string" json:"post_id"`
-	Page     int32  `thrift:"page,2" frugal:"2,default,i32" json:"page"`
-	PageSize int32  `thrift:"page_size,3" frugal:"3,default,i32" json:"page_size"`
+	PostId   string  `thrift:"post_id,1" frugal:"1,default,string" json:"post_id"`
+	ParentId *string `thrift:"parent_id,2,optional" frugal:"2,optional,string" json:"parent_id,omitempty"`
+	Page     int32   `thrift:"page,3" frugal:"3,default,i32" json:"page"`
+	PageSize int32   `thrift:"page_size,4" frugal:"4,default,i32" json:"page_size"`
 }
 
 func NewGetCommentListRequest() *GetCommentListRequest {
@@ -1264,6 +1265,15 @@ func (p *GetCommentListRequest) GetPostId() (v string) {
 	return p.PostId
 }
 
+var GetCommentListRequest_ParentId_DEFAULT string
+
+func (p *GetCommentListRequest) GetParentId() (v string) {
+	if !p.IsSetParentId() {
+		return GetCommentListRequest_ParentId_DEFAULT
+	}
+	return *p.ParentId
+}
+
 func (p *GetCommentListRequest) GetPage() (v int32) {
 	return p.Page
 }
@@ -1274,6 +1284,9 @@ func (p *GetCommentListRequest) GetPageSize() (v int32) {
 func (p *GetCommentListRequest) SetPostId(val string) {
 	p.PostId = val
 }
+func (p *GetCommentListRequest) SetParentId(val *string) {
+	p.ParentId = val
+}
 func (p *GetCommentListRequest) SetPage(val int32) {
 	p.Page = val
 }
@@ -1283,8 +1296,13 @@ func (p *GetCommentListRequest) SetPageSize(val int32) {
 
 var fieldIDToName_GetCommentListRequest = map[int16]string{
 	1: "post_id",
-	2: "page",
-	3: "page_size",
+	2: "parent_id",
+	3: "page",
+	4: "page_size",
+}
+
+func (p *GetCommentListRequest) IsSetParentId() bool {
+	return p.ParentId != nil
 }
 
 func (p *GetCommentListRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -1315,7 +1333,7 @@ func (p *GetCommentListRequest) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 2:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField2(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1325,6 +1343,14 @@ func (p *GetCommentListRequest) Read(iprot thrift.TProtocol) (err error) {
 		case 3:
 			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 4:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField4(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -1372,6 +1398,17 @@ func (p *GetCommentListRequest) ReadField1(iprot thrift.TProtocol) error {
 }
 func (p *GetCommentListRequest) ReadField2(iprot thrift.TProtocol) error {
 
+	var _field *string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.ParentId = _field
+	return nil
+}
+func (p *GetCommentListRequest) ReadField3(iprot thrift.TProtocol) error {
+
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
 		return err
@@ -1381,7 +1418,7 @@ func (p *GetCommentListRequest) ReadField2(iprot thrift.TProtocol) error {
 	p.Page = _field
 	return nil
 }
-func (p *GetCommentListRequest) ReadField3(iprot thrift.TProtocol) error {
+func (p *GetCommentListRequest) ReadField4(iprot thrift.TProtocol) error {
 
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1410,6 +1447,10 @@ func (p *GetCommentListRequest) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField3(oprot); err != nil {
 			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
 			goto WriteFieldError
 		}
 	}
@@ -1448,7 +1489,26 @@ WriteFieldEndError:
 }
 
 func (p *GetCommentListRequest) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page", thrift.I32, 2); err != nil {
+	if p.IsSetParentId() {
+		if err = oprot.WriteFieldBegin("parent_id", thrift.STRING, 2); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.ParentId); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+}
+
+func (p *GetCommentListRequest) writeField3(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("page", thrift.I32, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.Page); err != nil {
@@ -1459,13 +1519,13 @@ func (p *GetCommentListRequest) writeField2(oprot thrift.TProtocol) (err error) 
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 2 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
-func (p *GetCommentListRequest) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 3); err != nil {
+func (p *GetCommentListRequest) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("page_size", thrift.I32, 4); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteI32(p.PageSize); err != nil {
@@ -1476,9 +1536,9 @@ func (p *GetCommentListRequest) writeField3(oprot thrift.TProtocol) (err error) 
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
 func (p *GetCommentListRequest) String() string {
@@ -1498,10 +1558,13 @@ func (p *GetCommentListRequest) DeepEqual(ano *GetCommentListRequest) bool {
 	if !p.Field1DeepEqual(ano.PostId) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.Page) {
+	if !p.Field2DeepEqual(ano.ParentId) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.PageSize) {
+	if !p.Field3DeepEqual(ano.Page) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.PageSize) {
 		return false
 	}
 	return true
@@ -1514,14 +1577,26 @@ func (p *GetCommentListRequest) Field1DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *GetCommentListRequest) Field2DeepEqual(src int32) bool {
+func (p *GetCommentListRequest) Field2DeepEqual(src *string) bool {
+
+	if p.ParentId == src {
+		return true
+	} else if p.ParentId == nil || src == nil {
+		return false
+	}
+	if strings.Compare(*p.ParentId, *src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *GetCommentListRequest) Field3DeepEqual(src int32) bool {
 
 	if p.Page != src {
 		return false
 	}
 	return true
 }
-func (p *GetCommentListRequest) Field3DeepEqual(src int32) bool {
+func (p *GetCommentListRequest) Field4DeepEqual(src int32) bool {
 
 	if p.PageSize != src {
 		return false
