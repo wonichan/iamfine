@@ -1,0 +1,18 @@
+[36mINFO[0m[2025-06-12 00:32:51] log/logger.go:57 Logger initialized successfully              
+[31mERRO[0m[2025-06-12 00:32:51] user/main.go:29 Failed to init database: dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it. 
+[36mINFO[0m[2025-06-12 00:32:51] user/main.go:51 User service starting...                     
+[36mINFO[0m[2025-06-12 00:33:33] handler/user.go:32 Register start                                [36mtrace_id[0m=
+[36mINFO[0m[2025-06-12 00:36:35] log/logger.go:57 Logger initialized successfully              
+[31mERRO[0m[2025-06-12 00:36:35] user/main.go:29 Failed to init database: dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it. 
+[36mINFO[0m[2025-06-12 00:36:35] user/main.go:51 User service starting...                     
+[36mINFO[0m[2025-06-12 00:37:07] handler/user.go:33 Register start                                [36mtrace_id[0m=
+[36mINFO[0m[2025-06-12 00:37:53] handler/user.go:35                                               [36mtrace_id[0m=
+[36mINFO[0m[2025-06-12 00:45:12] log/logger.go:57 Logger initialized successfully              
+[31mERRO[0m[2025-06-12 00:45:12] user/main.go:29 Failed to init database: dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it. 
+[36mINFO[0m[2025-06-12 00:45:12] user/main.go:51 User service starting...                     
+[36mINFO[0m[2025-06-12 00:45:28] handler/user.go:33 Register start                                [36mtrace_id[0m=user-d14r57t5nhg5gc3ejp9g
+[36mINFO[0m[2025-06-12 00:45:36] handler/user.go:35 user-d14r57t5nhg5gc3ejp9g                     [36mtrace_id[0m=user-d14r57t5nhg5gc3ejp9g
+[36mINFO[0m[2025-06-12 00:47:23] log/logger.go:57 Logger initialized successfully              
+[31mERRO[0m[2025-06-12 00:47:23] user/main.go:29 Failed to init database: dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it. 
+[36mINFO[0m[2025-06-12 00:47:23] user/main.go:51 User service starting...                     
+[36mINFO[0m[2025-06-12 00:47:31] handler/user.go:32 Register start                                [36mtrace_id[0m=gateway-d14r68t5nhg4v62uc7og

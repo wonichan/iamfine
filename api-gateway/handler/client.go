@@ -6,6 +6,7 @@ import (
 	"github.com/cloudwego/kitex/client"
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/transmeta"
+	"github.com/cloudwego/kitex/transport"
 
 	"hupu/kitex_gen/comment/commentservice"
 	"hupu/kitex_gen/follow/followservice"
@@ -14,7 +15,6 @@ import (
 	"hupu/kitex_gen/post/postservice"
 	"hupu/kitex_gen/user/userservice"
 	"hupu/shared/config"
-	"hupu/shared/middleware"
 	"hupu/shared/utils"
 )
 
@@ -41,8 +41,8 @@ func WithCommonOption(clientName string) []client.Option {
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: clientName}),
 		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
 		client.WithTracer(utils.NewKitexClientTracer()),
+		client.WithTransportProtocol(transport.TTHeader),
 		client.WithRPCTimeout(time.Minute),
-		client.WithMiddleware(middleware.WithTraceIdMiddleWare()),
 	}
 }
 

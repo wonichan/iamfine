@@ -3,13 +3,16 @@ package handler
 import (
 	"context"
 	"fmt"
-	"hupu/kitex_gen/user"
-	"hupu/services/user/repository"
-	"hupu/shared/models"
-	"hupu/shared/utils"
 
 	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
+
+	"hupu/kitex_gen/user"
+	"hupu/services/user/repository"
+	"hupu/shared/constants"
+	"hupu/shared/log"
+	"hupu/shared/models"
+	"hupu/shared/utils"
 )
 
 type UserHandler struct {
@@ -25,6 +28,8 @@ func NewUserHandler(db *gorm.DB, rdb *redis.Client) *UserHandler {
 }
 
 func (h *UserHandler) Register(ctx context.Context, req *user.RegisterRequest) (*user.RegisterResponse, error) {
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Info("Register start")
 	userModel := &models.User{
 		Username: req.Username,
 		Password: req.Password,
@@ -38,7 +43,7 @@ func (h *UserHandler) Register(ctx context.Context, req *user.RegisterRequest) (
 			Message: fmt.Sprintf("failed to create user, err:%s", err.Error()),
 		}, nil
 	}
-
+	logger.Infof("Register success, user:%+v", savedUser)
 	return &user.RegisterResponse{
 		Code:    200,
 		Message: "注册成功",

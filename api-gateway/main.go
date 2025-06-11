@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"hupu/api-gateway/middleware"
 	"hupu/api-gateway/router"
 	"hupu/shared/config"
 	"hupu/shared/log"
@@ -25,7 +26,9 @@ func main() {
 		server.WithWriteTimeout(60*time.Second),
 	)
 	h.Use(
-		accesslog.New(accesslog.WithFormat("[${time}] ${status} - ${latency} ${method} ${path} ${queryParams}")))
+		accesslog.New(accesslog.WithFormat("[${time}] ${status} - ${latency} ${method} ${path} ${queryParams}")),
+		middleware.TraceIdMiddleware(),
+	)
 	// 注册路由
 	router.RegisterRoutes(h)
 	h.Engine.OnRun = append(h.Engine.OnRun, beginStart)

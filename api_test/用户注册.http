@@ -1,0 +1,22 @@
+@host = http://127.0.0.1:8080
+
+POST {{host}}/api/v1/user/register
+Content-Type: application/json
+
+{
+  "username": "testuser1",
+  "password": "123456",
+  "phone": "15023421665",
+  "code": "1234"
+}
+
+
+
+
+POST {{host}}/api/v1/user/login
+Content-Type: application/json
+
+{
+  "username": "testuser1",
+  "password": "123456"
+}

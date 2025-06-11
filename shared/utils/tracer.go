@@ -9,6 +9,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/pkg/stats"
 
+	"hupu/shared/constants"
 	"hupu/shared/log"
 )
 
@@ -27,7 +28,7 @@ func (t *KitexClientTracer) Start(ctx context.Context) context.Context {
 
 func (t *KitexClientTracer) Finish(ctx context.Context) {
 	// 获取traceID
-	traceID, ok := metainfo.GetPersistentValue(ctx, "trace_id")
+	traceID, ok := metainfo.GetPersistentValue(ctx, constants.TraceIdKey)
 	if traceID == "" || !ok {
 		klog.Warnf("trace_id not found in context")
 		return
@@ -54,7 +55,7 @@ func (t *KitexClientTracer) Finish(ctx context.Context) {
 
 	// 记录请求信息
 	logMsg := fmt.Sprintf(
-		"[KitexClient] TraceID: %s, Service: %s, Method: %s, ReqSize: %d bytes, RespSize: %d bytes, Time: %v",
+		"TraceID: %s, Service: %s, Method: %s, ReqSize: %d bytes, RespSize: %d bytes, Time: %v",
 		traceID, service, method, reqSize, respSize, cost,
 	)
 

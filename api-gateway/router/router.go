@@ -11,6 +11,7 @@ import (
 )
 
 func RegisterRoutes(h *server.Hertz) {
+	handler.Init()
 	// 健康检查
 	h.GET("/health", func(ctx context.Context, c *app.RequestContext) {
 		c.JSON(200, map[string]interface{}{

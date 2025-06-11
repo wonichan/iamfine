@@ -2,16 +2,21 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 
+	"github.com/bytedance/gopkg/cloud/metainfo"
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/kitex_gen/user"
+	"hupu/shared/constants"
 	"hupu/shared/log"
 )
 
 // 用户注册
 func Register(ctx context.Context, c *app.RequestContext) {
+	logger.Info("Register start")
 	// 解析请求参数
 	var req user.RegisterRequest
 	if err := c.BindAndValidate(&req); err != nil {
@@ -32,7 +37,7 @@ func Register(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-
+	logger.Infof("Register success, resp:%+v", resp)
 	c.JSON(http.StatusOK, resp)
 }
 
@@ -47,9 +52,9 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		})
 		return
 	}
-
+	newCtx := metainfo.WithPersistentValue(ctx, constants.TraceIdKey, fmt.Sprintf("user-%s", ctx.Value(constants.TraceIdKey)))
 	// 调用用户服务
-	resp, err := userClient.Login(ctx, &req)
+	resp, err := userClient.Login(newCtx, &req)
 	if err != nil {
 		log.GetLogger().Errorf("Login error: %v", err)
 		c.JSON(http.StatusInternalServerError, map[string]interface{}{
