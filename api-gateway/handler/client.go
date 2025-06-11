@@ -14,6 +14,7 @@ import (
 	"hupu/kitex_gen/post/postservice"
 	"hupu/kitex_gen/user/userservice"
 	"hupu/shared/config"
+	"hupu/shared/middleware"
 	"hupu/shared/utils"
 )
 
@@ -40,8 +41,8 @@ func WithCommonOption(clientName string) []client.Option {
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: clientName}),
 		client.WithMetaHandler(transmeta.ClientTTHeaderHandler),
 		client.WithTracer(utils.NewKitexClientTracer()),
-		client.WithShortConnection(),
 		client.WithRPCTimeout(time.Minute),
+		client.WithMiddleware(middleware.WithTraceIdMiddleWare()),
 	}
 }
 

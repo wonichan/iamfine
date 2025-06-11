@@ -26,7 +26,7 @@ oss:
   bucket_name: "hupu-bucket"
 
 jwt:
-  secret: "hupu_jwt_secret_key"
+  secret: "imouto"
   expire: 86400
 
 services:
