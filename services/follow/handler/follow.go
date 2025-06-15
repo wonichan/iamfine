@@ -115,3 +115,85 @@ func (h *FollowHandler) GetFollowerList(ctx context.Context, req *follow.GetFoll
 		Followers: followerList,
 	}, nil
 }
+
+// GetFollowCount 获取关注数量
+func (h *FollowHandler) GetFollowCount(ctx context.Context, req *follow.GetFollowCountRequest) (*follow.GetFollowCountResponse, error) {
+	count, err := h.rdb.GetFollowCount(ctx, req.UserId)
+	if err != nil {
+		return &follow.GetFollowCountResponse{
+			Code:    500,
+			Message: "查询关注数量失败",
+		}, err
+	}
+
+	return &follow.GetFollowCountResponse{
+		Code:    0,
+		Message: "查询成功",
+		Count:   int32(count),
+	}, nil
+}
+
+// GetFollowerCount 获取粉丝数量
+func (h *FollowHandler) GetFollowerCount(ctx context.Context, req *follow.GetFollowerCountRequest) (*follow.GetFollowerCountResponse, error) {
+	count, err := h.rdb.GetFollowerCount(ctx, req.UserId)
+	if err != nil {
+		return &follow.GetFollowerCountResponse{
+			Code:    500,
+			Message: "查询粉丝数量失败",
+		}, err
+	}
+
+	return &follow.GetFollowerCountResponse{
+		Code:    0,
+		Message: "查询成功",
+		Count:   int32(count),
+	}, nil
+}
+
+// GetMutualFollows 获取共同关注
+func (h *FollowHandler) GetMutualFollows(ctx context.Context, req *follow.GetMutualFollowsRequest) (*follow.GetMutualFollowsResponse, error) {
+	userIds, err := h.rdb.GetMutualFollows(ctx, req.UserId, req.TargetUserId, req.Page, req.PageSize)
+	if err != nil {
+		return &follow.GetMutualFollowsResponse{
+			Code:    500,
+			Message: "查询共同关注失败",
+		}, err
+	}
+
+	return &follow.GetMutualFollowsResponse{
+		Code:    0,
+		Message: "查询成功",
+		UserIds: userIds,
+	}, nil
+}
+
+// CheckFollowStatus 检查关注状态
+func (h *FollowHandler) CheckFollowStatus(ctx context.Context, req *follow.CheckFollowStatusRequest) (*follow.CheckFollowStatusResponse, error) {
+	// 检查是否关注
+	isFollowing, err := h.rdb.IsFollowing(ctx, req.FollowerId, req.FollowingId)
+	if err != nil {
+		return &follow.CheckFollowStatusResponse{
+			Code:    500,
+			Message: "查询关注状态失败",
+		}, err
+	}
+
+	// 如果已关注，检查是否互相关注
+	var isMutual bool
+	if isFollowing {
+		isMutual, err = h.rdb.IsFollowing(ctx, req.FollowingId, req.FollowerId)
+		if err != nil {
+			return &follow.CheckFollowStatusResponse{
+				Code:    500,
+				Message: "查询互关状态失败",
+			}, err
+		}
+	}
+
+	return &follow.CheckFollowStatusResponse{
+		Code:        0,
+		Message:     "查询成功",
+		IsFollowing: isFollowing,
+		IsMutual:    isMutual,
+	}, nil
+}

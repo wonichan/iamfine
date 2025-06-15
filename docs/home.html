@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tdesign-icons@0.2.4/lib/index.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #7C83FD;
+            --primary-light: #FF8A8A;
+            --bg-color: #FEFBF6;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .carousel-container {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .carousel-slide {
+            display: none;
+        }
+        
+        .carousel-slide.active {
+            display: block;
+        }
+        
+        .tab-indicator {
+            transition: all 0.3s ease;
+        }
+        
+        .post-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .post-card:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <!-- 状态栏 -->
+    <div class="bg-white px-4 py-2 flex justify-between items-center text-sm">
+        <span class="font-medium">9:41</span>
+        <div class="flex items-center space-x-1">
+            <div class="w-4 h-2 bg-green-500 rounded-sm"></div>
+            <div class="w-4 h-2 bg-green-500 rounded-sm"></div>
+            <div class="w-6 h-3 border border-gray-400 rounded-sm">
+                <div class="w-4 h-full bg-green-500 rounded-sm"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 顶部导航 -->
+    <div class="bg-white px-4 py-3 border-b border-gray-100">
+        <div class="flex space-x-6 overflow-x-auto">
+            <div class="flex flex-col items-center min-w-max">
+                <span class="text-base font-bold text-purple-600">推荐</span>
+                <div class="w-6 h-1 bg-purple-600 rounded-full mt-1"></div>
+            </div>
+            <div class="flex flex-col items-center min-w-max">
+                <span class="text-base text-gray-600">热议</span>
+            </div>
+            <div class="flex flex-col items-center min-w-max">
+                <span class="text-base text-gray-600">日常分享</span>
+            </div>
+            <div class="flex flex-col items-center min-w-max">
+                <span class="text-base text-gray-600">情感求助</span>
+            </div>
+            <div class="flex flex-col items-center min-w-max">
+                <span class="text-base text-gray-600">今日最高分</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="flex-1 overflow-y-auto">
+        <!-- 轮播区 -->
+        <div class="carousel-container bg-white mx-4 mt-4 rounded-2xl overflow-hidden">
+            <div class="carousel-slide active">
+                <div class="h-40 bg-gradient-to-r from-pink-400 to-purple-500 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <h3 class="text-lg font-bold mb-2">今天你被暖到了吗？</h3>
+                        <p class="text-sm opacity-90">分享生活中的温暖瞬间</p>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-slide">
+                <div class="h-40 bg-gradient-to-r from-blue-400 to-indigo-500 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <h3 class="text-lg font-bold mb-2">奇葩前任大赏</h3>
+                        <p class="text-sm opacity-90">那些年遇到的奇葩前任</p>
+                    </div>
+                </div>
+            </div>
+            <!-- 轮播指示器 -->
+            <div class="flex justify-center py-3 space-x-2">
+                <div class="w-2 h-2 bg-purple-600 rounded-full"></div>
+                <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+                <div class="w-2 h-2 bg-gray-300 rounded-full"></div>
+            </div>
+        </div>
+        
+        <!-- 帖子信息流 -->
+        <div class="px-4 py-4 space-y-4">
+            <!-- 帖子卡片1 -->
+            <div class="post-card bg-white rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-bold">匿</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div class="font-medium text-gray-800">匿名用户_7892</div>
+                        <div class="text-xs text-gray-500">2小时前</div>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 mb-2">男朋友总是玩游戏不理我，我该怎么办？</h3>
+                <p class="text-gray-600 text-sm leading-relaxed mb-3">
+                    和男朋友在一起快两年了，最近他迷上了一款新游戏，每天回家就是打游戏，连吃饭都要我叫好几遍。我想和他聊天他也是敷衍，感觉我们之间越来越疏远了...
+                </p>
+                
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <div class="flex items-center space-x-4">
+                        <span class="flex items-center">
+                            <span class="text-yellow-500 mr-1">⭐</span>
+                            平均分：6.8
+                        </span>
+                        <span class="flex items-center">
+                            <span class="mr-1">💬</span>
+                            156评论
+                        </span>
+                        <span class="flex items-center">
+                            <span class="mr-1">❤️</span>
+                            收藏
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 帖子卡片2 -->
+            <div class="post-card bg-white rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-bold">小</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div class="font-medium text-gray-800">小甜甜</div>
+                        <div class="text-xs text-gray-500">5小时前</div>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 mb-2">今天收到了男朋友的惊喜礼物！</h3>
+                <p class="text-gray-600 text-sm leading-relaxed mb-3">
+                    今天是我们在一起的100天纪念日，本来以为他忘记了，结果下班回家发现桌上放着一束玫瑰花和一个小礼盒，里面是我一直想要的项链！感动哭了😭
+                </p>
+                
+                <!-- 图片网格 -->
+                <div class="grid grid-cols-3 gap-2 mb-3">
+                    <div class="aspect-square bg-pink-100 rounded-lg flex items-center justify-center">
+                        <span class="text-pink-400 text-2xl">🌹</span>
+                    </div>
+                    <div class="aspect-square bg-purple-100 rounded-lg flex items-center justify-center">
+                        <span class="text-purple-400 text-2xl">💝</span>
+                    </div>
+                    <div class="aspect-square bg-yellow-100 rounded-lg flex items-center justify-center">
+                        <span class="text-yellow-400 text-2xl">💍</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <div class="flex items-center space-x-4">
+                        <span class="flex items-center">
+                            <span class="text-yellow-500 mr-1">⭐</span>
+                            平均分：9.2
+                        </span>
+                        <span class="flex items-center">
+                            <span class="mr-1">💬</span>
+                            89评论
+                        </span>
+                        <span class="flex items-center">
+                            <span class="mr-1">❤️</span>
+                            收藏
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 帖子卡片3 -->
+            <div class="post-card bg-white rounded-2xl p-4 shadow-sm">
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-bold">匿</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div class="font-medium text-gray-800">匿名用户_3456</div>
+                        <div class="text-xs text-gray-500">8小时前</div>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 mb-2">婆婆总是挑剔我做的饭，心累...</h3>
+                <p class="text-gray-600 text-sm leading-relaxed mb-3">
+                    结婚半年了，和老公婆婆住在一起。每次我做饭婆婆都要挑毛病，不是说咸了就是说淡了，有时候还会重新做一遍。老公也不帮我说话，我真的很委屈...
+                </p>
+                
+                <div class="flex items-center justify-between text-sm text-gray-500">
+                    <div class="flex items-center space-x-4">
+                        <span class="flex items-center">
+                            <span class="text-yellow-500 mr-1">⭐</span>
+                            平均分：4.3
+                        </span>
+                        <span class="flex items-center">
+                            <span class="mr-1">💬</span>
+                            234评论
+                        </span>
+                        <span class="flex items-center">
+                            <span class="mr-1">❤️</span>
+                            收藏
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bg-white border-t border-gray-100 px-4 py-2">
+        <div class="flex justify-around items-center">
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-purple-600 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-white text-xs">🏠</span>
+                </div>
+                <span class="text-xs text-purple-600 font-medium">首页</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">🏛️</span>
+                </div>
+                <span class="text-xs text-gray-500">广场</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">⭐</span>
+                </div>
+                <span class="text-xs text-gray-500">打分墙</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">👤</span>
+                </div>
+                <span class="text-xs text-gray-500">我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

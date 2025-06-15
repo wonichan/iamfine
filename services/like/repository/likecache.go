@@ -46,6 +46,12 @@ func (lr *likeRedisRepo) Like(ctx context.Context, userID, targetID, targetType 
 		return err
 	}
 
+	// 更新点赞用户列表
+	err = lr.addUserToLikeList(ctx, userID, targetID, targetType)
+	if err != nil {
+		return err
+	}
+
 	// 更新目标对象的点赞数
 	return lr.updateLikeCount(ctx, targetID, targetType, 1)
 }
@@ -59,6 +65,12 @@ func (lr *likeRedisRepo) Unlike(ctx context.Context, userID, targetID, targetTyp
 	pipe.Del(ctx, likeKey)
 	pipe.LRem(ctx, likeListKey, 0, fmt.Sprintf("%s:%s", targetID, targetType))
 	_, err := pipe.Exec(ctx)
+	if err != nil {
+		return err
+	}
+
+	// 从点赞用户列表中移除用户
+	err = lr.removeUserFromLikeList(ctx, userID, targetID, targetType)
 	if err != nil {
 		return err
 	}
@@ -126,6 +138,63 @@ func (lr *likeRedisRepo) saveLike(ctx context.Context, like *models.Like) error 
 	pipe.Expire(ctx, likeListKey, 24*time.Hour)
 	_, err = pipe.Exec(ctx)
 
+	return err
+}
+
+func (lr *likeRedisRepo) GetLikeCount(ctx context.Context, targetID, targetType string) (int64, error) {
+	var countKey string
+	if targetType == "post" {
+		countKey = fmt.Sprintf("post:like_count:%s", targetID)
+	} else if targetType == "comment" {
+		countKey = fmt.Sprintf("comment:like_count:%s", targetID)
+	} else {
+		return 0, fmt.Errorf("不支持的目标类型: %s", targetType)
+	}
+
+	count, err := lr.rdb.Get(ctx, countKey).Int64()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return count, nil
+}
+
+func (lr *likeRedisRepo) GetLikeUsers(ctx context.Context, targetID, targetType string, page, pageSize int32) ([]string, error) {
+	// 构建点赞用户列表键
+	likeUsersKey := fmt.Sprintf("like:users:%s:%s", targetID, targetType)
+
+	// 分页获取点赞用户列表
+	start := (page - 1) * pageSize
+	end := start + pageSize - 1
+	userIDs, err := lr.rdb.LRange(ctx, likeUsersKey, int64(start), int64(end)).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return []string{}, nil
+		}
+		return nil, err
+	}
+
+	return userIDs, nil
+}
+
+// 辅助方法：添加用户到点赞列表
+func (lr *likeRedisRepo) addUserToLikeList(ctx context.Context, userID, targetID, targetType string) error {
+	likeUsersKey := fmt.Sprintf("like:users:%s:%s", targetID, targetType)
+	_, err := lr.rdb.LPush(ctx, likeUsersKey, userID).Result()
+	if err != nil {
+		return err
+	}
+	// 设置过期时间
+	lr.rdb.Expire(ctx, likeUsersKey, 24*time.Hour)
+	return nil
+}
+
+// 辅助方法：从点赞列表中移除用户
+func (lr *likeRedisRepo) removeUserFromLikeList(ctx context.Context, userID, targetID, targetType string) error {
+	likeUsersKey := fmt.Sprintf("like:users:%s:%s", targetID, targetType)
+	_, err := lr.rdb.LRem(ctx, likeUsersKey, 0, userID).Result()
 	return err
 }
 

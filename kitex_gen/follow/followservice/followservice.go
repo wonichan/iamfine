@@ -48,6 +48,34 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"CheckFollowStatus": kitex.NewMethodInfo(
+		checkFollowStatusHandler,
+		newFollowServiceCheckFollowStatusArgs,
+		newFollowServiceCheckFollowStatusResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetFollowCount": kitex.NewMethodInfo(
+		getFollowCountHandler,
+		newFollowServiceGetFollowCountArgs,
+		newFollowServiceGetFollowCountResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetFollowerCount": kitex.NewMethodInfo(
+		getFollowerCountHandler,
+		newFollowServiceGetFollowerCountArgs,
+		newFollowServiceGetFollowerCountResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetMutualFollows": kitex.NewMethodInfo(
+		getMutualFollowsHandler,
+		newFollowServiceGetMutualFollowsArgs,
+		newFollowServiceGetMutualFollowsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -204,6 +232,78 @@ func newFollowServiceGetFollowerListResult() interface{} {
 	return follow.NewFollowServiceGetFollowerListResult()
 }
 
+func checkFollowStatusHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*follow.FollowServiceCheckFollowStatusArgs)
+	realResult := result.(*follow.FollowServiceCheckFollowStatusResult)
+	success, err := handler.(follow.FollowService).CheckFollowStatus(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newFollowServiceCheckFollowStatusArgs() interface{} {
+	return follow.NewFollowServiceCheckFollowStatusArgs()
+}
+
+func newFollowServiceCheckFollowStatusResult() interface{} {
+	return follow.NewFollowServiceCheckFollowStatusResult()
+}
+
+func getFollowCountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*follow.FollowServiceGetFollowCountArgs)
+	realResult := result.(*follow.FollowServiceGetFollowCountResult)
+	success, err := handler.(follow.FollowService).GetFollowCount(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newFollowServiceGetFollowCountArgs() interface{} {
+	return follow.NewFollowServiceGetFollowCountArgs()
+}
+
+func newFollowServiceGetFollowCountResult() interface{} {
+	return follow.NewFollowServiceGetFollowCountResult()
+}
+
+func getFollowerCountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*follow.FollowServiceGetFollowerCountArgs)
+	realResult := result.(*follow.FollowServiceGetFollowerCountResult)
+	success, err := handler.(follow.FollowService).GetFollowerCount(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newFollowServiceGetFollowerCountArgs() interface{} {
+	return follow.NewFollowServiceGetFollowerCountArgs()
+}
+
+func newFollowServiceGetFollowerCountResult() interface{} {
+	return follow.NewFollowServiceGetFollowerCountResult()
+}
+
+func getMutualFollowsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*follow.FollowServiceGetMutualFollowsArgs)
+	realResult := result.(*follow.FollowServiceGetMutualFollowsResult)
+	success, err := handler.(follow.FollowService).GetMutualFollows(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newFollowServiceGetMutualFollowsArgs() interface{} {
+	return follow.NewFollowServiceGetMutualFollowsArgs()
+}
+
+func newFollowServiceGetMutualFollowsResult() interface{} {
+	return follow.NewFollowServiceGetMutualFollowsResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -259,6 +359,46 @@ func (p *kClient) GetFollowerList(ctx context.Context, req *follow.GetFollowerLi
 	_args.Req = req
 	var _result follow.FollowServiceGetFollowerListResult
 	if err = p.c.Call(ctx, "GetFollowerList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CheckFollowStatus(ctx context.Context, req *follow.CheckFollowStatusRequest) (r *follow.CheckFollowStatusResponse, err error) {
+	var _args follow.FollowServiceCheckFollowStatusArgs
+	_args.Req = req
+	var _result follow.FollowServiceCheckFollowStatusResult
+	if err = p.c.Call(ctx, "CheckFollowStatus", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetFollowCount(ctx context.Context, req *follow.GetFollowCountRequest) (r *follow.GetFollowCountResponse, err error) {
+	var _args follow.FollowServiceGetFollowCountArgs
+	_args.Req = req
+	var _result follow.FollowServiceGetFollowCountResult
+	if err = p.c.Call(ctx, "GetFollowCount", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetFollowerCount(ctx context.Context, req *follow.GetFollowerCountRequest) (r *follow.GetFollowerCountResponse, err error) {
+	var _args follow.FollowServiceGetFollowerCountArgs
+	_args.Req = req
+	var _result follow.FollowServiceGetFollowerCountResult
+	if err = p.c.Call(ctx, "GetFollowerCount", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetMutualFollows(ctx context.Context, req *follow.GetMutualFollowsRequest) (r *follow.GetMutualFollowsResponse, err error) {
+	var _args follow.FollowServiceGetMutualFollowsArgs
+	_args.Req = req
+	var _result follow.FollowServiceGetMutualFollowsResult
+	if err = p.c.Call(ctx, "GetMutualFollows", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

@@ -119,6 +119,80 @@ func (fr *followRedisRepo) GetFollowerList(ctx context.Context, userID string, p
 	return followers, nil
 }
 
+func (fr *followRedisRepo) GetFollowCount(ctx context.Context, userID string) (int64, error) {
+	followingListKey := fmt.Sprintf("follow:list:%s", userID)
+	count, err := fr.rdb.LLen(ctx, followingListKey).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return count, nil
+}
+
+func (fr *followRedisRepo) GetFollowerCount(ctx context.Context, userID string) (int64, error) {
+	followerListKey := fmt.Sprintf("follower:list:%s", userID)
+	count, err := fr.rdb.LLen(ctx, followerListKey).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return count, nil
+}
+
+func (fr *followRedisRepo) GetMutualFollows(ctx context.Context, userID1, userID2 string, page, pageSize int32) ([]string, error) {
+	// 获取两个用户的关注列表
+	followingListKey1 := fmt.Sprintf("follow:list:%s", userID1)
+	followingListKey2 := fmt.Sprintf("follow:list:%s", userID2)
+
+	// 使用Redis的集合操作找交集
+	tempKey := fmt.Sprintf("temp:mutual:%s:%s", userID1, userID2)
+
+	// 将列表转换为集合并求交集
+	pipe := fr.rdb.Pipeline()
+	pipe.Del(ctx, tempKey)
+
+	// 获取用户1的关注列表
+	followingIDs1, err := fr.rdb.LRange(ctx, followingListKey1, 0, -1).Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		return nil, err
+	}
+
+	// 获取用户2的关注列表
+	followingIDs2, err := fr.rdb.LRange(ctx, followingListKey2, 0, -1).Result()
+	if err != nil && !errors.Is(err, redis.Nil) {
+		return nil, err
+	}
+
+	// 找出交集
+	followingSet2 := make(map[string]bool)
+	for _, id := range followingIDs2 {
+		followingSet2[id] = true
+	}
+
+	var mutualFollows []string
+	for _, id := range followingIDs1 {
+		if followingSet2[id] {
+			mutualFollows = append(mutualFollows, id)
+		}
+	}
+
+	// 分页处理
+	start := (page - 1) * pageSize
+	end := start + pageSize
+	if start >= int32(len(mutualFollows)) {
+		return []string{}, nil
+	}
+	if end > int32(len(mutualFollows)) {
+		end = int32(len(mutualFollows))
+	}
+
+	return mutualFollows[start:end], nil
+}
+
 // 辅助方法：保存关注关系到Redis
 func (fr *followRedisRepo) saveFollow(ctx context.Context, follow *models.Follow) error {
 	// 序列化关注数据

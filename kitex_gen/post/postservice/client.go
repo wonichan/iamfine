@@ -14,6 +14,13 @@ type Client interface {
 	CreatePost(ctx context.Context, req *post.CreatePostRequest, callOptions ...callopt.Option) (r *post.CreatePostResponse, err error)
 	GetPost(ctx context.Context, req *post.GetPostRequest, callOptions ...callopt.Option) (r *post.GetPostResponse, err error)
 	GetPostList(ctx context.Context, req *post.GetPostListRequest, callOptions ...callopt.Option) (r *post.GetPostListResponse, err error)
+	CreateTopic(ctx context.Context, req *post.CreateTopicRequest, callOptions ...callopt.Option) (r *post.CreateTopicResponse, err error)
+	GetTopicList(ctx context.Context, req *post.GetTopicListRequest, callOptions ...callopt.Option) (r *post.GetTopicListResponse, err error)
+	CollectPost(ctx context.Context, req *post.CollectPostRequest, callOptions ...callopt.Option) (r *post.CollectPostResponse, err error)
+	UncollectPost(ctx context.Context, req *post.UncollectPostRequest, callOptions ...callopt.Option) (r *post.UncollectPostResponse, err error)
+	GetCollectedPosts(ctx context.Context, req *post.GetCollectedPostsRequest, callOptions ...callopt.Option) (r *post.GetCollectedPostsResponse, err error)
+	RatePost(ctx context.Context, req *post.RatePostRequest, callOptions ...callopt.Option) (r *post.RatePostResponse, err error)
+	GetRatingRank(ctx context.Context, req *post.GetRatingRankRequest, callOptions ...callopt.Option) (r *post.GetRatingRankResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -58,4 +65,39 @@ func (p *kPostServiceClient) GetPost(ctx context.Context, req *post.GetPostReque
 func (p *kPostServiceClient) GetPostList(ctx context.Context, req *post.GetPostListRequest, callOptions ...callopt.Option) (r *post.GetPostListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetPostList(ctx, req)
+}
+
+func (p *kPostServiceClient) CreateTopic(ctx context.Context, req *post.CreateTopicRequest, callOptions ...callopt.Option) (r *post.CreateTopicResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.CreateTopic(ctx, req)
+}
+
+func (p *kPostServiceClient) GetTopicList(ctx context.Context, req *post.GetTopicListRequest, callOptions ...callopt.Option) (r *post.GetTopicListResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetTopicList(ctx, req)
+}
+
+func (p *kPostServiceClient) CollectPost(ctx context.Context, req *post.CollectPostRequest, callOptions ...callopt.Option) (r *post.CollectPostResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.CollectPost(ctx, req)
+}
+
+func (p *kPostServiceClient) UncollectPost(ctx context.Context, req *post.UncollectPostRequest, callOptions ...callopt.Option) (r *post.UncollectPostResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UncollectPost(ctx, req)
+}
+
+func (p *kPostServiceClient) GetCollectedPosts(ctx context.Context, req *post.GetCollectedPostsRequest, callOptions ...callopt.Option) (r *post.GetCollectedPostsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetCollectedPosts(ctx, req)
+}
+
+func (p *kPostServiceClient) RatePost(ctx context.Context, req *post.RatePostRequest, callOptions ...callopt.Option) (r *post.RatePostResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.RatePost(ctx, req)
+}
+
+func (p *kPostServiceClient) GetRatingRank(ctx context.Context, req *post.GetRatingRankRequest, callOptions ...callopt.Option) (r *post.GetRatingRankResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetRatingRank(ctx, req)
 }

@@ -13,6 +13,10 @@ import (
 type Client interface {
 	CreateNotification(ctx context.Context, req *notification.CreateNotificationRequest, callOptions ...callopt.Option) (r *notification.CreateNotificationResponse, err error)
 	GetNotificationList(ctx context.Context, req *notification.GetNotificationListRequest, callOptions ...callopt.Option) (r *notification.GetNotificationListResponse, err error)
+	MarkNotificationRead(ctx context.Context, req *notification.MarkNotificationReadRequest, callOptions ...callopt.Option) (r *notification.MarkNotificationReadResponse, err error)
+	MarkAllNotificationsRead(ctx context.Context, req *notification.MarkAllNotificationsReadRequest, callOptions ...callopt.Option) (r *notification.MarkAllNotificationsReadResponse, err error)
+	GetUnreadCount(ctx context.Context, req *notification.GetUnreadCountRequest, callOptions ...callopt.Option) (r *notification.GetUnreadCountResponse, err error)
+	DeleteNotification(ctx context.Context, req *notification.DeleteNotificationRequest, callOptions ...callopt.Option) (r *notification.DeleteNotificationResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -52,4 +56,24 @@ func (p *kNotificationServiceClient) CreateNotification(ctx context.Context, req
 func (p *kNotificationServiceClient) GetNotificationList(ctx context.Context, req *notification.GetNotificationListRequest, callOptions ...callopt.Option) (r *notification.GetNotificationListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetNotificationList(ctx, req)
+}
+
+func (p *kNotificationServiceClient) MarkNotificationRead(ctx context.Context, req *notification.MarkNotificationReadRequest, callOptions ...callopt.Option) (r *notification.MarkNotificationReadResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.MarkNotificationRead(ctx, req)
+}
+
+func (p *kNotificationServiceClient) MarkAllNotificationsRead(ctx context.Context, req *notification.MarkAllNotificationsReadRequest, callOptions ...callopt.Option) (r *notification.MarkAllNotificationsReadResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.MarkAllNotificationsRead(ctx, req)
+}
+
+func (p *kNotificationServiceClient) GetUnreadCount(ctx context.Context, req *notification.GetUnreadCountRequest, callOptions ...callopt.Option) (r *notification.GetUnreadCountResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetUnreadCount(ctx, req)
+}
+
+func (p *kNotificationServiceClient) DeleteNotification(ctx context.Context, req *notification.DeleteNotificationRequest, callOptions ...callopt.Option) (r *notification.DeleteNotificationResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeleteNotification(ctx, req)
 }

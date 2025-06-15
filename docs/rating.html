@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>打分墙</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tdesign-icons@0.2.4/lib/index.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #7C83FD;
+            --primary-light: #FF8A8A;
+            --bg-color: #FEFBF6;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .rating-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .rating-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .score-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <!-- 状态栏 -->
+    <div class="bg-white px-4 py-2 flex justify-between items-center text-sm">
+        <span class="font-medium">9:41</span>
+        <div class="flex items-center space-x-1">
+            <div class="w-4 h-2 bg-green-500 rounded-sm"></div>
+            <div class="w-4 h-2 bg-green-500 rounded-sm"></div>
+            <div class="w-6 h-3 border border-gray-400 rounded-sm">
+                <div class="w-4 h-full bg-green-500 rounded-sm"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 顶部标题 -->
+    <div class="bg-white px-4 py-4 border-b border-gray-100">
+        <h1 class="text-xl font-bold text-gray-800 text-center">打分墙</h1>
+    </div>
+    
+    <!-- 顶部导航切换 -->
+    <div class="bg-white px-4 py-3 border-b border-gray-100">
+        <div class="flex space-x-4 overflow-x-auto">
+            <div class="flex flex-col items-center min-w-max">
+                <span class="text-base font-bold text-purple-600">今日高分榜</span>
+                <div class="w-8 h-1 bg-purple-600 rounded-full mt-1"></div>
+            </div>
+            <div class="flex flex-col items-center min-w-max">
+                <span class="text-base text-gray-600">今日低分榜</span>
+            </div>
+            <div class="flex flex-col items-center min-w-max">
+                <span class="text-base text-gray-600">本周神评</span>
+            </div>
+            <div class="flex flex-col items-center min-w-max">
+                <span class="text-base text-gray-600">争议最大</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 打分说明 -->
+    <div class="px-4 py-3 bg-purple-50 mx-4 mt-4 rounded-2xl">
+        <p class="text-sm text-purple-700 text-center">
+            💡 请对故事本身或当事人的处理方式进行1-10分评价，你的分数将影响榜单结果
+        </p>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="flex-1 overflow-y-auto px-4 py-4">
+        <div class="space-y-4">
+            <!-- 高分帖子1 -->
+            <div class="rating-card bg-white rounded-2xl p-4 shadow-sm relative">
+                <div class="score-badge bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                    9.6分
+                </div>
+                
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-bold">小</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div class="font-medium text-gray-800">小暖阳</div>
+                        <div class="text-xs text-gray-500">3小时前</div>
+                    </div>
+                    <div class="flex items-center bg-yellow-100 px-2 py-1 rounded-full">
+                        <span class="text-yellow-600 text-xs mr-1">🏆</span>
+                        <span class="text-yellow-600 text-xs font-medium">第1名</span>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 mb-2">老公为了照顾生病的我，推掉了重要出差</h3>
+                <p class="text-gray-600 text-sm leading-relaxed mb-3">
+                    昨天发烧39度，老公本来要出差谈一个很重要的项目，但是看我病得厉害，直接推掉了出差，在家照顾我一整天。给我煮粥、买药、陪我去医院，一刻都没离开过...
+                </p>
+                
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center space-x-4">
+                        <span class="flex items-center text-yellow-600 font-medium">
+                            <span class="mr-1">⭐</span>
+                            平均分：9.6
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">💬</span>
+                            267评论
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">❤️</span>
+                            收藏
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 高分帖子2 -->
+            <div class="rating-card bg-white rounded-2xl p-4 shadow-sm relative">
+                <div class="score-badge bg-gradient-to-r from-green-400 to-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                    9.2分
+                </div>
+                
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-bold">匿</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div class="font-medium text-gray-800">匿名用户_9876</div>
+                        <div class="text-xs text-gray-500">5小时前</div>
+                    </div>
+                    <div class="flex items-center bg-green-100 px-2 py-1 rounded-full">
+                        <span class="text-green-600 text-xs mr-1">🥈</span>
+                        <span class="text-green-600 text-xs font-medium">第2名</span>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 mb-2">婆婆主动道歉，我们和解了</h3>
+                <p class="text-gray-600 text-sm leading-relaxed mb-3">
+                    之前因为带孩子的问题和婆婆闹得很不愉快，冷战了一个月。今天婆婆主动来找我道歉，说她想明白了，我们是一家人，应该互相理解。还给我买了我爱吃的水果...
+                </p>
+                
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center space-x-4">
+                        <span class="flex items-center text-green-600 font-medium">
+                            <span class="mr-1">⭐</span>
+                            平均分：9.2
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">💬</span>
+                            189评论
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">❤️</span>
+                            收藏
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 高分帖子3 -->
+            <div class="rating-card bg-white rounded-2xl p-4 shadow-sm relative">
+                <div class="score-badge bg-gradient-to-r from-blue-400 to-purple-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                    8.9分
+                </div>
+                
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-orange-400 to-red-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-bold">小</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div class="font-medium text-gray-800">小确幸</div>
+                        <div class="text-xs text-gray-500">7小时前</div>
+                    </div>
+                    <div class="flex items-center bg-blue-100 px-2 py-1 rounded-full">
+                        <span class="text-blue-600 text-xs mr-1">🥉</span>
+                        <span class="text-blue-600 text-xs font-medium">第3名</span>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 mb-2">男朋友偷偷学做我爱吃的菜</h3>
+                <p class="text-gray-600 text-sm leading-relaxed mb-3">
+                    最近总觉得男朋友神神秘秘的，今天才发现他在偷偷跟我妈学做我爱吃的红烧肉。虽然做得不太好吃，但是看到他认真的样子，真的很感动。原来他一直在默默为我努力...
+                </p>
+                
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center space-x-4">
+                        <span class="flex items-center text-blue-600 font-medium">
+                            <span class="mr-1">⭐</span>
+                            平均分：8.9
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">💬</span>
+                            156评论
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">❤️</span>
+                            收藏
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 高分帖子4 -->
+            <div class="rating-card bg-white rounded-2xl p-4 shadow-sm relative">
+                <div class="score-badge bg-gradient-to-r from-purple-400 to-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                    8.7分
+                </div>
+                
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-bold">匿</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div class="font-medium text-gray-800">匿名用户_5432</div>
+                        <div class="text-xs text-gray-500">9小时前</div>
+                    </div>
+                    <div class="flex items-center bg-purple-100 px-2 py-1 rounded-full">
+                        <span class="text-purple-600 text-xs mr-1">🏅</span>
+                        <span class="text-purple-600 text-xs font-medium">第4名</span>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 mb-2">终于鼓起勇气向暗恋的人表白了</h3>
+                <p class="text-gray-600 text-sm leading-relaxed mb-3">
+                    暗恋了同事两年，一直不敢表白。今天终于鼓起勇气，虽然被拒绝了，但是他说我们可以先做朋友。虽然有点失落，但是至少不用再纠结了，也算是一种解脱...
+                </p>
+                
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center space-x-4">
+                        <span class="flex items-center text-purple-600 font-medium">
+                            <span class="mr-1">⭐</span>
+                            平均分：8.7
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">💬</span>
+                            98评论
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">❤️</span>
+                            收藏
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 高分帖子5 -->
+            <div class="rating-card bg-white rounded-2xl p-4 shadow-sm relative">
+                <div class="score-badge bg-gradient-to-r from-teal-400 to-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                    8.5分
+                </div>
+                
+                <div class="flex items-center mb-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+                        <span class="text-white text-sm font-bold">小</span>
+                    </div>
+                    <div class="ml-3 flex-1">
+                        <div class="font-medium text-gray-800">小幸运</div>
+                        <div class="text-xs text-gray-500">12小时前</div>
+                    </div>
+                    <div class="flex items-center bg-teal-100 px-2 py-1 rounded-full">
+                        <span class="text-teal-600 text-xs mr-1">🎖️</span>
+                        <span class="text-teal-600 text-xs font-medium">第5名</span>
+                    </div>
+                </div>
+                
+                <h3 class="font-bold text-gray-800 mb-2">和闺蜜重归于好，友谊万岁</h3>
+                <p class="text-gray-600 text-sm leading-relaxed mb-3">
+                    因为一些误会和最好的闺蜜冷战了半年，今天她主动联系我，我们聊了很久，把所有的误会都说开了。原来我们都在等对方先开口，真的太傻了。友谊比什么都重要...
+                </p>
+                
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center space-x-4">
+                        <span class="flex items-center text-teal-600 font-medium">
+                            <span class="mr-1">⭐</span>
+                            平均分：8.5
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">💬</span>
+                            134评论
+                        </span>
+                        <span class="flex items-center text-gray-500">
+                            <span class="mr-1">❤️</span>
+                            收藏
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部间距 -->
+        <div class="h-20"></div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bg-white border-t border-gray-100 px-4 py-2">
+        <div class="flex justify-around items-center">
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">🏠</span>
+                </div>
+                <span class="text-xs text-gray-500">首页</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">🏛️</span>
+                </div>
+                <span class="text-xs text-gray-500">广场</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-purple-600 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-white text-xs">⭐</span>
+                </div>
+                <span class="text-xs text-purple-600 font-medium">打分墙</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">👤</span>
+                </div>
+                <span class="text-xs text-gray-500">我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

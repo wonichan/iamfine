@@ -114,3 +114,23 @@ func (lr *likeRepository) GetLikeList(ctx context.Context, userID string, page, 
 
 	return likeList, nil
 }
+
+func (lr *likeRepository) GetLikeCount(ctx context.Context, targetID, targetType string) (int64, error) {
+	var count int64
+	err := lr.db.Model(&models.Like{}).Where("target_id = ? AND target_type = ?", targetID, targetType).Count(&count).Error
+	return count, err
+}
+
+func (lr *likeRepository) GetLikeUsers(ctx context.Context, targetID, targetType string, page, pageSize int32) ([]string, error) {
+	var userIDs []string
+	offset := (page - 1) * pageSize
+	err := lr.db.Model(&models.Like{}).
+		Select("user_id").
+		Where("target_id = ? AND target_type = ?", targetID, targetType).
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Order("created_at DESC").
+		Pluck("user_id", &userIDs).Error
+
+	return userIDs, err
+}

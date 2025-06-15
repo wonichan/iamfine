@@ -90,3 +90,36 @@ func (fr *followRepository) GetFollowerList(ctx context.Context, userID string, 
 
 	return followerList, nil
 }
+
+func (fr *followRepository) GetFollowCount(ctx context.Context, userID string) (int64, error) {
+	var count int64
+	err := fr.db.Model(&models.Follow{}).Where("follower_id = ?", userID).Count(&count).Error
+	return count, err
+}
+
+func (fr *followRepository) GetFollowerCount(ctx context.Context, userID string) (int64, error) {
+	var count int64
+	err := fr.db.Model(&models.Follow{}).Where("following_id = ?", userID).Count(&count).Error
+	return count, err
+}
+
+func (fr *followRepository) GetMutualFollows(ctx context.Context, userID1, userID2 string, page, pageSize int32) ([]string, error) {
+	// 查找用户1关注的人中，也关注用户2的人
+	var mutualFollows []string
+	offset := (page - 1) * pageSize
+
+	// 子查询：用户1关注的人
+	subQuery1 := fr.db.Model(&models.Follow{}).Select("following_id").Where("follower_id = ?", userID1)
+	// 子查询：用户2关注的人
+	subQuery2 := fr.db.Model(&models.Follow{}).Select("following_id").Where("follower_id = ?", userID2)
+
+	// 查找交集
+	err := fr.db.Model(&models.Follow{}).
+		Select("following_id").
+		Where("follower_id = ? AND following_id IN (?)", subQuery1, subQuery2).
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Pluck("following_id", &mutualFollows).Error
+
+	return mutualFollows, err
+}

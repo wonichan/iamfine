@@ -34,6 +34,55 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"CreateTopic": kitex.NewMethodInfo(
+		createTopicHandler,
+		newPostServiceCreateTopicArgs,
+		newPostServiceCreateTopicResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetTopicList": kitex.NewMethodInfo(
+		getTopicListHandler,
+		newPostServiceGetTopicListArgs,
+		newPostServiceGetTopicListResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"CollectPost": kitex.NewMethodInfo(
+		collectPostHandler,
+		newPostServiceCollectPostArgs,
+		newPostServiceCollectPostResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"UncollectPost": kitex.NewMethodInfo(
+		uncollectPostHandler,
+		newPostServiceUncollectPostArgs,
+		newPostServiceUncollectPostResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetCollectedPosts": kitex.NewMethodInfo(
+		getCollectedPostsHandler,
+		newPostServiceGetCollectedPostsArgs,
+		newPostServiceGetCollectedPostsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"RatePost": kitex.NewMethodInfo(
+		ratePostHandler,
+		newPostServiceRatePostArgs,
+		newPostServiceRatePostResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetRatingRank": kitex.NewMethodInfo(
+		getRatingRankHandler,
+		newPostServiceGetRatingRankArgs,
+		newPostServiceGetRatingRankResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -154,6 +203,132 @@ func newPostServiceGetPostListResult() interface{} {
 	return post.NewPostServiceGetPostListResult()
 }
 
+func createTopicHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceCreateTopicArgs)
+	realResult := result.(*post.PostServiceCreateTopicResult)
+	success, err := handler.(post.PostService).CreateTopic(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceCreateTopicArgs() interface{} {
+	return post.NewPostServiceCreateTopicArgs()
+}
+
+func newPostServiceCreateTopicResult() interface{} {
+	return post.NewPostServiceCreateTopicResult()
+}
+
+func getTopicListHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetTopicListArgs)
+	realResult := result.(*post.PostServiceGetTopicListResult)
+	success, err := handler.(post.PostService).GetTopicList(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetTopicListArgs() interface{} {
+	return post.NewPostServiceGetTopicListArgs()
+}
+
+func newPostServiceGetTopicListResult() interface{} {
+	return post.NewPostServiceGetTopicListResult()
+}
+
+func collectPostHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceCollectPostArgs)
+	realResult := result.(*post.PostServiceCollectPostResult)
+	success, err := handler.(post.PostService).CollectPost(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceCollectPostArgs() interface{} {
+	return post.NewPostServiceCollectPostArgs()
+}
+
+func newPostServiceCollectPostResult() interface{} {
+	return post.NewPostServiceCollectPostResult()
+}
+
+func uncollectPostHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceUncollectPostArgs)
+	realResult := result.(*post.PostServiceUncollectPostResult)
+	success, err := handler.(post.PostService).UncollectPost(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceUncollectPostArgs() interface{} {
+	return post.NewPostServiceUncollectPostArgs()
+}
+
+func newPostServiceUncollectPostResult() interface{} {
+	return post.NewPostServiceUncollectPostResult()
+}
+
+func getCollectedPostsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetCollectedPostsArgs)
+	realResult := result.(*post.PostServiceGetCollectedPostsResult)
+	success, err := handler.(post.PostService).GetCollectedPosts(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetCollectedPostsArgs() interface{} {
+	return post.NewPostServiceGetCollectedPostsArgs()
+}
+
+func newPostServiceGetCollectedPostsResult() interface{} {
+	return post.NewPostServiceGetCollectedPostsResult()
+}
+
+func ratePostHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceRatePostArgs)
+	realResult := result.(*post.PostServiceRatePostResult)
+	success, err := handler.(post.PostService).RatePost(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceRatePostArgs() interface{} {
+	return post.NewPostServiceRatePostArgs()
+}
+
+func newPostServiceRatePostResult() interface{} {
+	return post.NewPostServiceRatePostResult()
+}
+
+func getRatingRankHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetRatingRankArgs)
+	realResult := result.(*post.PostServiceGetRatingRankResult)
+	success, err := handler.(post.PostService).GetRatingRank(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetRatingRankArgs() interface{} {
+	return post.NewPostServiceGetRatingRankArgs()
+}
+
+func newPostServiceGetRatingRankResult() interface{} {
+	return post.NewPostServiceGetRatingRankResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -189,6 +364,76 @@ func (p *kClient) GetPostList(ctx context.Context, req *post.GetPostListRequest)
 	_args.Req = req
 	var _result post.PostServiceGetPostListResult
 	if err = p.c.Call(ctx, "GetPostList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CreateTopic(ctx context.Context, req *post.CreateTopicRequest) (r *post.CreateTopicResponse, err error) {
+	var _args post.PostServiceCreateTopicArgs
+	_args.Req = req
+	var _result post.PostServiceCreateTopicResult
+	if err = p.c.Call(ctx, "CreateTopic", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetTopicList(ctx context.Context, req *post.GetTopicListRequest) (r *post.GetTopicListResponse, err error) {
+	var _args post.PostServiceGetTopicListArgs
+	_args.Req = req
+	var _result post.PostServiceGetTopicListResult
+	if err = p.c.Call(ctx, "GetTopicList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CollectPost(ctx context.Context, req *post.CollectPostRequest) (r *post.CollectPostResponse, err error) {
+	var _args post.PostServiceCollectPostArgs
+	_args.Req = req
+	var _result post.PostServiceCollectPostResult
+	if err = p.c.Call(ctx, "CollectPost", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UncollectPost(ctx context.Context, req *post.UncollectPostRequest) (r *post.UncollectPostResponse, err error) {
+	var _args post.PostServiceUncollectPostArgs
+	_args.Req = req
+	var _result post.PostServiceUncollectPostResult
+	if err = p.c.Call(ctx, "UncollectPost", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetCollectedPosts(ctx context.Context, req *post.GetCollectedPostsRequest) (r *post.GetCollectedPostsResponse, err error) {
+	var _args post.PostServiceGetCollectedPostsArgs
+	_args.Req = req
+	var _result post.PostServiceGetCollectedPostsResult
+	if err = p.c.Call(ctx, "GetCollectedPosts", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) RatePost(ctx context.Context, req *post.RatePostRequest) (r *post.RatePostResponse, err error) {
+	var _args post.PostServiceRatePostArgs
+	_args.Req = req
+	var _result post.PostServiceRatePostResult
+	if err = p.c.Call(ctx, "RatePost", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetRatingRank(ctx context.Context, req *post.GetRatingRankRequest) (r *post.GetRatingRankResponse, err error) {
+	var _args post.PostServiceGetRatingRankArgs
+	_args.Req = req
+	var _result post.PostServiceGetRatingRankResult
+	if err = p.c.Call(ctx, "GetRatingRank", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

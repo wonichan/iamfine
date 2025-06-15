@@ -122,11 +122,16 @@ func (cr *commentRedisRepo) UpdateComment(ctx context.Context, comment *models.C
 	return existComment, nil
 }
 
-func (cr *commentRedisRepo) DeleteComment(ctx context.Context, commentID string) error {
+func (cr *commentRedisRepo) DeleteComment(ctx context.Context, commentID, userID string) error {
 	// 获取评论信息
 	comment, err := cr.GetComment(ctx, commentID)
 	if err != nil {
 		return err
+	}
+
+	// 检查是否是评论作者
+	if comment.UserID != userID {
+		return fmt.Errorf("无权删除此评论")
 	}
 
 	// 删除评论数据
@@ -146,6 +151,89 @@ func (cr *commentRedisRepo) DeleteComment(ctx context.Context, commentID string)
 	_, err = pipe.Exec(ctx)
 
 	return err
+}
+
+func (cr *commentRedisRepo) GetCommentDetail(ctx context.Context, commentID string) (*models.Comment, error) {
+	return cr.GetComment(ctx, commentID)
+}
+
+func (cr *commentRedisRepo) GetUserCommentList(ctx context.Context, userID string, page, pageSize int32) ([]*models.Comment, error) {
+	// 构建用户评论列表键
+	listKey := fmt.Sprintf("comment:list:user:%s", userID)
+
+	// 分页获取评论ID列表
+	start := (page - 1) * pageSize
+	end := start + pageSize - 1
+	commentIDs, err := cr.rdb.LRange(ctx, listKey, int64(start), int64(end)).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return []*models.Comment{}, nil
+		}
+		return nil, err
+	}
+
+	// 批量获取评论详情
+	var comments []*models.Comment
+	for _, commentID := range commentIDs {
+		comment, err := cr.GetComment(ctx, commentID)
+		if err == nil && comment != nil {
+			comments = append(comments, comment)
+		}
+	}
+
+	return comments, nil
+}
+
+func (cr *commentRedisRepo) LikeComment(ctx context.Context, commentID, userID string) error {
+	// 获取评论信息
+	comment, err := cr.GetComment(ctx, commentID)
+	if err != nil {
+		return err
+	}
+
+	// 增加点赞数
+	comment.LikeCount++
+	comment.UpdatedAt = time.Now()
+
+	// 保存更新后的评论
+	return cr.saveComment(ctx, comment)
+}
+
+func (cr *commentRedisRepo) UnlikeComment(ctx context.Context, commentID, userID string) error {
+	// 获取评论信息
+	comment, err := cr.GetComment(ctx, commentID)
+	if err != nil {
+		return err
+	}
+
+	// 减少点赞数
+	if comment.LikeCount > 0 {
+		comment.LikeCount--
+	}
+	comment.UpdatedAt = time.Now()
+
+	// 保存更新后的评论
+	return cr.saveComment(ctx, comment)
+}
+
+func (cr *commentRedisRepo) GetAnonymousAvatar(ctx context.Context, avatarID string) (*models.AnonymousAvatar, error) {
+	avatarKey := fmt.Sprintf("anonymous_avatar:%s", avatarID)
+	avatarData, err := cr.rdb.Get(ctx, avatarKey).Result()
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			return nil, fmt.Errorf("匿名头像不存在")
+		}
+		return nil, err
+	}
+
+	// 反序列化头像数据
+	var avatar models.AnonymousAvatar
+	err = json.Unmarshal([]byte(avatarData), &avatar)
+	if err != nil {
+		return nil, err
+	}
+
+	return &avatar, nil
 }
 
 // 辅助方法：保存评论到Redis

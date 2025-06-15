@@ -27,6 +27,41 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"GetComment": kitex.NewMethodInfo(
+		getCommentHandler,
+		newCommentServiceGetCommentArgs,
+		newCommentServiceGetCommentResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetUserComments": kitex.NewMethodInfo(
+		getUserCommentsHandler,
+		newCommentServiceGetUserCommentsArgs,
+		newCommentServiceGetUserCommentsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"LikeComment": kitex.NewMethodInfo(
+		likeCommentHandler,
+		newCommentServiceLikeCommentArgs,
+		newCommentServiceLikeCommentResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"UnlikeComment": kitex.NewMethodInfo(
+		unlikeCommentHandler,
+		newCommentServiceUnlikeCommentArgs,
+		newCommentServiceUnlikeCommentResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"DeleteComment": kitex.NewMethodInfo(
+		deleteCommentHandler,
+		newCommentServiceDeleteCommentArgs,
+		newCommentServiceDeleteCommentResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -129,6 +164,96 @@ func newCommentServiceGetCommentListResult() interface{} {
 	return comment.NewCommentServiceGetCommentListResult()
 }
 
+func getCommentHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceGetCommentArgs)
+	realResult := result.(*comment.CommentServiceGetCommentResult)
+	success, err := handler.(comment.CommentService).GetComment(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceGetCommentArgs() interface{} {
+	return comment.NewCommentServiceGetCommentArgs()
+}
+
+func newCommentServiceGetCommentResult() interface{} {
+	return comment.NewCommentServiceGetCommentResult()
+}
+
+func getUserCommentsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceGetUserCommentsArgs)
+	realResult := result.(*comment.CommentServiceGetUserCommentsResult)
+	success, err := handler.(comment.CommentService).GetUserComments(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceGetUserCommentsArgs() interface{} {
+	return comment.NewCommentServiceGetUserCommentsArgs()
+}
+
+func newCommentServiceGetUserCommentsResult() interface{} {
+	return comment.NewCommentServiceGetUserCommentsResult()
+}
+
+func likeCommentHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceLikeCommentArgs)
+	realResult := result.(*comment.CommentServiceLikeCommentResult)
+	success, err := handler.(comment.CommentService).LikeComment(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceLikeCommentArgs() interface{} {
+	return comment.NewCommentServiceLikeCommentArgs()
+}
+
+func newCommentServiceLikeCommentResult() interface{} {
+	return comment.NewCommentServiceLikeCommentResult()
+}
+
+func unlikeCommentHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceUnlikeCommentArgs)
+	realResult := result.(*comment.CommentServiceUnlikeCommentResult)
+	success, err := handler.(comment.CommentService).UnlikeComment(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceUnlikeCommentArgs() interface{} {
+	return comment.NewCommentServiceUnlikeCommentArgs()
+}
+
+func newCommentServiceUnlikeCommentResult() interface{} {
+	return comment.NewCommentServiceUnlikeCommentResult()
+}
+
+func deleteCommentHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceDeleteCommentArgs)
+	realResult := result.(*comment.CommentServiceDeleteCommentResult)
+	success, err := handler.(comment.CommentService).DeleteComment(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceDeleteCommentArgs() interface{} {
+	return comment.NewCommentServiceDeleteCommentArgs()
+}
+
+func newCommentServiceDeleteCommentResult() interface{} {
+	return comment.NewCommentServiceDeleteCommentResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -154,6 +279,56 @@ func (p *kClient) GetCommentList(ctx context.Context, req *comment.GetCommentLis
 	_args.Req = req
 	var _result comment.CommentServiceGetCommentListResult
 	if err = p.c.Call(ctx, "GetCommentList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetComment(ctx context.Context, req *comment.GetCommentRequest) (r *comment.GetCommentResponse, err error) {
+	var _args comment.CommentServiceGetCommentArgs
+	_args.Req = req
+	var _result comment.CommentServiceGetCommentResult
+	if err = p.c.Call(ctx, "GetComment", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetUserComments(ctx context.Context, req *comment.GetUserCommentsRequest) (r *comment.GetUserCommentsResponse, err error) {
+	var _args comment.CommentServiceGetUserCommentsArgs
+	_args.Req = req
+	var _result comment.CommentServiceGetUserCommentsResult
+	if err = p.c.Call(ctx, "GetUserComments", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) LikeComment(ctx context.Context, req *comment.LikeCommentRequest) (r *comment.LikeCommentResponse, err error) {
+	var _args comment.CommentServiceLikeCommentArgs
+	_args.Req = req
+	var _result comment.CommentServiceLikeCommentResult
+	if err = p.c.Call(ctx, "LikeComment", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UnlikeComment(ctx context.Context, req *comment.UnlikeCommentRequest) (r *comment.UnlikeCommentResponse, err error) {
+	var _args comment.CommentServiceUnlikeCommentArgs
+	_args.Req = req
+	var _result comment.CommentServiceUnlikeCommentResult
+	if err = p.c.Call(ctx, "UnlikeComment", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteComment(ctx context.Context, req *comment.DeleteCommentRequest) (r *comment.DeleteCommentResponse, err error) {
+	var _args comment.CommentServiceDeleteCommentArgs
+	_args.Req = req
+	var _result comment.CommentServiceDeleteCommentResult
+	if err = p.c.Call(ctx, "DeleteComment", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

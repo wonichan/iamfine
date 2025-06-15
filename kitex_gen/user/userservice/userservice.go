@@ -34,6 +34,69 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"UpdateUser": kitex.NewMethodInfo(
+		updateUserHandler,
+		newUserServiceUpdateUserArgs,
+		newUserServiceUpdateUserResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"FollowUser": kitex.NewMethodInfo(
+		followUserHandler,
+		newUserServiceFollowUserArgs,
+		newUserServiceFollowUserResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"UnfollowUser": kitex.NewMethodInfo(
+		unfollowUserHandler,
+		newUserServiceUnfollowUserArgs,
+		newUserServiceUnfollowUserResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetFollowers": kitex.NewMethodInfo(
+		getFollowersHandler,
+		newUserServiceGetFollowersArgs,
+		newUserServiceGetFollowersResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetFollowing": kitex.NewMethodInfo(
+		getFollowingHandler,
+		newUserServiceGetFollowingArgs,
+		newUserServiceGetFollowingResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"CreateAnonymousProfile": kitex.NewMethodInfo(
+		createAnonymousProfileHandler,
+		newUserServiceCreateAnonymousProfileArgs,
+		newUserServiceCreateAnonymousProfileResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetAnonymousProfiles": kitex.NewMethodInfo(
+		getAnonymousProfilesHandler,
+		newUserServiceGetAnonymousProfilesArgs,
+		newUserServiceGetAnonymousProfilesResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"UpdateAnonymousProfile": kitex.NewMethodInfo(
+		updateAnonymousProfileHandler,
+		newUserServiceUpdateAnonymousProfileArgs,
+		newUserServiceUpdateAnonymousProfileResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetUserStats": kitex.NewMethodInfo(
+		getUserStatsHandler,
+		newUserServiceGetUserStatsArgs,
+		newUserServiceGetUserStatsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -154,6 +217,168 @@ func newUserServiceGetUserResult() interface{} {
 	return user.NewUserServiceGetUserResult()
 }
 
+func updateUserHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceUpdateUserArgs)
+	realResult := result.(*user.UserServiceUpdateUserResult)
+	success, err := handler.(user.UserService).UpdateUser(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceUpdateUserArgs() interface{} {
+	return user.NewUserServiceUpdateUserArgs()
+}
+
+func newUserServiceUpdateUserResult() interface{} {
+	return user.NewUserServiceUpdateUserResult()
+}
+
+func followUserHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceFollowUserArgs)
+	realResult := result.(*user.UserServiceFollowUserResult)
+	success, err := handler.(user.UserService).FollowUser(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceFollowUserArgs() interface{} {
+	return user.NewUserServiceFollowUserArgs()
+}
+
+func newUserServiceFollowUserResult() interface{} {
+	return user.NewUserServiceFollowUserResult()
+}
+
+func unfollowUserHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceUnfollowUserArgs)
+	realResult := result.(*user.UserServiceUnfollowUserResult)
+	success, err := handler.(user.UserService).UnfollowUser(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceUnfollowUserArgs() interface{} {
+	return user.NewUserServiceUnfollowUserArgs()
+}
+
+func newUserServiceUnfollowUserResult() interface{} {
+	return user.NewUserServiceUnfollowUserResult()
+}
+
+func getFollowersHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceGetFollowersArgs)
+	realResult := result.(*user.UserServiceGetFollowersResult)
+	success, err := handler.(user.UserService).GetFollowers(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceGetFollowersArgs() interface{} {
+	return user.NewUserServiceGetFollowersArgs()
+}
+
+func newUserServiceGetFollowersResult() interface{} {
+	return user.NewUserServiceGetFollowersResult()
+}
+
+func getFollowingHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceGetFollowingArgs)
+	realResult := result.(*user.UserServiceGetFollowingResult)
+	success, err := handler.(user.UserService).GetFollowing(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceGetFollowingArgs() interface{} {
+	return user.NewUserServiceGetFollowingArgs()
+}
+
+func newUserServiceGetFollowingResult() interface{} {
+	return user.NewUserServiceGetFollowingResult()
+}
+
+func createAnonymousProfileHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceCreateAnonymousProfileArgs)
+	realResult := result.(*user.UserServiceCreateAnonymousProfileResult)
+	success, err := handler.(user.UserService).CreateAnonymousProfile(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceCreateAnonymousProfileArgs() interface{} {
+	return user.NewUserServiceCreateAnonymousProfileArgs()
+}
+
+func newUserServiceCreateAnonymousProfileResult() interface{} {
+	return user.NewUserServiceCreateAnonymousProfileResult()
+}
+
+func getAnonymousProfilesHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceGetAnonymousProfilesArgs)
+	realResult := result.(*user.UserServiceGetAnonymousProfilesResult)
+	success, err := handler.(user.UserService).GetAnonymousProfiles(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceGetAnonymousProfilesArgs() interface{} {
+	return user.NewUserServiceGetAnonymousProfilesArgs()
+}
+
+func newUserServiceGetAnonymousProfilesResult() interface{} {
+	return user.NewUserServiceGetAnonymousProfilesResult()
+}
+
+func updateAnonymousProfileHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceUpdateAnonymousProfileArgs)
+	realResult := result.(*user.UserServiceUpdateAnonymousProfileResult)
+	success, err := handler.(user.UserService).UpdateAnonymousProfile(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceUpdateAnonymousProfileArgs() interface{} {
+	return user.NewUserServiceUpdateAnonymousProfileArgs()
+}
+
+func newUserServiceUpdateAnonymousProfileResult() interface{} {
+	return user.NewUserServiceUpdateAnonymousProfileResult()
+}
+
+func getUserStatsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*user.UserServiceGetUserStatsArgs)
+	realResult := result.(*user.UserServiceGetUserStatsResult)
+	success, err := handler.(user.UserService).GetUserStats(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newUserServiceGetUserStatsArgs() interface{} {
+	return user.NewUserServiceGetUserStatsArgs()
+}
+
+func newUserServiceGetUserStatsResult() interface{} {
+	return user.NewUserServiceGetUserStatsResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -189,6 +414,96 @@ func (p *kClient) GetUser(ctx context.Context, req *user.GetUserRequest) (r *use
 	_args.Req = req
 	var _result user.UserServiceGetUserResult
 	if err = p.c.Call(ctx, "GetUser", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (r *user.UpdateUserResponse, err error) {
+	var _args user.UserServiceUpdateUserArgs
+	_args.Req = req
+	var _result user.UserServiceUpdateUserResult
+	if err = p.c.Call(ctx, "UpdateUser", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) FollowUser(ctx context.Context, req *user.FollowUserRequest) (r *user.FollowUserResponse, err error) {
+	var _args user.UserServiceFollowUserArgs
+	_args.Req = req
+	var _result user.UserServiceFollowUserResult
+	if err = p.c.Call(ctx, "FollowUser", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UnfollowUser(ctx context.Context, req *user.UnfollowUserRequest) (r *user.UnfollowUserResponse, err error) {
+	var _args user.UserServiceUnfollowUserArgs
+	_args.Req = req
+	var _result user.UserServiceUnfollowUserResult
+	if err = p.c.Call(ctx, "UnfollowUser", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetFollowers(ctx context.Context, req *user.GetFollowersRequest) (r *user.GetFollowersResponse, err error) {
+	var _args user.UserServiceGetFollowersArgs
+	_args.Req = req
+	var _result user.UserServiceGetFollowersResult
+	if err = p.c.Call(ctx, "GetFollowers", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetFollowing(ctx context.Context, req *user.GetFollowingRequest) (r *user.GetFollowingResponse, err error) {
+	var _args user.UserServiceGetFollowingArgs
+	_args.Req = req
+	var _result user.UserServiceGetFollowingResult
+	if err = p.c.Call(ctx, "GetFollowing", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) CreateAnonymousProfile(ctx context.Context, req *user.CreateAnonymousProfileRequest) (r *user.CreateAnonymousProfileResponse, err error) {
+	var _args user.UserServiceCreateAnonymousProfileArgs
+	_args.Req = req
+	var _result user.UserServiceCreateAnonymousProfileResult
+	if err = p.c.Call(ctx, "CreateAnonymousProfile", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetAnonymousProfiles(ctx context.Context, req *user.GetAnonymousProfilesRequest) (r *user.GetAnonymousProfilesResponse, err error) {
+	var _args user.UserServiceGetAnonymousProfilesArgs
+	_args.Req = req
+	var _result user.UserServiceGetAnonymousProfilesResult
+	if err = p.c.Call(ctx, "GetAnonymousProfiles", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateAnonymousProfile(ctx context.Context, req *user.UpdateAnonymousProfileRequest) (r *user.UpdateAnonymousProfileResponse, err error) {
+	var _args user.UserServiceUpdateAnonymousProfileArgs
+	_args.Req = req
+	var _result user.UserServiceUpdateAnonymousProfileResult
+	if err = p.c.Call(ctx, "UpdateAnonymousProfile", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetUserStats(ctx context.Context, req *user.GetUserStatsRequest) (r *user.GetUserStatsResponse, err error) {
+	var _args user.UserServiceGetUserStatsArgs
+	_args.Req = req
+	var _result user.UserServiceGetUserStatsResult
+	if err = p.c.Call(ctx, "GetUserStats", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

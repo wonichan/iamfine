@@ -14,6 +14,15 @@ type Client interface {
 	Register(ctx context.Context, req *user.RegisterRequest, callOptions ...callopt.Option) (r *user.RegisterResponse, err error)
 	Login(ctx context.Context, req *user.LoginRequest, callOptions ...callopt.Option) (r *user.LoginResponse, err error)
 	GetUser(ctx context.Context, req *user.GetUserRequest, callOptions ...callopt.Option) (r *user.GetUserResponse, err error)
+	UpdateUser(ctx context.Context, req *user.UpdateUserRequest, callOptions ...callopt.Option) (r *user.UpdateUserResponse, err error)
+	FollowUser(ctx context.Context, req *user.FollowUserRequest, callOptions ...callopt.Option) (r *user.FollowUserResponse, err error)
+	UnfollowUser(ctx context.Context, req *user.UnfollowUserRequest, callOptions ...callopt.Option) (r *user.UnfollowUserResponse, err error)
+	GetFollowers(ctx context.Context, req *user.GetFollowersRequest, callOptions ...callopt.Option) (r *user.GetFollowersResponse, err error)
+	GetFollowing(ctx context.Context, req *user.GetFollowingRequest, callOptions ...callopt.Option) (r *user.GetFollowingResponse, err error)
+	CreateAnonymousProfile(ctx context.Context, req *user.CreateAnonymousProfileRequest, callOptions ...callopt.Option) (r *user.CreateAnonymousProfileResponse, err error)
+	GetAnonymousProfiles(ctx context.Context, req *user.GetAnonymousProfilesRequest, callOptions ...callopt.Option) (r *user.GetAnonymousProfilesResponse, err error)
+	UpdateAnonymousProfile(ctx context.Context, req *user.UpdateAnonymousProfileRequest, callOptions ...callopt.Option) (r *user.UpdateAnonymousProfileResponse, err error)
+	GetUserStats(ctx context.Context, req *user.GetUserStatsRequest, callOptions ...callopt.Option) (r *user.GetUserStatsResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -58,4 +67,49 @@ func (p *kUserServiceClient) Login(ctx context.Context, req *user.LoginRequest, 
 func (p *kUserServiceClient) GetUser(ctx context.Context, req *user.GetUserRequest, callOptions ...callopt.Option) (r *user.GetUserResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetUser(ctx, req)
+}
+
+func (p *kUserServiceClient) UpdateUser(ctx context.Context, req *user.UpdateUserRequest, callOptions ...callopt.Option) (r *user.UpdateUserResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateUser(ctx, req)
+}
+
+func (p *kUserServiceClient) FollowUser(ctx context.Context, req *user.FollowUserRequest, callOptions ...callopt.Option) (r *user.FollowUserResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.FollowUser(ctx, req)
+}
+
+func (p *kUserServiceClient) UnfollowUser(ctx context.Context, req *user.UnfollowUserRequest, callOptions ...callopt.Option) (r *user.UnfollowUserResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UnfollowUser(ctx, req)
+}
+
+func (p *kUserServiceClient) GetFollowers(ctx context.Context, req *user.GetFollowersRequest, callOptions ...callopt.Option) (r *user.GetFollowersResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetFollowers(ctx, req)
+}
+
+func (p *kUserServiceClient) GetFollowing(ctx context.Context, req *user.GetFollowingRequest, callOptions ...callopt.Option) (r *user.GetFollowingResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetFollowing(ctx, req)
+}
+
+func (p *kUserServiceClient) CreateAnonymousProfile(ctx context.Context, req *user.CreateAnonymousProfileRequest, callOptions ...callopt.Option) (r *user.CreateAnonymousProfileResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.CreateAnonymousProfile(ctx, req)
+}
+
+func (p *kUserServiceClient) GetAnonymousProfiles(ctx context.Context, req *user.GetAnonymousProfilesRequest, callOptions ...callopt.Option) (r *user.GetAnonymousProfilesResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetAnonymousProfiles(ctx, req)
+}
+
+func (p *kUserServiceClient) UpdateAnonymousProfile(ctx context.Context, req *user.UpdateAnonymousProfileRequest, callOptions ...callopt.Option) (r *user.UpdateAnonymousProfileResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateAnonymousProfile(ctx, req)
+}
+
+func (p *kUserServiceClient) GetUserStats(ctx context.Context, req *user.GetUserStatsRequest, callOptions ...callopt.Option) (r *user.GetUserStatsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetUserStats(ctx, req)
 }

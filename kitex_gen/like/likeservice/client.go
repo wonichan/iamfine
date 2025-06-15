@@ -15,6 +15,8 @@ type Client interface {
 	Unlike(ctx context.Context, req *like.UnlikeRequest, callOptions ...callopt.Option) (r *like.UnlikeResponse, err error)
 	IsLiked(ctx context.Context, req *like.LikeRequest, callOptions ...callopt.Option) (r *like.LikeResponse, err error)
 	GetLikeList(ctx context.Context, req *like.GetLikeListRequest, callOptions ...callopt.Option) (r *like.GetLikeListResponse, err error)
+	GetLikeCount(ctx context.Context, req *like.GetLikeCountRequest, callOptions ...callopt.Option) (r *like.GetLikeCountResponse, err error)
+	GetLikeUsers(ctx context.Context, req *like.GetLikeUsersRequest, callOptions ...callopt.Option) (r *like.GetLikeUsersResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -64,4 +66,14 @@ func (p *kLikeServiceClient) IsLiked(ctx context.Context, req *like.LikeRequest,
 func (p *kLikeServiceClient) GetLikeList(ctx context.Context, req *like.GetLikeListRequest, callOptions ...callopt.Option) (r *like.GetLikeListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetLikeList(ctx, req)
+}
+
+func (p *kLikeServiceClient) GetLikeCount(ctx context.Context, req *like.GetLikeCountRequest, callOptions ...callopt.Option) (r *like.GetLikeCountResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetLikeCount(ctx, req)
+}
+
+func (p *kLikeServiceClient) GetLikeUsers(ctx context.Context, req *like.GetLikeUsersRequest, callOptions ...callopt.Option) (r *like.GetLikeUsersResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetLikeUsers(ctx, req)
 }

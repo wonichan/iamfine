@@ -3,6 +3,7 @@ module hupu
 go 1.21
 
 require (
+	github.com/bytedance/gopkg v0.1.2
 	github.com/cloudwego/gopkg v0.1.4
 	github.com/cloudwego/hertz v0.10.0
 	github.com/cloudwego/kitex v0.13.1
@@ -21,7 +22,6 @@ require (
 
 require (
 	github.com/apache/thrift v0.13.0 // indirect
-	github.com/bytedance/gopkg v0.1.2 // indirect
 	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect

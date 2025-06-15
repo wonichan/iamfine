@@ -41,6 +41,20 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"GetLikeCount": kitex.NewMethodInfo(
+		getLikeCountHandler,
+		newLikeServiceGetLikeCountArgs,
+		newLikeServiceGetLikeCountResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetLikeUsers": kitex.NewMethodInfo(
+		getLikeUsersHandler,
+		newLikeServiceGetLikeUsersArgs,
+		newLikeServiceGetLikeUsersResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -179,6 +193,42 @@ func newLikeServiceGetLikeListResult() interface{} {
 	return like.NewLikeServiceGetLikeListResult()
 }
 
+func getLikeCountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*like.LikeServiceGetLikeCountArgs)
+	realResult := result.(*like.LikeServiceGetLikeCountResult)
+	success, err := handler.(like.LikeService).GetLikeCount(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newLikeServiceGetLikeCountArgs() interface{} {
+	return like.NewLikeServiceGetLikeCountArgs()
+}
+
+func newLikeServiceGetLikeCountResult() interface{} {
+	return like.NewLikeServiceGetLikeCountResult()
+}
+
+func getLikeUsersHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*like.LikeServiceGetLikeUsersArgs)
+	realResult := result.(*like.LikeServiceGetLikeUsersResult)
+	success, err := handler.(like.LikeService).GetLikeUsers(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newLikeServiceGetLikeUsersArgs() interface{} {
+	return like.NewLikeServiceGetLikeUsersArgs()
+}
+
+func newLikeServiceGetLikeUsersResult() interface{} {
+	return like.NewLikeServiceGetLikeUsersResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -224,6 +274,26 @@ func (p *kClient) GetLikeList(ctx context.Context, req *like.GetLikeListRequest)
 	_args.Req = req
 	var _result like.LikeServiceGetLikeListResult
 	if err = p.c.Call(ctx, "GetLikeList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetLikeCount(ctx context.Context, req *like.GetLikeCountRequest) (r *like.GetLikeCountResponse, err error) {
+	var _args like.LikeServiceGetLikeCountArgs
+	_args.Req = req
+	var _result like.LikeServiceGetLikeCountResult
+	if err = p.c.Call(ctx, "GetLikeCount", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetLikeUsers(ctx context.Context, req *like.GetLikeUsersRequest) (r *like.GetLikeUsersResponse, err error) {
+	var _args like.LikeServiceGetLikeUsersArgs
+	_args.Req = req
+	var _result like.LikeServiceGetLikeUsersResult
+	if err = p.c.Call(ctx, "GetLikeUsers", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

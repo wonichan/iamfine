@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tdesign-icons@0.2.4/lib/index.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #7C83FD;
+            --primary-light: #FF8A8A;
+            --bg-color: #FEFBF6;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .profile-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .stat-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .function-item {
+            transition: background-color 0.2s ease;
+        }
+        
+        .function-item:hover {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <!-- 状态栏 -->
+    <div class="bg-white px-4 py-2 flex justify-between items-center text-sm">
+        <span class="font-medium">9:41</span>
+        <div class="flex items-center space-x-1">
+            <div class="w-4 h-2 bg-green-500 rounded-sm"></div>
+            <div class="w-4 h-2 bg-green-500 rounded-sm"></div>
+            <div class="w-6 h-3 border border-gray-400 rounded-sm">
+                <div class="w-4 h-full bg-green-500 rounded-sm"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="flex-1 overflow-y-auto">
+        <!-- 个人信息头部 -->
+        <div class="profile-header px-4 py-8 text-white relative">
+            <div class="flex items-center mb-4">
+                <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-white text-2xl font-bold">小</span>
+                </div>
+                <div class="flex-1">
+                    <h2 class="text-xl font-bold mb-1">小甜甜</h2>
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs">恋爱中</span>
+                        <span class="bg-white bg-opacity-20 px-2 py-1 rounded-full text-xs">95后</span>
+                    </div>
+                    <p class="text-sm opacity-90">愿所有美好都如期而至 ✨</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xs opacity-80">编辑资料</span>
+                    <div class="text-lg">✏️</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 数据统计网格 -->
+        <div class="px-4 py-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">我的数据</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="stat-card bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-2xl">📝</span>
+                        <span class="text-2xl font-bold text-purple-600">12</span>
+                    </div>
+                    <h4 class="font-medium text-gray-800">我的帖子</h4>
+                    <p class="text-xs text-gray-500 mt-1">发布的内容</p>
+                </div>
+                
+                <div class="stat-card bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-2xl">💬</span>
+                        <span class="text-2xl font-bold text-blue-600">89</span>
+                    </div>
+                    <h4 class="font-medium text-gray-800">我的评论</h4>
+                    <p class="text-xs text-gray-500 mt-1">参与讨论</p>
+                </div>
+                
+                <div class="stat-card bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-2xl">❤️</span>
+                        <span class="text-2xl font-bold text-red-500">34</span>
+                    </div>
+                    <h4 class="font-medium text-gray-800">我的收藏</h4>
+                    <p class="text-xs text-gray-500 mt-1">喜欢的内容</p>
+                </div>
+                
+                <div class="stat-card bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-2xl">⭐</span>
+                        <span class="text-2xl font-bold text-yellow-600">8.6</span>
+                    </div>
+                    <h4 class="font-medium text-gray-800">收到评分</h4>
+                    <p class="text-xs text-gray-500 mt-1">平均得分</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 常用功能 -->
+        <div class="px-4 pb-4">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">常用功能</h3>
+            <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
+                <div class="function-item flex items-center px-4 py-4 border-b border-gray-100">
+                    <div class="w-10 h-10 bg-red-100 rounded-2xl flex items-center justify-center mr-3">
+                        <span class="text-red-500 text-lg">🔔</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">消息中心</h4>
+                        <p class="text-xs text-gray-500">评论/评分通知</p>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="bg-red-500 text-white text-xs px-2 py-1 rounded-full mr-2">3</span>
+                        <span class="text-gray-400">›</span>
+                    </div>
+                </div>
+                
+                <div class="function-item flex items-center px-4 py-4 border-b border-gray-100">
+                    <div class="w-10 h-10 bg-blue-100 rounded-2xl flex items-center justify-center mr-3">
+                        <span class="text-blue-500 text-lg">📖</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">浏览历史</h4>
+                        <p class="text-xs text-gray-500">查看过的内容</p>
+                    </div>
+                    <span class="text-gray-400">›</span>
+                </div>
+                
+                <div class="function-item flex items-center px-4 py-4">
+                    <div class="w-10 h-10 bg-yellow-100 rounded-2xl flex items-center justify-center mr-3">
+                        <span class="text-yellow-500 text-lg">📄</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">我的草稿箱</h4>
+                        <p class="text-xs text-gray-500">未发布的内容</p>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="bg-yellow-500 text-white text-xs px-2 py-1 rounded-full mr-2">2</span>
+                        <span class="text-gray-400">›</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 系统功能 -->
+        <div class="px-4 pb-4">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">系统功能</h3>
+            <div class="bg-white rounded-2xl overflow-hidden shadow-sm">
+                <div class="function-item flex items-center px-4 py-4 border-b border-gray-100">
+                    <div class="w-10 h-10 bg-purple-100 rounded-2xl flex items-center justify-center mr-3">
+                        <span class="text-purple-500 text-lg">⚙️</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">设置</h4>
+                        <p class="text-xs text-gray-500">账号安全、隐私设置</p>
+                    </div>
+                    <span class="text-gray-400">›</span>
+                </div>
+                
+                <div class="function-item flex items-center px-4 py-4 border-b border-gray-100">
+                    <div class="w-10 h-10 bg-green-100 rounded-2xl flex items-center justify-center mr-3">
+                        <span class="text-green-500 text-lg">🎭</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">匿名马甲管理</h4>
+                        <p class="text-xs text-gray-500">管理匿名身份</p>
+                    </div>
+                    <span class="text-gray-400">›</span>
+                </div>
+                
+                <div class="function-item flex items-center px-4 py-4 border-b border-gray-100">
+                    <div class="w-10 h-10 bg-indigo-100 rounded-2xl flex items-center justify-center mr-3">
+                        <span class="text-indigo-500 text-lg">🌙</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">夜间模式</h4>
+                        <p class="text-xs text-gray-500">护眼深色主题</p>
+                    </div>
+                    <div class="flex items-center">
+                        <div class="w-12 h-6 bg-gray-200 rounded-full relative">
+                            <div class="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 transition-transform"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="function-item flex items-center px-4 py-4">
+                    <div class="w-10 h-10 bg-orange-100 rounded-2xl flex items-center justify-center mr-3">
+                        <span class="text-orange-500 text-lg">❓</span>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-medium text-gray-800">帮助与反馈</h4>
+                        <p class="text-xs text-gray-500">使用帮助、意见反馈</p>
+                    </div>
+                    <span class="text-gray-400">›</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 退出登录 -->
+        <div class="px-4 pb-8">
+            <button class="w-full bg-red-50 text-red-600 py-4 rounded-2xl font-medium">
+                退出登录
+            </button>
+        </div>
+        
+        <!-- 底部间距 -->
+        <div class="h-20"></div>
+    </div>
+    
+    <!-- 底部导航栏 -->
+    <div class="bg-white border-t border-gray-100 px-4 py-2">
+        <div class="flex justify-around items-center">
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">🏠</span>
+                </div>
+                <span class="text-xs text-gray-500">首页</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">🏛️</span>
+                </div>
+                <span class="text-xs text-gray-500">广场</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">⭐</span>
+                </div>
+                <span class="text-xs text-gray-500">打分墙</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-purple-600 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-white text-xs">👤</span>
+                </div>
+                <span class="text-xs text-purple-600 font-medium">我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

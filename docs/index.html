@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>共鸣回廊 - 小程序原型展示</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tdesign-icons@0.2.4/lib/index.css" rel="stylesheet">
+    <style>
+        /* 自定义配色 */
+        :root {
+            --primary-color: #7C83FD;
+            --primary-light: #FF8A8A;
+            --bg-color: #FEFBF6;
+            --card-bg: #FFFFFF;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            border-radius: 40px;
+            border: 8px solid #1f2937;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            position: relative;
+            background: #000;
+        }
+        
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 30px;
+            background: #000;
+            border-radius: 0 0 20px 20px;
+            z-index: 10;
+        }
+        
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+        
+        .prototype-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            padding: 40px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        .page-title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div class="bg-gray-100 py-8">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">共鸣回廊 - 小程序原型</h1>
+            <p class="text-gray-600 text-lg">情感生活社区微信小程序原型展示</p>
+        </div>
+        
+        <div class="prototype-grid">
+            <!-- 首页 -->
+            <div class="flex flex-col items-center">
+                <div class="page-title">首页 (Home)</div>
+                <div class="phone-frame">
+                    <iframe src="home.html" class="phone-screen"></iframe>
+                </div>
+            </div>
+            
+            <!-- 广场 -->
+            <div class="flex flex-col items-center">
+                <div class="page-title">广场 (Plaza)</div>
+                <div class="phone-frame">
+                    <iframe src="plaza.html" class="phone-screen"></iframe>
+                </div>
+            </div>
+            
+            <!-- 打分墙 -->
+            <div class="flex flex-col items-center">
+                <div class="page-title">打分墙 (Rating Wall)</div>
+                <div class="phone-frame">
+                    <iframe src="rating.html" class="phone-screen"></iframe>
+                </div>
+            </div>
+            
+            <!-- 我的 -->
+            <div class="flex flex-col items-center">
+                <div class="page-title">我的 (Profile)</div>
+                <div class="phone-frame">
+                    <iframe src="profile.html" class="phone-screen"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

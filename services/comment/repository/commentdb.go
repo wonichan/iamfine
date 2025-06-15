@@ -89,6 +89,57 @@ func (cr *commentRepository) UpdateComment(ctx context.Context, comment *models.
 	return comment, nil
 }
 
-func (cr *commentRepository) DeleteComment(ctx context.Context, commentID string) error {
-	return cr.db.Where("id = ?", commentID).Delete(&models.Comment{}).Error
+func (cr *commentRepository) DeleteComment(ctx context.Context, commentID, userID string) error {
+	return cr.db.Where("id = ? AND user_id = ?", commentID, userID).Delete(&models.Comment{}).Error
+}
+
+func (cr *commentRepository) GetCommentDetail(ctx context.Context, commentID string) (*models.Comment, error) {
+	var comment models.Comment
+	err := cr.db.Where("id = ?", commentID).First(&comment).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("评论不存在")
+		}
+		return nil, err
+	}
+	return &comment, nil
+}
+
+func (cr *commentRepository) GetUserCommentList(ctx context.Context, userID string, page, pageSize int32) ([]*models.Comment, error) {
+	var comments []models.Comment
+	offset := (page - 1) * pageSize
+	err := cr.db.Where("user_id = ?", userID).Offset(int(offset)).Limit(int(pageSize)).Order("created_at DESC").Find(&comments).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 转换为指针切片
+	var commentList []*models.Comment
+	for i := range comments {
+		commentList = append(commentList, &comments[i])
+	}
+
+	return commentList, nil
+}
+
+func (cr *commentRepository) LikeComment(ctx context.Context, commentID, userID string) error {
+	// 增加评论点赞数
+	return cr.db.Model(&models.Comment{}).Where("id = ?", commentID).UpdateColumn("like_count", gorm.Expr("like_count + ?", 1)).Error
+}
+
+func (cr *commentRepository) UnlikeComment(ctx context.Context, commentID, userID string) error {
+	// 减少评论点赞数
+	return cr.db.Model(&models.Comment{}).Where("id = ?", commentID).UpdateColumn("like_count", gorm.Expr("like_count - ?", 1)).Error
+}
+
+func (cr *commentRepository) GetAnonymousAvatar(ctx context.Context, avatarID string) (*models.AnonymousAvatar, error) {
+	var avatar models.AnonymousAvatar
+	err := cr.db.Where("id = ?", avatarID).First(&avatar).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("匿名头像不存在")
+		}
+		return nil, err
+	}
+	return &avatar, nil
 }

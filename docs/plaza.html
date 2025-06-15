@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>广场</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tdesign-icons@0.2.4/lib/index.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #7C83FD;
+            --primary-light: #FF8A8A;
+            --bg-color: #FEFBF6;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .topic-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .topic-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .floating-btn {
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            z-index: 50;
+            box-shadow: 0 8px 25px rgba(124, 131, 253, 0.3);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
+    <!-- 状态栏 -->
+    <div class="bg-white px-4 py-2 flex justify-between items-center text-sm">
+        <span class="font-medium">9:41</span>
+        <div class="flex items-center space-x-1">
+            <div class="w-4 h-2 bg-green-500 rounded-sm"></div>
+            <div class="w-4 h-2 bg-green-500 rounded-sm"></div>
+            <div class="w-6 h-3 border border-gray-400 rounded-sm">
+                <div class="w-4 h-full bg-green-500 rounded-sm"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 顶部标题 -->
+    <div class="bg-white px-4 py-4 border-b border-gray-100">
+        <h1 class="text-xl font-bold text-gray-800 text-center">广场</h1>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="flex-1 overflow-y-auto">
+        <!-- 搜索框 -->
+        <div class="px-4 py-4">
+            <div class="relative">
+                <input type="text" 
+                       placeholder="搜索你感兴趣的话题或故事" 
+                       class="w-full bg-white rounded-2xl px-4 py-3 pl-12 text-sm border border-gray-200 focus:outline-none focus:border-purple-400">
+                <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
+                    <span class="text-gray-400">🔍</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 热门话题横向滚动 -->
+        <div class="px-4 mb-6">
+            <h2 class="text-lg font-bold text-gray-800 mb-3">热门话题</h2>
+            <div class="flex space-x-4 overflow-x-auto pb-2">
+                <div class="topic-card min-w-[280px] bg-gradient-to-r from-pink-400 to-purple-500 rounded-2xl p-4 text-white">
+                    <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">💕</span>
+                        <span class="font-bold">今天你被暖到了吗？</span>
+                    </div>
+                    <p class="text-sm opacity-90 mb-3">分享生活中的温暖瞬间，传递正能量</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs opacity-80">1.2k人参与</span>
+                        <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-xs">参与讨论</span>
+                    </div>
+                </div>
+                
+                <div class="topic-card min-w-[280px] bg-gradient-to-r from-orange-400 to-red-500 rounded-2xl p-4 text-white">
+                    <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">🤡</span>
+                        <span class="font-bold">奇葩前任大赏</span>
+                    </div>
+                    <p class="text-sm opacity-90 mb-3">那些年遇到的奇葩前任们</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs opacity-80">856人参与</span>
+                        <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-xs">参与讨论</span>
+                    </div>
+                </div>
+                
+                <div class="topic-card min-w-[280px] bg-gradient-to-r from-blue-400 to-indigo-500 rounded-2xl p-4 text-white">
+                    <div class="flex items-center mb-2">
+                        <span class="text-2xl mr-2">⚖️</span>
+                        <span class="font-bold">婚姻中的妥协艺术</span>
+                    </div>
+                    <p class="text-sm opacity-90 mb-3">探讨婚姻生活中的平衡之道</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs opacity-80">634人参与</span>
+                        <span class="bg-white bg-opacity-20 px-3 py-1 rounded-full text-xs">参与讨论</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 话题列表 -->
+        <div class="px-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-4">全部话题</h2>
+            <div class="space-y-3">
+                <!-- 话题项1 -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-pink-400 to-purple-500 rounded-2xl flex items-center justify-center mr-4">
+                            <span class="text-white text-xl">💕</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800 mb-1">恋爱日常</h3>
+                            <p class="text-sm text-gray-600 mb-2">分享你和TA的甜蜜瞬间</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">今日参与 234人</span>
+                                <span class="text-xs text-purple-600 font-medium">进入话题 →</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 话题项2 -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-2xl flex items-center justify-center mr-4">
+                            <span class="text-white text-xl">🏰</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800 mb-1">婚姻围城</h3>
+                            <p class="text-sm text-gray-600 mb-2">婚姻生活的酸甜苦辣</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">今日参与 189人</span>
+                                <span class="text-xs text-purple-600 font-medium">进入话题 →</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 话题项3 -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-2xl flex items-center justify-center mr-4">
+                            <span class="text-white text-xl">😤</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800 mb-1">我要吐槽</h3>
+                            <p class="text-sm text-gray-600 mb-2">说出你的不满和委屈</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">今日参与 456人</span>
+                                <span class="text-xs text-purple-600 font-medium">进入话题 →</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 话题项4 -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-400 to-blue-500 rounded-2xl flex items-center justify-center mr-4">
+                            <span class="text-white text-xl">👨‍👩‍👧‍👦</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800 mb-1">家庭关系</h3>
+                            <p class="text-sm text-gray-600 mb-2">处理复杂的家庭关系</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">今日参与 167人</span>
+                                <span class="text-xs text-purple-600 font-medium">进入话题 →</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 话题项5 -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-2xl flex items-center justify-center mr-4">
+                            <span class="text-white text-xl">🆘</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800 mb-1">情感求助</h3>
+                            <p class="text-sm text-gray-600 mb-2">寻求情感问题的建议</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">今日参与 298人</span>
+                                <span class="text-xs text-purple-600 font-medium">进入话题 →</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 话题项6 -->
+                <div class="bg-white rounded-2xl p-4 shadow-sm">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-gradient-to-r from-indigo-400 to-purple-500 rounded-2xl flex items-center justify-center mr-4">
+                            <span class="text-white text-xl">💭</span>
+                        </div>
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800 mb-1">心情随笔</h3>
+                            <p class="text-sm text-gray-600 mb-2">记录生活的点点滴滴</p>
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs text-gray-500">今日参与 123人</span>
+                                <span class="text-xs text-purple-600 font-medium">进入话题 →</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 底部间距 -->
+        <div class="h-20"></div>
+    </div>
+    
+    <!-- 悬浮发布按钮 -->
+    <button class="floating-btn w-14 h-14 bg-purple-600 rounded-full flex items-center justify-center">
+        <span class="text-white text-2xl">✏️</span>
+    </button>
+    
+    <!-- 底部导航栏 -->
+    <div class="bg-white border-t border-gray-100 px-4 py-2">
+        <div class="flex justify-around items-center">
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">🏠</span>
+                </div>
+                <span class="text-xs text-gray-500">首页</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-purple-600 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-white text-xs">🏛️</span>
+                </div>
+                <span class="text-xs text-purple-600 font-medium">广场</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">⭐</span>
+                </div>
+                <span class="text-xs text-gray-500">打分墙</span>
+            </div>
+            <div class="flex flex-col items-center py-2">
+                <div class="w-6 h-6 bg-gray-300 rounded-lg flex items-center justify-center mb-1">
+                    <span class="text-gray-600 text-xs">👤</span>
+                </div>
+                <span class="text-xs text-gray-500">我的</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

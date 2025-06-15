@@ -27,6 +27,34 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"MarkNotificationRead": kitex.NewMethodInfo(
+		markNotificationReadHandler,
+		newNotificationServiceMarkNotificationReadArgs,
+		newNotificationServiceMarkNotificationReadResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"MarkAllNotificationsRead": kitex.NewMethodInfo(
+		markAllNotificationsReadHandler,
+		newNotificationServiceMarkAllNotificationsReadArgs,
+		newNotificationServiceMarkAllNotificationsReadResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetUnreadCount": kitex.NewMethodInfo(
+		getUnreadCountHandler,
+		newNotificationServiceGetUnreadCountArgs,
+		newNotificationServiceGetUnreadCountResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"DeleteNotification": kitex.NewMethodInfo(
+		deleteNotificationHandler,
+		newNotificationServiceDeleteNotificationArgs,
+		newNotificationServiceDeleteNotificationResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -129,6 +157,78 @@ func newNotificationServiceGetNotificationListResult() interface{} {
 	return notification.NewNotificationServiceGetNotificationListResult()
 }
 
+func markNotificationReadHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*notification.NotificationServiceMarkNotificationReadArgs)
+	realResult := result.(*notification.NotificationServiceMarkNotificationReadResult)
+	success, err := handler.(notification.NotificationService).MarkNotificationRead(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newNotificationServiceMarkNotificationReadArgs() interface{} {
+	return notification.NewNotificationServiceMarkNotificationReadArgs()
+}
+
+func newNotificationServiceMarkNotificationReadResult() interface{} {
+	return notification.NewNotificationServiceMarkNotificationReadResult()
+}
+
+func markAllNotificationsReadHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*notification.NotificationServiceMarkAllNotificationsReadArgs)
+	realResult := result.(*notification.NotificationServiceMarkAllNotificationsReadResult)
+	success, err := handler.(notification.NotificationService).MarkAllNotificationsRead(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newNotificationServiceMarkAllNotificationsReadArgs() interface{} {
+	return notification.NewNotificationServiceMarkAllNotificationsReadArgs()
+}
+
+func newNotificationServiceMarkAllNotificationsReadResult() interface{} {
+	return notification.NewNotificationServiceMarkAllNotificationsReadResult()
+}
+
+func getUnreadCountHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*notification.NotificationServiceGetUnreadCountArgs)
+	realResult := result.(*notification.NotificationServiceGetUnreadCountResult)
+	success, err := handler.(notification.NotificationService).GetUnreadCount(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newNotificationServiceGetUnreadCountArgs() interface{} {
+	return notification.NewNotificationServiceGetUnreadCountArgs()
+}
+
+func newNotificationServiceGetUnreadCountResult() interface{} {
+	return notification.NewNotificationServiceGetUnreadCountResult()
+}
+
+func deleteNotificationHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*notification.NotificationServiceDeleteNotificationArgs)
+	realResult := result.(*notification.NotificationServiceDeleteNotificationResult)
+	success, err := handler.(notification.NotificationService).DeleteNotification(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newNotificationServiceDeleteNotificationArgs() interface{} {
+	return notification.NewNotificationServiceDeleteNotificationArgs()
+}
+
+func newNotificationServiceDeleteNotificationResult() interface{} {
+	return notification.NewNotificationServiceDeleteNotificationResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -154,6 +254,46 @@ func (p *kClient) GetNotificationList(ctx context.Context, req *notification.Get
 	_args.Req = req
 	var _result notification.NotificationServiceGetNotificationListResult
 	if err = p.c.Call(ctx, "GetNotificationList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) MarkNotificationRead(ctx context.Context, req *notification.MarkNotificationReadRequest) (r *notification.MarkNotificationReadResponse, err error) {
+	var _args notification.NotificationServiceMarkNotificationReadArgs
+	_args.Req = req
+	var _result notification.NotificationServiceMarkNotificationReadResult
+	if err = p.c.Call(ctx, "MarkNotificationRead", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) MarkAllNotificationsRead(ctx context.Context, req *notification.MarkAllNotificationsReadRequest) (r *notification.MarkAllNotificationsReadResponse, err error) {
+	var _args notification.NotificationServiceMarkAllNotificationsReadArgs
+	_args.Req = req
+	var _result notification.NotificationServiceMarkAllNotificationsReadResult
+	if err = p.c.Call(ctx, "MarkAllNotificationsRead", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetUnreadCount(ctx context.Context, req *notification.GetUnreadCountRequest) (r *notification.GetUnreadCountResponse, err error) {
+	var _args notification.NotificationServiceGetUnreadCountArgs
+	_args.Req = req
+	var _result notification.NotificationServiceGetUnreadCountResult
+	if err = p.c.Call(ctx, "GetUnreadCount", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteNotification(ctx context.Context, req *notification.DeleteNotificationRequest) (r *notification.DeleteNotificationResponse, err error) {
+	var _args notification.NotificationServiceDeleteNotificationArgs
+	_args.Req = req
+	var _result notification.NotificationServiceDeleteNotificationResult
+	if err = p.c.Call(ctx, "DeleteNotification", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

@@ -99,3 +99,51 @@ func (h *LikeHandler) GetLikeList(ctx context.Context, req *like.GetLikeListRequ
 		Likes:   likeList,
 	}, nil
 }
+
+// GetLikeCount 获取点赞数量
+func (h *LikeHandler) GetLikeCount(ctx context.Context, req *like.GetLikeCountRequest) (*like.GetLikeCountResponse, error) {
+	count, err := h.rdb.GetLikeCount(ctx, req.TargetId, req.TargetType)
+	if err != nil {
+		return &like.GetLikeCountResponse{
+			Code:    500,
+			Message: "查询点赞数量失败",
+		}, err
+	}
+
+	return &like.GetLikeCountResponse{
+		Code:    0,
+		Message: "查询成功",
+		Count:   count,
+	}, nil
+}
+
+// GetLikeUsers 获取点赞用户列表
+func (h *LikeHandler) GetLikeUsers(ctx context.Context, req *like.GetLikeUsersRequest) (*like.GetLikeUsersResponse, error) {
+	userIDs, err := h.rdb.GetLikeUsers(ctx, req.TargetId, req.TargetType, req.Page, req.PageSize)
+	if err != nil {
+		return &like.GetLikeUsersResponse{
+			Code:    500,
+			Message: "查询点赞用户失败",
+		}, err
+	}
+
+	// 转换为响应格式
+	var userList []*like.LikeUser
+	for _, userID := range userIDs {
+		// TODO: 这里应该调用用户服务获取用户详细信息
+		// 目前先返回基本信息
+		userList = append(userList, &like.LikeUser{
+			UserId:    userID,
+			Username:  "", // 需要从用户服务获取
+			Nickname:  "", // 需要从用户服务获取
+			Avatar:    "", // 需要从用户服务获取
+			CreatedAt: 0,  // 需要从点赞记录获取
+		})
+	}
+
+	return &like.GetLikeUsersResponse{
+		Code:    0,
+		Message: "查询成功",
+		Users:   userList,
+	}, nil
+}

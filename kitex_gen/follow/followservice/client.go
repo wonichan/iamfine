@@ -16,6 +16,10 @@ type Client interface {
 	IsFollowing(ctx context.Context, req *follow.FollowRequest, callOptions ...callopt.Option) (r *follow.FollowResponse, err error)
 	GetFollowList(ctx context.Context, req *follow.GetFollowListRequest, callOptions ...callopt.Option) (r *follow.GetFollowListResponse, err error)
 	GetFollowerList(ctx context.Context, req *follow.GetFollowerListRequest, callOptions ...callopt.Option) (r *follow.GetFollowerListResponse, err error)
+	CheckFollowStatus(ctx context.Context, req *follow.CheckFollowStatusRequest, callOptions ...callopt.Option) (r *follow.CheckFollowStatusResponse, err error)
+	GetFollowCount(ctx context.Context, req *follow.GetFollowCountRequest, callOptions ...callopt.Option) (r *follow.GetFollowCountResponse, err error)
+	GetFollowerCount(ctx context.Context, req *follow.GetFollowerCountRequest, callOptions ...callopt.Option) (r *follow.GetFollowerCountResponse, err error)
+	GetMutualFollows(ctx context.Context, req *follow.GetMutualFollowsRequest, callOptions ...callopt.Option) (r *follow.GetMutualFollowsResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -70,4 +74,24 @@ func (p *kFollowServiceClient) GetFollowList(ctx context.Context, req *follow.Ge
 func (p *kFollowServiceClient) GetFollowerList(ctx context.Context, req *follow.GetFollowerListRequest, callOptions ...callopt.Option) (r *follow.GetFollowerListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetFollowerList(ctx, req)
+}
+
+func (p *kFollowServiceClient) CheckFollowStatus(ctx context.Context, req *follow.CheckFollowStatusRequest, callOptions ...callopt.Option) (r *follow.CheckFollowStatusResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.CheckFollowStatus(ctx, req)
+}
+
+func (p *kFollowServiceClient) GetFollowCount(ctx context.Context, req *follow.GetFollowCountRequest, callOptions ...callopt.Option) (r *follow.GetFollowCountResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetFollowCount(ctx, req)
+}
+
+func (p *kFollowServiceClient) GetFollowerCount(ctx context.Context, req *follow.GetFollowerCountRequest, callOptions ...callopt.Option) (r *follow.GetFollowerCountResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetFollowerCount(ctx, req)
+}
+
+func (p *kFollowServiceClient) GetMutualFollows(ctx context.Context, req *follow.GetMutualFollowsRequest, callOptions ...callopt.Option) (r *follow.GetMutualFollowsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetMutualFollows(ctx, req)
 }
