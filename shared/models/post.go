@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+
+	kitex_gen_post "hupu/kitex_gen/post"
 )
 
 type PostCategory int32
@@ -56,6 +58,31 @@ type Post struct {
 
 func (Post) TableName() string {
 	return "posts"
+}
+
+func PostToKitexPost(post *Post) *kitex_gen_post.Post {
+	return &kitex_gen_post.Post{
+		Id:            post.ID,
+		UserId:        post.UserID,
+		TopicId:       post.TopicID,
+		Title:         post.Title,
+		Content:       post.Content,
+		Images:        post.Images,
+		Category:      kitex_gen_post.PostCategory(post.Category),
+		IsAnonymous:   &post.IsAnonymous,
+		AnonymousName: post.AnonymousName,
+		LikeCount:     post.LikeCount,
+		CommentCount:  post.CommentCount,
+		ViewCount:     post.ViewCount,
+		ShareCount:    post.ShareCount,
+		CollectCount:  post.FavoriteCount,
+		IsHot:         post.IsHot,
+		IsTop:         post.IsTop,
+		Location:      post.Location,
+		Tags:          post.Tags,
+		CreatedAt:     post.CreatedAt.Unix(),
+		UpdatedAt:     post.UpdatedAt.Unix(),
+	}
 }
 
 type PostFavorite struct {
