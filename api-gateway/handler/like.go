@@ -133,3 +133,124 @@ func GetLikeList(ctx context.Context, c *app.RequestContext) {
 
 	c.JSON(http.StatusOK, resp)
 }
+
+// 检查是否已点赞
+func IsLiked(ctx context.Context, c *app.RequestContext) {
+	// 从上下文获取用户ID
+	userID, exists := c.Get("user_id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, map[string]interface{}{
+			"code":    401,
+			"message": "未授权",
+		})
+		return
+	}
+
+	// 解析请求参数
+	var req like.LikeRequest
+	if err := c.BindAndValidate(&req); err != nil {
+		c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"code":    400,
+			"message": "参数错误: " + err.Error(),
+		})
+		return
+	}
+
+	// 设置用户ID
+	req.UserId = userID.(string)
+
+	// 调用点赞服务
+	resp, err := likeClient.IsLiked(ctx, &req)
+	if err != nil {
+		log.GetLogger().Errorf("IsLiked error: %v", err)
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"code":    500,
+			"message": "检查点赞状态失败",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+// 获取点赞数量
+func GetLikeCount(ctx context.Context, c *app.RequestContext) {
+	// 获取目标ID和类型参数
+	targetID := c.Query("target_id")
+	targetType := c.Query("target_type")
+
+	if targetID == "" || targetType == "" {
+		c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"code":    400,
+			"message": "目标ID和类型不能为空",
+		})
+		return
+	}
+
+	// 构建请求
+	req := &like.GetLikeCountRequest{
+		TargetId:   targetID,
+		TargetType: targetType,
+	}
+
+	// 调用点赞服务
+	resp, err := likeClient.GetLikeCount(ctx, req)
+	if err != nil {
+		log.GetLogger().Errorf("GetLikeCount error: %v", err)
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"code":    500,
+			"message": "获取点赞数量失败",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
+
+// 获取点赞用户列表
+func GetLikeUsers(ctx context.Context, c *app.RequestContext) {
+	// 获取目标ID和类型参数
+	targetID := c.Query("target_id")
+	targetType := c.Query("target_type")
+	pageStr := c.Query("page")
+	pageSizeStr := c.Query("page_size")
+
+	if targetID == "" || targetType == "" {
+		c.JSON(http.StatusBadRequest, map[string]interface{}{
+			"code":    400,
+			"message": "目标ID和类型不能为空",
+		})
+		return
+	}
+
+	page, err := strconv.ParseInt(pageStr, 10, 32)
+	if err != nil || page <= 0 {
+		page = 1
+	}
+
+	pageSize, err := strconv.ParseInt(pageSizeStr, 10, 32)
+	if err != nil || pageSize <= 0 {
+		pageSize = 10
+	}
+
+	// 构建请求
+	req := &like.GetLikeUsersRequest{
+		TargetId:   targetID,
+		TargetType: targetType,
+		Page:       int32(page),
+		PageSize:   int32(pageSize),
+	}
+
+	// 调用点赞服务
+	resp, err := likeClient.GetLikeUsers(ctx, req)
+	if err != nil {
+		log.GetLogger().Errorf("GetLikeUsers error: %v", err)
+		c.JSON(http.StatusInternalServerError, map[string]interface{}{
+			"code":    500,
+			"message": "获取点赞用户列表失败",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, resp)
+}
