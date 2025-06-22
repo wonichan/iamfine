@@ -28,6 +28,7 @@ func NewUserHandler(db *gorm.DB, rdb *redis.Client) *UserHandler {
 	}
 }
 
+// 用户注册
 func (h *UserHandler) Register(ctx context.Context, req *user.RegisterRequest) (*user.RegisterResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Info("Register start")
@@ -50,10 +51,11 @@ func (h *UserHandler) Register(ctx context.Context, req *user.RegisterRequest) (
 	return &user.RegisterResponse{
 		Code:    200,
 		Message: "注册成功",
-		User: h.convertToUserResponse(savedUser),
+		User:    h.convertToUserResponse(savedUser),
 	}, nil
 }
 
+// 用户登录
 func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (*user.LoginResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Info("Login start")
@@ -82,10 +84,11 @@ func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (*user.
 		Code:    200,
 		Message: "登录成功",
 		Token:   token,
-		User: h.convertToUserResponse(getUser),
+		User:    h.convertToUserResponse(getUser),
 	}, nil
 }
 
+// 获取用户信息
 func (h *UserHandler) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Infof("GetUser start, req:%+v", req)
@@ -102,10 +105,11 @@ func (h *UserHandler) GetUser(ctx context.Context, req *user.GetUserRequest) (*u
 	return &user.GetUserResponse{
 		Code:    0,
 		Message: "查询成功",
-		User: h.convertToUserResponse(getUser),
+		User:    h.convertToUserResponse(getUser),
 	}, nil
 }
 
+// 更新用户信息
 func (h *UserHandler) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Infof("UpdateUser start, req:%+v", req)
@@ -150,7 +154,7 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *user.UpdateUserReques
 	return &user.UpdateUserResponse{
 		Code:    0,
 		Message: "更新成功",
-		User: h.convertToUserResponse(updatedUser),
+		User:    h.convertToUserResponse(updatedUser),
 	}, nil
 }
 
@@ -184,7 +188,7 @@ func (h *UserHandler) UnfollowUser(ctx context.Context, req *user.UnfollowUserRe
 		Message: "取消关注成功",
 	}, nil
 }
- 
+
 // 获取粉丝列表
 func (h *UserHandler) GetFollowers(ctx context.Context, req *user.GetFollowersRequest) (*user.GetFollowersResponse, error) {
 	followers, err := h.db.GetFollowerList(ctx, req.UserId, req.Page, req.PageSize)
@@ -339,14 +343,14 @@ func (h *UserHandler) GetUserStats(ctx context.Context, req *user.GetUserStatsRe
 	}
 
 	return &user.GetUserStatsResponse{
-		Code:          200,
-		Message:       "获取成功",
-		PostCount:     stats.PostCount,
-		CommentCount:  stats.CommentCount,
-		LikeCount:     stats.LikeCount,
-		CollectCount:  stats.FavoriteCount,
-		AverageScore:  stats.AverageScore,
-		FollowerCount: stats.FollowerCount,
+		Code:           200,
+		Message:        "获取成功",
+		PostCount:      stats.PostCount,
+		CommentCount:   stats.CommentCount,
+		LikeCount:      stats.LikeCount,
+		CollectCount:   stats.FavoriteCount,
+		AverageScore:   stats.AverageScore,
+		FollowerCount:  stats.FollowerCount,
 		FollowingCount: stats.FollowingCount,
 	}, nil
 }
