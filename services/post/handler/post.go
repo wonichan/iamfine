@@ -303,3 +303,173 @@ func (h *PostHandler) GetRatingRank(ctx context.Context, req *post.GetRatingRank
 		Total:   int32(len(postList)),
 	}, nil
 }
+
+// UpdatePost 更新帖子
+func (h *PostHandler) UpdatePost(ctx context.Context, req *post.UpdatePostRequest) (*post.UpdatePostResponse, error) {
+	// TODO: 实现更新帖子逻辑
+	return &post.UpdatePostResponse{
+		Code:    0,
+		Message: "更新成功",
+	}, nil
+}
+
+// DeletePost 删除帖子
+func (h *PostHandler) DeletePost(ctx context.Context, req *post.DeletePostRequest) (*post.DeletePostResponse, error) {
+	// TODO: 实现删除帖子逻辑
+	return &post.DeletePostResponse{
+		Code:    0,
+		Message: "删除成功",
+	}, nil
+}
+
+// GetRecommendPosts 获取推荐帖子
+func (h *PostHandler) GetRecommendPosts(ctx context.Context, req *post.GetRecommendPostsRequest) (*post.GetRecommendPostsResponse, error) {
+	// TODO: 实现获取推荐帖子逻辑
+	return &post.GetRecommendPostsResponse{
+		Code:    0,
+		Message: "获取成功",
+		Posts:   []*post.Post{},
+		Total:   0,
+		HasMore: false,
+	}, nil
+}
+
+// GetHotPosts 获取热门帖子
+func (h *PostHandler) GetHotPosts(ctx context.Context, req *post.GetHotPostsRequest) (*post.GetHotPostsResponse, error) {
+	// TODO: 实现获取热门帖子逻辑
+	return &post.GetHotPostsResponse{
+		Code:    0,
+		Message: "获取成功",
+		Posts:   []*post.Post{},
+		Total:   0,
+		HasMore: false,
+	}, nil
+}
+
+// GetHighScorePosts 获取高分帖子
+func (h *PostHandler) GetHighScorePosts(ctx context.Context, req *post.GetHighScorePostsRequest) (*post.GetHighScorePostsResponse, error) {
+	// TODO: 实现获取高分帖子逻辑
+	return &post.GetHighScorePostsResponse{
+		Code:    0,
+		Message: "获取成功",
+		Posts:   []*post.Post{},
+		Total:   0,
+		HasMore: false,
+	}, nil
+}
+
+// GetLowScorePosts 获取低分帖子
+func (h *PostHandler) GetLowScorePosts(ctx context.Context, req *post.GetLowScorePostsRequest) (*post.GetLowScorePostsResponse, error) {
+	// TODO: 实现获取低分帖子逻辑
+	return &post.GetLowScorePostsResponse{
+		Code:    0,
+		Message: "获取成功",
+		Posts:   []*post.Post{},
+		Total:   0,
+		HasMore: false,
+	}, nil
+}
+
+// GetControversialPosts 获取争议帖子
+func (h *PostHandler) GetControversialPosts(ctx context.Context, req *post.GetControversialPostsRequest) (*post.GetControversialPostsResponse, error) {
+	// TODO: 实现获取争议帖子逻辑
+	return &post.GetControversialPostsResponse{
+		Code:    0,
+		Message: "获取成功",
+		Posts:   []*post.Post{},
+		Total:   0,
+		HasMore: false,
+	}, nil
+}
+
+// SearchPosts 搜索帖子
+func (h *PostHandler) SearchPosts(ctx context.Context, req *post.SearchPostsRequest) (*post.SearchPostsResponse, error) {
+	// TODO: 实现搜索帖子逻辑
+	return &post.SearchPostsResponse{
+		Code:    0,
+		Message: "搜索成功",
+		Posts:   []*post.Post{},
+		Total:   0,
+	}, nil
+}
+
+// GetTopic 获取话题详情
+func (h *PostHandler) GetTopic(ctx context.Context, req *post.GetTopicRequest) (*post.GetTopicResponse, error) {
+	// TODO: 实现获取话题详情逻辑
+	return &post.GetTopicResponse{
+		Code:    0,
+		Message: "获取成功",
+	}, nil
+}
+
+// GetHotTopics 获取热门话题
+func (h *PostHandler) GetHotTopics(ctx context.Context, req *post.GetHotTopicsRequest) (*post.GetHotTopicsResponse, error) {
+	// TODO: 实现获取热门话题逻辑
+	return &post.GetHotTopicsResponse{
+		Code:    0,
+		Message: "获取成功",
+		Topics:  []*post.Topic{},
+	}, nil
+}
+
+// GetTopicCategories 获取话题分类
+func (h *PostHandler) GetTopicCategories(ctx context.Context, req *post.GetTopicCategoriesRequest) (*post.GetTopicCategoriesResponse, error) {
+	// TODO: 实现获取话题分类逻辑
+	return &post.GetTopicCategoriesResponse{
+		Code:    0,
+		Message: "获取成功",
+		Topics:  []*post.Topic{},
+	}, nil
+}
+
+// SearchTopics 搜索话题
+func (h *PostHandler) SearchTopics(ctx context.Context, req *post.SearchTopicsRequest) (*post.SearchTopicsResponse, error) {
+	// TODO: 实现搜索话题逻辑
+	return &post.SearchTopicsResponse{
+		Code:    0,
+		Message: "搜索成功",
+		Topics:  []*post.Topic{},
+		Total:   0,
+	}, nil
+}
+
+// ShareTopic 分享话题
+func (h *PostHandler) ShareTopic(ctx context.Context, req *post.ShareTopicRequest) (*post.ShareTopicResponse, error) {
+	// TODO: 实现分享话题逻辑
+	return &post.ShareTopicResponse{
+		Code:    0,
+		Message: "分享成功",
+	}, nil
+}
+
+// GetUserRating 获取用户评分
+func (h *PostHandler) GetUserRating(ctx context.Context, req *post.GetUserRatingRequest) (*post.GetUserRatingResponse, error) {
+	// TODO: 实现获取用户评分逻辑
+	return &post.GetUserRatingResponse{
+		Code:     0,
+		Message:  "获取成功",
+		IsRated:  false,
+	}, nil
+}
+
+// UpdateRating 更新评分
+func (h *PostHandler) UpdateRating(ctx context.Context, req *post.UpdateRatingRequest) (*post.UpdateRatingResponse, error) {
+	// TODO: 实现更新评分逻辑
+	return &post.UpdateRatingResponse{
+		Code:          0,
+		Message:       "更新成功",
+		AverageScore:  0,
+		TotalRatings:  0,
+	}, nil
+}
+
+// DeleteRating 删除评分
+func (h *PostHandler) DeleteRating(ctx context.Context, req *post.DeleteRatingRequest) (*post.DeleteRatingResponse, error) {
+	// TODO: 实现删除评分逻辑
+	return &post.DeleteRatingResponse{
+		Code:          0,
+		Message:       "删除成功",
+		AverageScore:  0,
+		TotalRatings:  0,
+	}, nil
+}

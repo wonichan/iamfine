@@ -14,12 +14,28 @@ type Client interface {
 	CreatePost(ctx context.Context, req *post.CreatePostRequest, callOptions ...callopt.Option) (r *post.CreatePostResponse, err error)
 	GetPost(ctx context.Context, req *post.GetPostRequest, callOptions ...callopt.Option) (r *post.GetPostResponse, err error)
 	GetPostList(ctx context.Context, req *post.GetPostListRequest, callOptions ...callopt.Option) (r *post.GetPostListResponse, err error)
+	UpdatePost(ctx context.Context, req *post.UpdatePostRequest, callOptions ...callopt.Option) (r *post.UpdatePostResponse, err error)
+	DeletePost(ctx context.Context, req *post.DeletePostRequest, callOptions ...callopt.Option) (r *post.DeletePostResponse, err error)
+	GetRecommendPosts(ctx context.Context, req *post.GetRecommendPostsRequest, callOptions ...callopt.Option) (r *post.GetRecommendPostsResponse, err error)
+	GetHotPosts(ctx context.Context, req *post.GetHotPostsRequest, callOptions ...callopt.Option) (r *post.GetHotPostsResponse, err error)
+	GetHighScorePosts(ctx context.Context, req *post.GetHighScorePostsRequest, callOptions ...callopt.Option) (r *post.GetHighScorePostsResponse, err error)
+	GetLowScorePosts(ctx context.Context, req *post.GetLowScorePostsRequest, callOptions ...callopt.Option) (r *post.GetLowScorePostsResponse, err error)
+	GetControversialPosts(ctx context.Context, req *post.GetControversialPostsRequest, callOptions ...callopt.Option) (r *post.GetControversialPostsResponse, err error)
+	SearchPosts(ctx context.Context, req *post.SearchPostsRequest, callOptions ...callopt.Option) (r *post.SearchPostsResponse, err error)
 	CreateTopic(ctx context.Context, req *post.CreateTopicRequest, callOptions ...callopt.Option) (r *post.CreateTopicResponse, err error)
+	GetTopic(ctx context.Context, req *post.GetTopicRequest, callOptions ...callopt.Option) (r *post.GetTopicResponse, err error)
 	GetTopicList(ctx context.Context, req *post.GetTopicListRequest, callOptions ...callopt.Option) (r *post.GetTopicListResponse, err error)
+	GetHotTopics(ctx context.Context, req *post.GetHotTopicsRequest, callOptions ...callopt.Option) (r *post.GetHotTopicsResponse, err error)
+	GetTopicCategories(ctx context.Context, req *post.GetTopicCategoriesRequest, callOptions ...callopt.Option) (r *post.GetTopicCategoriesResponse, err error)
+	SearchTopics(ctx context.Context, req *post.SearchTopicsRequest, callOptions ...callopt.Option) (r *post.SearchTopicsResponse, err error)
+	ShareTopic(ctx context.Context, req *post.ShareTopicRequest, callOptions ...callopt.Option) (r *post.ShareTopicResponse, err error)
 	CollectPost(ctx context.Context, req *post.CollectPostRequest, callOptions ...callopt.Option) (r *post.CollectPostResponse, err error)
 	UncollectPost(ctx context.Context, req *post.UncollectPostRequest, callOptions ...callopt.Option) (r *post.UncollectPostResponse, err error)
 	GetCollectedPosts(ctx context.Context, req *post.GetCollectedPostsRequest, callOptions ...callopt.Option) (r *post.GetCollectedPostsResponse, err error)
 	RatePost(ctx context.Context, req *post.RatePostRequest, callOptions ...callopt.Option) (r *post.RatePostResponse, err error)
+	GetUserRating(ctx context.Context, req *post.GetUserRatingRequest, callOptions ...callopt.Option) (r *post.GetUserRatingResponse, err error)
+	UpdateRating(ctx context.Context, req *post.UpdateRatingRequest, callOptions ...callopt.Option) (r *post.UpdateRatingResponse, err error)
+	DeleteRating(ctx context.Context, req *post.DeleteRatingRequest, callOptions ...callopt.Option) (r *post.DeleteRatingResponse, err error)
 	GetRatingRank(ctx context.Context, req *post.GetRatingRankRequest, callOptions ...callopt.Option) (r *post.GetRatingRankResponse, err error)
 }
 
@@ -67,14 +83,79 @@ func (p *kPostServiceClient) GetPostList(ctx context.Context, req *post.GetPostL
 	return p.kClient.GetPostList(ctx, req)
 }
 
+func (p *kPostServiceClient) UpdatePost(ctx context.Context, req *post.UpdatePostRequest, callOptions ...callopt.Option) (r *post.UpdatePostResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdatePost(ctx, req)
+}
+
+func (p *kPostServiceClient) DeletePost(ctx context.Context, req *post.DeletePostRequest, callOptions ...callopt.Option) (r *post.DeletePostResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeletePost(ctx, req)
+}
+
+func (p *kPostServiceClient) GetRecommendPosts(ctx context.Context, req *post.GetRecommendPostsRequest, callOptions ...callopt.Option) (r *post.GetRecommendPostsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetRecommendPosts(ctx, req)
+}
+
+func (p *kPostServiceClient) GetHotPosts(ctx context.Context, req *post.GetHotPostsRequest, callOptions ...callopt.Option) (r *post.GetHotPostsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetHotPosts(ctx, req)
+}
+
+func (p *kPostServiceClient) GetHighScorePosts(ctx context.Context, req *post.GetHighScorePostsRequest, callOptions ...callopt.Option) (r *post.GetHighScorePostsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetHighScorePosts(ctx, req)
+}
+
+func (p *kPostServiceClient) GetLowScorePosts(ctx context.Context, req *post.GetLowScorePostsRequest, callOptions ...callopt.Option) (r *post.GetLowScorePostsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetLowScorePosts(ctx, req)
+}
+
+func (p *kPostServiceClient) GetControversialPosts(ctx context.Context, req *post.GetControversialPostsRequest, callOptions ...callopt.Option) (r *post.GetControversialPostsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetControversialPosts(ctx, req)
+}
+
+func (p *kPostServiceClient) SearchPosts(ctx context.Context, req *post.SearchPostsRequest, callOptions ...callopt.Option) (r *post.SearchPostsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.SearchPosts(ctx, req)
+}
+
 func (p *kPostServiceClient) CreateTopic(ctx context.Context, req *post.CreateTopicRequest, callOptions ...callopt.Option) (r *post.CreateTopicResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.CreateTopic(ctx, req)
 }
 
+func (p *kPostServiceClient) GetTopic(ctx context.Context, req *post.GetTopicRequest, callOptions ...callopt.Option) (r *post.GetTopicResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetTopic(ctx, req)
+}
+
 func (p *kPostServiceClient) GetTopicList(ctx context.Context, req *post.GetTopicListRequest, callOptions ...callopt.Option) (r *post.GetTopicListResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetTopicList(ctx, req)
+}
+
+func (p *kPostServiceClient) GetHotTopics(ctx context.Context, req *post.GetHotTopicsRequest, callOptions ...callopt.Option) (r *post.GetHotTopicsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetHotTopics(ctx, req)
+}
+
+func (p *kPostServiceClient) GetTopicCategories(ctx context.Context, req *post.GetTopicCategoriesRequest, callOptions ...callopt.Option) (r *post.GetTopicCategoriesResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetTopicCategories(ctx, req)
+}
+
+func (p *kPostServiceClient) SearchTopics(ctx context.Context, req *post.SearchTopicsRequest, callOptions ...callopt.Option) (r *post.SearchTopicsResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.SearchTopics(ctx, req)
+}
+
+func (p *kPostServiceClient) ShareTopic(ctx context.Context, req *post.ShareTopicRequest, callOptions ...callopt.Option) (r *post.ShareTopicResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.ShareTopic(ctx, req)
 }
 
 func (p *kPostServiceClient) CollectPost(ctx context.Context, req *post.CollectPostRequest, callOptions ...callopt.Option) (r *post.CollectPostResponse, err error) {
@@ -95,6 +176,21 @@ func (p *kPostServiceClient) GetCollectedPosts(ctx context.Context, req *post.Ge
 func (p *kPostServiceClient) RatePost(ctx context.Context, req *post.RatePostRequest, callOptions ...callopt.Option) (r *post.RatePostResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.RatePost(ctx, req)
+}
+
+func (p *kPostServiceClient) GetUserRating(ctx context.Context, req *post.GetUserRatingRequest, callOptions ...callopt.Option) (r *post.GetUserRatingResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetUserRating(ctx, req)
+}
+
+func (p *kPostServiceClient) UpdateRating(ctx context.Context, req *post.UpdateRatingRequest, callOptions ...callopt.Option) (r *post.UpdateRatingResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateRating(ctx, req)
+}
+
+func (p *kPostServiceClient) DeleteRating(ctx context.Context, req *post.DeleteRatingRequest, callOptions ...callopt.Option) (r *post.DeleteRatingResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeleteRating(ctx, req)
 }
 
 func (p *kPostServiceClient) GetRatingRank(ctx context.Context, req *post.GetRatingRankRequest, callOptions ...callopt.Option) (r *post.GetRatingRankResponse, err error) {

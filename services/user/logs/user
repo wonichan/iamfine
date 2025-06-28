@@ -16,3 +16,22 @@
 [31mERRO[0m[2025-06-12 00:47:23] user/main.go:29 Failed to init database: dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it. 
 [36mINFO[0m[2025-06-12 00:47:23] user/main.go:51 User service starting...                     
 [36mINFO[0m[2025-06-12 00:47:31] handler/user.go:32 Register start                                [36mtrace_id[0m=gateway-d14r68t5nhg4v62uc7og
+[36mINFO[0m[2025-06-29 03:04:36] log/logger.go:57 Logger initialized successfully              
+[31mERRO[0m[2025-06-29 03:04:36] user/main.go:29 Failed to init database: dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it. 
+[31mFATA[0m[2025-06-29 03:04:37] user/main.go:35 Failed to init redis: dial tcp [::1]:6379: connectex: No connection could be made because the target machine actively refused it. 
+[36mINFO[0m[2025-06-29 03:05:16] log/logger.go:57 Logger initialized successfully              
+[31mERRO[0m[2025-06-29 03:05:16] user/main.go:29 Failed to init database: dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it. 
+[36mINFO[0m[2025-06-29 03:05:16] user/main.go:51 User service starting...                     
+[31mFATA[0m[2025-06-29 03:05:16] user/main.go:54 Failed to start server: listen tcp 127.0.0.1:8001: bind: An attempt was made to access a socket in a way forbidden by its access permissions. 
+[36mINFO[0m[2025-06-29 03:05:43] log/logger.go:57 Logger initialized successfully              
+[31mERRO[0m[2025-06-29 03:05:43] user/main.go:29 Failed to init database: dial tcp [::1]:3306: connectex: No connection could be made because the target machine actively refused it. 
+[36mINFO[0m[2025-06-29 03:05:43] user/main.go:51 User service starting...                     
+[36mINFO[0m[2025-06-29 03:06:38] handler/user.go:61 Login start                                   [36mtrace_id[0m=d1g3qdl5nhg0b01o4qug
+[36mINFO[0m[2025-06-29 03:09:18] handler/user.go:34 Register start                                [36mtrace_id[0m=d1g3rlt5nhg0b01o4r10
+[36mINFO[0m[2025-06-29 03:09:18] handler/user.go:50 Register success, user:&{ID:d1g3rnl5nhg4o513kop0 Username:xhw Password:$2a$10$TfGMqSN2ak6ZRU8PHcAnn.Gg9916VEFRim0yF7KzyXI3py6ZCIbTy Nickname:xhw Avatar: Phone: Email: Status:0 Bio:<nil> RelationshipStatus:<nil> AgeGroup:<nil> Location:<nil> PostCount:0 CommentCount:0 LikeCount:0 FavoriteCount:0 AverageScore:0 FollowerCount:0 FollowingCount:0 IsVerified:false Tags:[] CreatedAt:2025-06-29 03:09:18.6816577 +0800 CST m=+215.376235001 UpdatedAt:2025-06-29 03:09:18.6816577 +0800 CST m=+215.376235001 DeletedAt:{Time:0001-01-01 00:00:00 +0000 UTC Valid:false}}  [36mtrace_id[0m=d1g3rlt5nhg0b01o4r10
+[36mINFO[0m[2025-06-29 03:11:06] handler/user.go:61 Login start                                   [36mtrace_id[0m=d1g3shl5nhg0b01o4r1g
+[36mINFO[0m[2025-06-29 03:14:21] handler/user.go:61 Login start                                   [36mtrace_id[0m=d1g3u2l5nhg2ag43rklg
+[36mINFO[0m[2025-06-29 03:16:13] handler/user.go:61 Login start                                   [36mtrace_id[0m=d1g3uvd5nhg2ag43rkn0
+[36mINFO[0m[2025-06-29 03:17:15] handler/user.go:94 GetUser start, req:GetUserRequest({UserId:d1g3rnl5nhg4o513kop0})  [36mtrace_id[0m=d1g3vad5nhg2ag43rko0
+[36mINFO[0m[2025-06-29 03:22:14] handler/user.go:61 Login start                                   [36mtrace_id[0m=d1g41pl5nhg2ag43rkog
+[36mINFO[0m[2025-06-29 03:22:39] handler/user.go:94 GetUser start, req:GetUserRequest({UserId:d1g3rnl5nhg4o513kop0})  [36mtrace_id[0m=d1g41sd5nhg2ag43rkp0

@@ -1,34 +1,16 @@
-[36mINFO[0m[2025-06-15 13:12:29] log/logger.go:57 Logger initialized successfully              
-[36mINFO[0m[2025-06-15 13:12:29] api-gateway/main.go:36 API Gateway starting...                      
-[36mINFO[0m[2025-06-15 13:12:29] api-gateway/main.go:41 here we go...                                
-[36mINFO[0m[2025-06-15 13:13:08] utils/tracer.go:63 TraceID: d175cp55nhg4r50r5dqg, Service: user, Method: Register, ReqSize: 194 bytes, RespSize: 233 bytes, Time: 82.3645ms 
-[36mINFO[0m[2025-06-15 13:14:49] utils/tracer.go:63 TraceID: user-%!!(MISSING)s(<nil>), Service: user, Method: Login, ReqSize: 423 bytes, RespSize: 193 bytes, Time: 79.8185ms 
-[36mINFO[0m[2025-06-15 13:16:16] utils/tracer.go:63 TraceID: user-%!!(MISSING)s(<nil>), Service: user, Method: Login, ReqSize: 423 bytes, RespSize: 193 bytes, Time: 75.2287ms 
-[36mINFO[0m[2025-06-15 13:17:12] log/logger.go:57 Logger initialized successfully              
-[36mINFO[0m[2025-06-15 13:17:12] api-gateway/main.go:36 API Gateway starting...                      
-[36mINFO[0m[2025-06-15 13:17:12] api-gateway/main.go:41 here we go...                                
-[36mINFO[0m[2025-06-15 13:17:31] utils/tracer.go:63 TraceID: d175eqt5nhg4m87tfcmg, Service: user, Method: Login, ReqSize: 423 bytes, RespSize: 201 bytes, Time: 76.9669ms 
-[36mINFO[0m[2025-06-15 13:35:43] log/logger.go:57 Logger initialized successfully              
-[36mINFO[0m[2025-06-15 13:35:43] api-gateway/main.go:36 API Gateway starting...                      
-[36mINFO[0m[2025-06-15 13:35:43] api-gateway/main.go:41 here we go...                                
-[36mINFO[0m[2025-06-15 13:36:03] utils/tracer.go:63 TraceID: d175ngt5nhg4nc7erqe0, Service: user, Method: Login, ReqSize: 224 bytes, RespSize: 201 bytes, Time: 16.665ms 
-[31mERRO[0m[2025-06-15 13:36:03] handler/user.go:55 Login error: remote or network error[remote]: panic: [happened in biz handler, method=UserService.Login, please check the panic at the server side] runtime error: invalid memory address or nil pointer dereference 
-[36mINFO[0m[2025-06-15 13:39:04] utils/tracer.go:63 TraceID: d175ogl5nhg4nc7erqeg, Service: user, Method: Login, ReqSize: 224 bytes, RespSize: 201 bytes, Time: 54.1619063s 
-[31mERRO[0m[2025-06-15 13:39:04] handler/user.go:55 Login error: remote or network error[remote]: panic: [happened in biz handler, method=UserService.Login, please check the panic at the server side] runtime error: invalid memory address or nil pointer dereference 
-[36mINFO[0m[2025-06-15 13:39:50] utils/tracer.go:63 TraceID: d175p9l5nhg4nc7erqf0, Service: user, Method: Register, ReqSize: 114 bytes, RespSize: 233 bytes, Time: 15.2037ms 
-[36mINFO[0m[2025-06-15 13:39:56] utils/tracer.go:63 TraceID: d175pb55nhg4nc7erqfg, Service: user, Method: Register, ReqSize: 195 bytes, RespSize: 234 bytes, Time: 71.5117ms 
-[36mINFO[0m[2025-06-15 13:40:19] utils/tracer.go:63 TraceID: d175pcl5nhg4nc7erqg0, Service: user, Method: Login, ReqSize: 224 bytes, RespSize: 201 bytes, Time: 16.9079332s 
-[31mERRO[0m[2025-06-15 13:40:19] handler/user.go:55 Login error: remote or network error[remote]: panic: [happened in biz handler, method=UserService.Login, please check the panic at the server side] runtime error: invalid memory address or nil pointer dereference 
-[36mINFO[0m[2025-06-15 13:41:27] utils/tracer.go:63 TraceID: d175q0l5nhg4nc7erqgg, Service: user, Method: Login, ReqSize: 224 bytes, RespSize: 201 bytes, Time: 4.9697723s 
-[31mERRO[0m[2025-06-15 13:41:27] handler/user.go:55 Login error: remote or network error[remote]: panic: [happened in biz handler, method=UserService.Login, please check the panic at the server side] runtime error: invalid memory address or nil pointer dereference 
-[36mINFO[0m[2025-06-15 13:42:36] utils/tracer.go:63 TraceID: d175q6l5nhg4nc7erqh0, Service: user, Method: Login, ReqSize: 224 bytes, RespSize: 201 bytes, Time: 49.4096504s 
-[31mERRO[0m[2025-06-15 13:42:36] handler/user.go:55 Login error: remote or network error[remote]: panic: [happened in biz handler, method=UserService.Login, please check the panic at the server side] runtime error: invalid memory address or nil pointer dereference 
-[36mINFO[0m[2025-06-15 13:43:27] utils/tracer.go:63 TraceID: d175qml5nhg4nc7erqhg, Service: user, Method: Register, ReqSize: 195 bytes, RespSize: 234 bytes, Time: 36.9809791s 
-[36mINFO[0m[2025-06-15 13:44:10] utils/tracer.go:63 TraceID: d175r2l5nhg4nc7erqi0, Service: user, Method: Login, ReqSize: 224 bytes, RespSize: 201 bytes, Time: 31.9160783s 
-[31mERRO[0m[2025-06-15 13:44:10] handler/user.go:55 Login error: remote or network error[remote]: panic: [happened in biz handler, method=UserService.Login, please check the panic at the server side] runtime error: invalid memory address or nil pointer dereference 
-[36mINFO[0m[2025-06-15 13:45:31] utils/tracer.go:63 TraceID: d175ro55nhg4nc7erqig, Service: user, Method: Login, ReqSize: 0 bytes, RespSize: 201 bytes, Time: 27.2232618s 
-[31mERRO[0m[2025-06-15 13:45:31] handler/user.go:55 Login error: remote or network error: default codec read failed: EOF 
-[36mINFO[0m[2025-06-15 13:50:07] utils/tracer.go:63 TraceID: d175tkt5nhg4nc7erqj0, Service: user, Method: Login, ReqSize: 0 bytes, RespSize: 201 bytes, Time: 1m0.0082091s 
-[31mERRO[0m[2025-06-15 13:50:07] handler/user.go:55 Login error: rpc timeout: timeout=1m0s, to=user, method=Login, location=kitex.rpcTimeoutMW, remote=localhost:8001 
-[36mINFO[0m[2025-06-15 13:53:03] utils/tracer.go:63 TraceID: d175vf55nhg4nc7erqjg, Service: user, Method: Register, ReqSize: 195 bytes, RespSize: 234 bytes, Time: 2.9637393s 
-[36mINFO[0m[2025-06-15 13:53:35] utils/tracer.go:63 TraceID: d175vht5nhg4nc7erqk0, Service: user, Method: Login, ReqSize: 424 bytes, RespSize: 201 bytes, Time: 24.1332192s 
+[36mINFO[0m[2025-06-29 03:05:59] log/logger.go:57 Logger initialized successfully              
+[36mINFO[0m[2025-06-29 03:05:59] api-gateway/main.go:36 API Gateway starting...                      
+[36mINFO[0m[2025-06-29 03:05:59] api-gateway/main.go:41 here we go...                                
+[36mINFO[0m[2025-06-29 03:06:38] utils/tracer.go:63 TraceID: d1g3qdl5nhg0b01o4qug, Service: user, Method: Login, ReqSize: 109 bytes, RespSize: 197 bytes, Time: 28.2771ms 
+[36mINFO[0m[2025-06-29 03:09:18] utils/tracer.go:63 TraceID: d1g3rlt5nhg0b01o4r10, Service: user, Method: Register, ReqSize: 265 bytes, RespSize: 214 bytes, Time: 72.1455ms 
+[36mINFO[0m[2025-06-29 03:11:06] utils/tracer.go:63 TraceID: d1g3shl5nhg0b01o4r1g, Service: user, Method: Login, ReqSize: 486 bytes, RespSize: 197 bytes, Time: 90.0088ms 
+[36mINFO[0m[2025-06-29 03:14:14] log/logger.go:57 Logger initialized successfully              
+[36mINFO[0m[2025-06-29 03:14:14] api-gateway/main.go:36 API Gateway starting...                      
+[36mINFO[0m[2025-06-29 03:14:14] api-gateway/main.go:41 here we go...                                
+[36mINFO[0m[2025-06-29 03:14:21] utils/tracer.go:63 TraceID: d1g3u2l5nhg2ag43rklg, Service: user, Method: Login, ReqSize: 486 bytes, RespSize: 197 bytes, Time: 73.3512ms 
+[36mINFO[0m[2025-06-29 03:16:13] utils/tracer.go:63 TraceID: d1g3uvd5nhg2ag43rkn0, Service: user, Method: Login, ReqSize: 486 bytes, RespSize: 197 bytes, Time: 55.5196ms 
+[36mINFO[0m[2025-06-29 03:17:15] utils/tracer.go:63 TraceID: d1g3vad5nhg2ag43rko0, Service: user, Method: GetUser, ReqSize: 83 bytes, RespSize: 201 bytes, Time: 77.885ms 
+[31mERRO[0m[2025-06-29 03:17:22] user/common.go:108 GetUserInfo error: remote or network error[remote]: biz error: 密码错误 
+[36mINFO[0m[2025-06-29 03:22:14] utils/tracer.go:63 TraceID: d1g41pl5nhg2ag43rkog, Service: user, Method: Login, ReqSize: 486 bytes, RespSize: 197 bytes, Time: 64.0475ms 
+[36mINFO[0m[2025-06-29 03:22:39] utils/tracer.go:63 TraceID: d1g41sd5nhg2ag43rkp0, Service: user, Method: GetUser, ReqSize: 83 bytes, RespSize: 201 bytes, Time: 50.584ms 
+[31mERRO[0m[2025-06-29 03:22:39] user/common.go:108 GetUserInfo error: remote or network error[remote]: biz error: 密码错误 

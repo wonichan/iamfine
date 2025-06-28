@@ -69,7 +69,7 @@ func PostToKitexPost(post *Post) *kitex_gen_post.Post {
 		Content:       post.Content,
 		Images:        post.Images,
 		Category:      kitex_gen_post.PostCategory(post.Category),
-		IsAnonymous:   &post.IsAnonymous,
+		IsAnonymous:   post.IsAnonymous,
 		AnonymousName: post.AnonymousName,
 		LikeCount:     post.LikeCount,
 		CommentCount:  post.CommentCount,

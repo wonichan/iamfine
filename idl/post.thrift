@@ -183,14 +183,256 @@ struct GetRatingRankResponse {
     4: i32 total
 }
 
+// 更新帖子请求响应
+struct UpdatePostRequest {
+    1: string post_id
+    2: string user_id
+    3: string title
+    4: string content
+    5: list<string> images
+    6: optional string topic_id
+    7: PostCategory category
+    8: bool is_anonymous
+    9: optional string location
+    10: list<string> tags
+}
+
+struct UpdatePostResponse {
+    1: i32 code
+    2: string message
+    3: Post post
+}
+
+// 删除帖子请求响应
+struct DeletePostRequest {
+    1: string post_id
+    2: string user_id
+}
+
+struct DeletePostResponse {
+    1: i32 code
+    2: string message
+}
+
+// 搜索帖子请求响应
+struct SearchPostsRequest {
+    1: string keyword
+    2: i32 page
+    3: i32 page_size
+}
+
+struct SearchPostsResponse {
+    1: i32 code
+    2: string message
+    3: list<Post> posts
+    4: i32 total
+}
+
+// 获取推荐帖子请求响应
+struct GetRecommendPostsRequest {
+    1: i32 page
+    2: i32 page_size
+    3: optional string category
+    4: optional string tag
+}
+
+struct GetRecommendPostsResponse {
+    1: i32 code
+    2: string message
+    3: list<Post> posts
+    4: i32 total
+    5: bool has_more
+}
+
+// 获取热门帖子请求响应
+struct GetHotPostsRequest {
+    1: i32 page
+    2: i32 page_size
+    3: optional string category
+    4: optional string tag
+}
+
+struct GetHotPostsResponse {
+    1: i32 code
+    2: string message
+    3: list<Post> posts
+    4: i32 total
+    5: bool has_more
+}
+
+// 获取高分帖子请求响应
+struct GetHighScorePostsRequest {
+    1: i32 page
+    2: i32 page_size
+    3: optional string category
+    4: optional string tag
+}
+
+struct GetHighScorePostsResponse {
+    1: i32 code
+    2: string message
+    3: list<Post> posts
+    4: i32 total
+    5: bool has_more
+}
+
+// 获取低分帖子请求响应
+struct GetLowScorePostsRequest {
+    1: i32 page
+    2: i32 page_size
+    3: optional string category
+    4: optional string tag
+}
+
+struct GetLowScorePostsResponse {
+    1: i32 code
+    2: string message
+    3: list<Post> posts
+    4: i32 total
+    5: bool has_more
+}
+
+// 获取争议帖子请求响应
+struct GetControversialPostsRequest {
+    1: i32 page
+    2: i32 page_size
+    3: optional string category
+    4: optional string tag
+}
+
+struct GetControversialPostsResponse {
+    1: i32 code
+    2: string message
+    3: list<Post> posts
+    4: i32 total
+    5: bool has_more
+}
+
+// 获取话题详情请求响应
+struct GetTopicRequest {
+    1: string topic_id
+}
+
+struct GetTopicResponse {
+    1: i32 code
+    2: string message
+    3: Topic topic
+}
+
+// 获取热门话题请求响应
+struct GetHotTopicsRequest {
+    1: optional i32 limit
+}
+
+struct GetHotTopicsResponse {
+    1: i32 code
+    2: string message
+    3: list<Topic> topics
+}
+
+// 获取话题分类请求响应
+struct GetTopicCategoriesRequest {
+    1: optional i32 limit
+}
+
+struct GetTopicCategoriesResponse {
+    1: i32 code
+    2: string message
+    3: list<Topic> topics
+}
+
+// 搜索话题请求响应
+struct SearchTopicsRequest {
+    1: string keyword
+    2: i32 page
+    3: i32 page_size
+}
+
+struct SearchTopicsResponse {
+    1: i32 code
+    2: string message
+    3: list<Topic> topics
+    4: i32 total
+}
+
+// 分享话题请求响应
+struct ShareTopicRequest {
+    1: string topic_id
+    2: string user_id
+}
+
+struct ShareTopicResponse {
+    1: i32 code
+    2: string message
+}
+
+// 获取用户评分请求响应
+struct GetUserRatingRequest {
+    1: string user_id
+    2: string post_id
+}
+
+struct GetUserRatingResponse {
+    1: i32 code
+    2: string message
+    3: optional double score
+    4: bool is_rated
+}
+
+// 更新评分请求响应
+struct UpdateRatingRequest {
+    1: string user_id
+    2: string post_id
+    3: double score
+    4: optional string comment
+}
+
+struct UpdateRatingResponse {
+    1: i32 code
+    2: string message
+    3: double average_score
+    4: i32 total_ratings
+}
+
+// 删除评分请求响应
+struct DeleteRatingRequest {
+    1: string user_id
+    2: string post_id
+}
+
+struct DeleteRatingResponse {
+    1: i32 code
+    2: string message
+    3: double average_score
+    4: i32 total_ratings
+}
+
 service PostService {
+    // 帖子管理
     CreatePostResponse CreatePost(1: CreatePostRequest req)
     GetPostResponse GetPost(1: GetPostRequest req)
     GetPostListResponse GetPostList(1: GetPostListRequest req)
+    UpdatePostResponse UpdatePost(1: UpdatePostRequest req)
+    DeletePostResponse DeletePost(1: DeletePostRequest req)
+    
+    // 帖子列表获取
+    GetRecommendPostsResponse GetRecommendPosts(1: GetRecommendPostsRequest req)
+    GetHotPostsResponse GetHotPosts(1: GetHotPostsRequest req)
+    GetHighScorePostsResponse GetHighScorePosts(1: GetHighScorePostsRequest req)
+    GetLowScorePostsResponse GetLowScorePosts(1: GetLowScorePostsRequest req)
+    GetControversialPostsResponse GetControversialPosts(1: GetControversialPostsRequest req)
+    
+    // 搜索功能
+    SearchPostsResponse SearchPosts(1: SearchPostsRequest req)
     
     // 话题管理
     CreateTopicResponse CreateTopic(1: CreateTopicRequest req)
+    GetTopicResponse GetTopic(1: GetTopicRequest req)
     GetTopicListResponse GetTopicList(1: GetTopicListRequest req)
+    GetHotTopicsResponse GetHotTopics(1: GetHotTopicsRequest req)
+    GetTopicCategoriesResponse GetTopicCategories(1: GetTopicCategoriesRequest req)
+    SearchTopicsResponse SearchTopics(1: SearchTopicsRequest req)
+    ShareTopicResponse ShareTopic(1: ShareTopicRequest req)
     
     // 收藏功能
     CollectPostResponse CollectPost(1: CollectPostRequest req)
@@ -199,5 +441,8 @@ service PostService {
     
     // 评分功能
     RatePostResponse RatePost(1: RatePostRequest req)
+    GetUserRatingResponse GetUserRating(1: GetUserRatingRequest req)
+    UpdateRatingResponse UpdateRating(1: UpdateRatingRequest req)
+    DeleteRatingResponse DeleteRating(1: DeleteRatingRequest req)
     GetRatingRankResponse GetRatingRank(1: GetRatingRankRequest req)
 }

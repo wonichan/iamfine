@@ -34,6 +34,62 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"UpdatePost": kitex.NewMethodInfo(
+		updatePostHandler,
+		newPostServiceUpdatePostArgs,
+		newPostServiceUpdatePostResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"DeletePost": kitex.NewMethodInfo(
+		deletePostHandler,
+		newPostServiceDeletePostArgs,
+		newPostServiceDeletePostResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetRecommendPosts": kitex.NewMethodInfo(
+		getRecommendPostsHandler,
+		newPostServiceGetRecommendPostsArgs,
+		newPostServiceGetRecommendPostsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetHotPosts": kitex.NewMethodInfo(
+		getHotPostsHandler,
+		newPostServiceGetHotPostsArgs,
+		newPostServiceGetHotPostsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetHighScorePosts": kitex.NewMethodInfo(
+		getHighScorePostsHandler,
+		newPostServiceGetHighScorePostsArgs,
+		newPostServiceGetHighScorePostsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetLowScorePosts": kitex.NewMethodInfo(
+		getLowScorePostsHandler,
+		newPostServiceGetLowScorePostsArgs,
+		newPostServiceGetLowScorePostsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetControversialPosts": kitex.NewMethodInfo(
+		getControversialPostsHandler,
+		newPostServiceGetControversialPostsArgs,
+		newPostServiceGetControversialPostsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"SearchPosts": kitex.NewMethodInfo(
+		searchPostsHandler,
+		newPostServiceSearchPostsArgs,
+		newPostServiceSearchPostsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 	"CreateTopic": kitex.NewMethodInfo(
 		createTopicHandler,
 		newPostServiceCreateTopicArgs,
@@ -41,10 +97,45 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"GetTopic": kitex.NewMethodInfo(
+		getTopicHandler,
+		newPostServiceGetTopicArgs,
+		newPostServiceGetTopicResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 	"GetTopicList": kitex.NewMethodInfo(
 		getTopicListHandler,
 		newPostServiceGetTopicListArgs,
 		newPostServiceGetTopicListResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetHotTopics": kitex.NewMethodInfo(
+		getHotTopicsHandler,
+		newPostServiceGetHotTopicsArgs,
+		newPostServiceGetHotTopicsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetTopicCategories": kitex.NewMethodInfo(
+		getTopicCategoriesHandler,
+		newPostServiceGetTopicCategoriesArgs,
+		newPostServiceGetTopicCategoriesResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"SearchTopics": kitex.NewMethodInfo(
+		searchTopicsHandler,
+		newPostServiceSearchTopicsArgs,
+		newPostServiceSearchTopicsResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"ShareTopic": kitex.NewMethodInfo(
+		shareTopicHandler,
+		newPostServiceShareTopicArgs,
+		newPostServiceShareTopicResult,
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
@@ -73,6 +164,27 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		ratePostHandler,
 		newPostServiceRatePostArgs,
 		newPostServiceRatePostResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetUserRating": kitex.NewMethodInfo(
+		getUserRatingHandler,
+		newPostServiceGetUserRatingArgs,
+		newPostServiceGetUserRatingResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"UpdateRating": kitex.NewMethodInfo(
+		updateRatingHandler,
+		newPostServiceUpdateRatingArgs,
+		newPostServiceUpdateRatingResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"DeleteRating": kitex.NewMethodInfo(
+		deleteRatingHandler,
+		newPostServiceDeleteRatingArgs,
+		newPostServiceDeleteRatingResult,
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
@@ -203,6 +315,150 @@ func newPostServiceGetPostListResult() interface{} {
 	return post.NewPostServiceGetPostListResult()
 }
 
+func updatePostHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceUpdatePostArgs)
+	realResult := result.(*post.PostServiceUpdatePostResult)
+	success, err := handler.(post.PostService).UpdatePost(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceUpdatePostArgs() interface{} {
+	return post.NewPostServiceUpdatePostArgs()
+}
+
+func newPostServiceUpdatePostResult() interface{} {
+	return post.NewPostServiceUpdatePostResult()
+}
+
+func deletePostHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceDeletePostArgs)
+	realResult := result.(*post.PostServiceDeletePostResult)
+	success, err := handler.(post.PostService).DeletePost(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceDeletePostArgs() interface{} {
+	return post.NewPostServiceDeletePostArgs()
+}
+
+func newPostServiceDeletePostResult() interface{} {
+	return post.NewPostServiceDeletePostResult()
+}
+
+func getRecommendPostsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetRecommendPostsArgs)
+	realResult := result.(*post.PostServiceGetRecommendPostsResult)
+	success, err := handler.(post.PostService).GetRecommendPosts(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetRecommendPostsArgs() interface{} {
+	return post.NewPostServiceGetRecommendPostsArgs()
+}
+
+func newPostServiceGetRecommendPostsResult() interface{} {
+	return post.NewPostServiceGetRecommendPostsResult()
+}
+
+func getHotPostsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetHotPostsArgs)
+	realResult := result.(*post.PostServiceGetHotPostsResult)
+	success, err := handler.(post.PostService).GetHotPosts(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetHotPostsArgs() interface{} {
+	return post.NewPostServiceGetHotPostsArgs()
+}
+
+func newPostServiceGetHotPostsResult() interface{} {
+	return post.NewPostServiceGetHotPostsResult()
+}
+
+func getHighScorePostsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetHighScorePostsArgs)
+	realResult := result.(*post.PostServiceGetHighScorePostsResult)
+	success, err := handler.(post.PostService).GetHighScorePosts(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetHighScorePostsArgs() interface{} {
+	return post.NewPostServiceGetHighScorePostsArgs()
+}
+
+func newPostServiceGetHighScorePostsResult() interface{} {
+	return post.NewPostServiceGetHighScorePostsResult()
+}
+
+func getLowScorePostsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetLowScorePostsArgs)
+	realResult := result.(*post.PostServiceGetLowScorePostsResult)
+	success, err := handler.(post.PostService).GetLowScorePosts(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetLowScorePostsArgs() interface{} {
+	return post.NewPostServiceGetLowScorePostsArgs()
+}
+
+func newPostServiceGetLowScorePostsResult() interface{} {
+	return post.NewPostServiceGetLowScorePostsResult()
+}
+
+func getControversialPostsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetControversialPostsArgs)
+	realResult := result.(*post.PostServiceGetControversialPostsResult)
+	success, err := handler.(post.PostService).GetControversialPosts(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetControversialPostsArgs() interface{} {
+	return post.NewPostServiceGetControversialPostsArgs()
+}
+
+func newPostServiceGetControversialPostsResult() interface{} {
+	return post.NewPostServiceGetControversialPostsResult()
+}
+
+func searchPostsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceSearchPostsArgs)
+	realResult := result.(*post.PostServiceSearchPostsResult)
+	success, err := handler.(post.PostService).SearchPosts(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceSearchPostsArgs() interface{} {
+	return post.NewPostServiceSearchPostsArgs()
+}
+
+func newPostServiceSearchPostsResult() interface{} {
+	return post.NewPostServiceSearchPostsResult()
+}
+
 func createTopicHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*post.PostServiceCreateTopicArgs)
 	realResult := result.(*post.PostServiceCreateTopicResult)
@@ -221,6 +477,24 @@ func newPostServiceCreateTopicResult() interface{} {
 	return post.NewPostServiceCreateTopicResult()
 }
 
+func getTopicHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetTopicArgs)
+	realResult := result.(*post.PostServiceGetTopicResult)
+	success, err := handler.(post.PostService).GetTopic(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetTopicArgs() interface{} {
+	return post.NewPostServiceGetTopicArgs()
+}
+
+func newPostServiceGetTopicResult() interface{} {
+	return post.NewPostServiceGetTopicResult()
+}
+
 func getTopicListHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*post.PostServiceGetTopicListArgs)
 	realResult := result.(*post.PostServiceGetTopicListResult)
@@ -237,6 +511,78 @@ func newPostServiceGetTopicListArgs() interface{} {
 
 func newPostServiceGetTopicListResult() interface{} {
 	return post.NewPostServiceGetTopicListResult()
+}
+
+func getHotTopicsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetHotTopicsArgs)
+	realResult := result.(*post.PostServiceGetHotTopicsResult)
+	success, err := handler.(post.PostService).GetHotTopics(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetHotTopicsArgs() interface{} {
+	return post.NewPostServiceGetHotTopicsArgs()
+}
+
+func newPostServiceGetHotTopicsResult() interface{} {
+	return post.NewPostServiceGetHotTopicsResult()
+}
+
+func getTopicCategoriesHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetTopicCategoriesArgs)
+	realResult := result.(*post.PostServiceGetTopicCategoriesResult)
+	success, err := handler.(post.PostService).GetTopicCategories(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetTopicCategoriesArgs() interface{} {
+	return post.NewPostServiceGetTopicCategoriesArgs()
+}
+
+func newPostServiceGetTopicCategoriesResult() interface{} {
+	return post.NewPostServiceGetTopicCategoriesResult()
+}
+
+func searchTopicsHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceSearchTopicsArgs)
+	realResult := result.(*post.PostServiceSearchTopicsResult)
+	success, err := handler.(post.PostService).SearchTopics(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceSearchTopicsArgs() interface{} {
+	return post.NewPostServiceSearchTopicsArgs()
+}
+
+func newPostServiceSearchTopicsResult() interface{} {
+	return post.NewPostServiceSearchTopicsResult()
+}
+
+func shareTopicHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceShareTopicArgs)
+	realResult := result.(*post.PostServiceShareTopicResult)
+	success, err := handler.(post.PostService).ShareTopic(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceShareTopicArgs() interface{} {
+	return post.NewPostServiceShareTopicArgs()
+}
+
+func newPostServiceShareTopicResult() interface{} {
+	return post.NewPostServiceShareTopicResult()
 }
 
 func collectPostHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -311,6 +657,60 @@ func newPostServiceRatePostResult() interface{} {
 	return post.NewPostServiceRatePostResult()
 }
 
+func getUserRatingHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceGetUserRatingArgs)
+	realResult := result.(*post.PostServiceGetUserRatingResult)
+	success, err := handler.(post.PostService).GetUserRating(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceGetUserRatingArgs() interface{} {
+	return post.NewPostServiceGetUserRatingArgs()
+}
+
+func newPostServiceGetUserRatingResult() interface{} {
+	return post.NewPostServiceGetUserRatingResult()
+}
+
+func updateRatingHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceUpdateRatingArgs)
+	realResult := result.(*post.PostServiceUpdateRatingResult)
+	success, err := handler.(post.PostService).UpdateRating(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceUpdateRatingArgs() interface{} {
+	return post.NewPostServiceUpdateRatingArgs()
+}
+
+func newPostServiceUpdateRatingResult() interface{} {
+	return post.NewPostServiceUpdateRatingResult()
+}
+
+func deleteRatingHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*post.PostServiceDeleteRatingArgs)
+	realResult := result.(*post.PostServiceDeleteRatingResult)
+	success, err := handler.(post.PostService).DeleteRating(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newPostServiceDeleteRatingArgs() interface{} {
+	return post.NewPostServiceDeleteRatingArgs()
+}
+
+func newPostServiceDeleteRatingResult() interface{} {
+	return post.NewPostServiceDeleteRatingResult()
+}
+
 func getRatingRankHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*post.PostServiceGetRatingRankArgs)
 	realResult := result.(*post.PostServiceGetRatingRankResult)
@@ -369,6 +769,86 @@ func (p *kClient) GetPostList(ctx context.Context, req *post.GetPostListRequest)
 	return _result.GetSuccess(), nil
 }
 
+func (p *kClient) UpdatePost(ctx context.Context, req *post.UpdatePostRequest) (r *post.UpdatePostResponse, err error) {
+	var _args post.PostServiceUpdatePostArgs
+	_args.Req = req
+	var _result post.PostServiceUpdatePostResult
+	if err = p.c.Call(ctx, "UpdatePost", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeletePost(ctx context.Context, req *post.DeletePostRequest) (r *post.DeletePostResponse, err error) {
+	var _args post.PostServiceDeletePostArgs
+	_args.Req = req
+	var _result post.PostServiceDeletePostResult
+	if err = p.c.Call(ctx, "DeletePost", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetRecommendPosts(ctx context.Context, req *post.GetRecommendPostsRequest) (r *post.GetRecommendPostsResponse, err error) {
+	var _args post.PostServiceGetRecommendPostsArgs
+	_args.Req = req
+	var _result post.PostServiceGetRecommendPostsResult
+	if err = p.c.Call(ctx, "GetRecommendPosts", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetHotPosts(ctx context.Context, req *post.GetHotPostsRequest) (r *post.GetHotPostsResponse, err error) {
+	var _args post.PostServiceGetHotPostsArgs
+	_args.Req = req
+	var _result post.PostServiceGetHotPostsResult
+	if err = p.c.Call(ctx, "GetHotPosts", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetHighScorePosts(ctx context.Context, req *post.GetHighScorePostsRequest) (r *post.GetHighScorePostsResponse, err error) {
+	var _args post.PostServiceGetHighScorePostsArgs
+	_args.Req = req
+	var _result post.PostServiceGetHighScorePostsResult
+	if err = p.c.Call(ctx, "GetHighScorePosts", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetLowScorePosts(ctx context.Context, req *post.GetLowScorePostsRequest) (r *post.GetLowScorePostsResponse, err error) {
+	var _args post.PostServiceGetLowScorePostsArgs
+	_args.Req = req
+	var _result post.PostServiceGetLowScorePostsResult
+	if err = p.c.Call(ctx, "GetLowScorePosts", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetControversialPosts(ctx context.Context, req *post.GetControversialPostsRequest) (r *post.GetControversialPostsResponse, err error) {
+	var _args post.PostServiceGetControversialPostsArgs
+	_args.Req = req
+	var _result post.PostServiceGetControversialPostsResult
+	if err = p.c.Call(ctx, "GetControversialPosts", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) SearchPosts(ctx context.Context, req *post.SearchPostsRequest) (r *post.SearchPostsResponse, err error) {
+	var _args post.PostServiceSearchPostsArgs
+	_args.Req = req
+	var _result post.PostServiceSearchPostsResult
+	if err = p.c.Call(ctx, "SearchPosts", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
 func (p *kClient) CreateTopic(ctx context.Context, req *post.CreateTopicRequest) (r *post.CreateTopicResponse, err error) {
 	var _args post.PostServiceCreateTopicArgs
 	_args.Req = req
@@ -379,11 +859,61 @@ func (p *kClient) CreateTopic(ctx context.Context, req *post.CreateTopicRequest)
 	return _result.GetSuccess(), nil
 }
 
+func (p *kClient) GetTopic(ctx context.Context, req *post.GetTopicRequest) (r *post.GetTopicResponse, err error) {
+	var _args post.PostServiceGetTopicArgs
+	_args.Req = req
+	var _result post.PostServiceGetTopicResult
+	if err = p.c.Call(ctx, "GetTopic", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
 func (p *kClient) GetTopicList(ctx context.Context, req *post.GetTopicListRequest) (r *post.GetTopicListResponse, err error) {
 	var _args post.PostServiceGetTopicListArgs
 	_args.Req = req
 	var _result post.PostServiceGetTopicListResult
 	if err = p.c.Call(ctx, "GetTopicList", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetHotTopics(ctx context.Context, req *post.GetHotTopicsRequest) (r *post.GetHotTopicsResponse, err error) {
+	var _args post.PostServiceGetHotTopicsArgs
+	_args.Req = req
+	var _result post.PostServiceGetHotTopicsResult
+	if err = p.c.Call(ctx, "GetHotTopics", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetTopicCategories(ctx context.Context, req *post.GetTopicCategoriesRequest) (r *post.GetTopicCategoriesResponse, err error) {
+	var _args post.PostServiceGetTopicCategoriesArgs
+	_args.Req = req
+	var _result post.PostServiceGetTopicCategoriesResult
+	if err = p.c.Call(ctx, "GetTopicCategories", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) SearchTopics(ctx context.Context, req *post.SearchTopicsRequest) (r *post.SearchTopicsResponse, err error) {
+	var _args post.PostServiceSearchTopicsArgs
+	_args.Req = req
+	var _result post.PostServiceSearchTopicsResult
+	if err = p.c.Call(ctx, "SearchTopics", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) ShareTopic(ctx context.Context, req *post.ShareTopicRequest) (r *post.ShareTopicResponse, err error) {
+	var _args post.PostServiceShareTopicArgs
+	_args.Req = req
+	var _result post.PostServiceShareTopicResult
+	if err = p.c.Call(ctx, "ShareTopic", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -424,6 +954,36 @@ func (p *kClient) RatePost(ctx context.Context, req *post.RatePostRequest) (r *p
 	_args.Req = req
 	var _result post.PostServiceRatePostResult
 	if err = p.c.Call(ctx, "RatePost", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetUserRating(ctx context.Context, req *post.GetUserRatingRequest) (r *post.GetUserRatingResponse, err error) {
+	var _args post.PostServiceGetUserRatingArgs
+	_args.Req = req
+	var _result post.PostServiceGetUserRatingResult
+	if err = p.c.Call(ctx, "GetUserRating", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateRating(ctx context.Context, req *post.UpdateRatingRequest) (r *post.UpdateRatingResponse, err error) {
+	var _args post.PostServiceUpdateRatingArgs
+	_args.Req = req
+	var _result post.PostServiceUpdateRatingResult
+	if err = p.c.Call(ctx, "UpdateRating", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteRating(ctx context.Context, req *post.DeleteRatingRequest) (r *post.DeleteRatingResponse, err error) {
+	var _args post.PostServiceDeleteRatingArgs
+	_args.Req = req
+	var _result post.PostServiceDeleteRatingResult
+	if err = p.c.Call(ctx, "DeleteRating", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

@@ -36,6 +36,30 @@ const (
 	commentServiceName = "comment"
 )
 
+func GetUserClient() userservice.Client {
+	return userClient
+}
+
+func GetPostClient() postservice.Client {
+	return postClient
+}
+
+func GetNotificationClient() notificationservice.Client {
+	return notificationClient
+}
+
+func GetLikeClient() likeservice.Client {
+	return likeClient
+}
+
+func GetFollowClient() followservice.Client {
+	return followClient
+}
+
+func GetCommentClient() commentservice.Client {
+	return commentClient
+}
+
 func WithCommonOption(clientName string) []client.Option {
 	return []client.Option{
 		client.WithClientBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: clientName}),
