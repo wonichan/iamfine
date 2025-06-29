@@ -83,10 +83,21 @@ func (h *FollowHandler) GetFollowList(ctx context.Context, req *follow.GetFollow
 		}, err
 	}
 
+	// 转换为Follow结构体数组
+	follows := make([]*follow.Follow, len(followList))
+	for i, userID := range followList {
+		follows[i] = &follow.Follow{
+			FollowerId:  req.UserId,
+			FollowingId: userID,
+		}
+	}
+
 	return &follow.GetFollowListResponse{
 		Code:    0,
 		Message: "查询成功",
-		UserIds: followList,
+		Follows: follows,
+		Total:   int32(len(follows)),
+		HasMore: len(follows) == int(req.PageSize),
 	}, nil
 }
 
@@ -160,10 +171,22 @@ func (h *FollowHandler) GetMutualFollows(ctx context.Context, req *follow.GetMut
 		}, err
 	}
 
+	// 转换为Follow结构体数组
+	mutualFollows := make([]*follow.Follow, len(userIds))
+	for i, userID := range userIds {
+		mutualFollows[i] = &follow.Follow{
+			FollowerId:  req.UserId,
+			FollowingId: userID,
+			IsMutual:    true,
+		}
+	}
+
 	return &follow.GetMutualFollowsResponse{
 		Code:    0,
 		Message: "查询成功",
-		UserIds: userIds,
+		MutualFollows: mutualFollows,
+		Total:   int32(len(mutualFollows)),
+		HasMore: len(mutualFollows) == int(req.PageSize),
 	}, nil
 }
 

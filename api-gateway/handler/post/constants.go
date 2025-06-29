@@ -1,20 +1,30 @@
 package post
 
-// HTTP状态码常量
+import "hupu/api-gateway/handler/common"
+
+// 引用共享常量
 const (
-	HTTPStatusOK                  = 200
-	HTTPStatusBadRequest          = 400
-	HTTPStatusUnauthorized        = 401
-	HTTPStatusForbidden           = 403
-	HTTPStatusNotFound            = 404
-	HTTPStatusInternalServerError = 500
+	// HTTP状态码
+	HTTPStatusOK                  = common.HTTPStatusOK
+	HTTPStatusBadRequest          = common.HTTPStatusBadRequest
+	HTTPStatusUnauthorized        = common.HTTPStatusUnauthorized
+	HTTPStatusForbidden           = common.HTTPStatusForbidden
+	HTTPStatusNotFound            = common.HTTPStatusNotFound
+	HTTPStatusInternalServerError = common.HTTPStatusInternalServerError
+
+	// 通用消息
+	MsgSuccess      = common.MsgSuccess
+	MsgUnauthorized = common.MsgUnauthorized
+	MsgParamError   = common.MsgParamError
+
+	// 分页参数
+	DefaultPage     = common.DefaultPage
+	DefaultPageSize = common.DefaultPageSize
+	MaxPageSize     = common.MaxPageSize
 )
 
-// 响应消息常量
+// 帖子服务特有的错误消息常量
 const (
-	MsgSuccess            = "success"
-	MsgUnauthorized       = "未授权"
-	MsgParamError         = "参数错误"
 	MsgPostIDEmpty        = "帖子ID不能为空"
 	MsgTopicIDEmpty       = "话题ID不能为空"
 	MsgKeywordEmpty       = "搜索关键词不能为空"
@@ -37,13 +47,6 @@ const (
 	MsgUpdateRatingFailed = "更新评分失败"
 	MsgDeleteRatingFailed = "删除评分失败"
 	MsgGetRankFailed      = "获取排行榜失败"
-)
-
-// 默认分页参数
-const (
-	DefaultPage     = 1
-	DefaultPageSize = 10
-	MaxPageSize     = 50
 )
 
 // 排序类型常量
@@ -73,7 +76,7 @@ const (
 
 // 上下文键常量
 const (
-	UserIDKey = "user_id"
+	UserIDKey = common.UserIDKey
 )
 
 // 查询参数键常量

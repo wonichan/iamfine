@@ -1,5 +1,11 @@
 namespace go comment
 
+struct Author {
+    1: string id
+    2: string nickname
+    3: string avatar
+}
+
 struct Comment {
     1: string id
     2: string post_id
@@ -17,6 +23,8 @@ struct Comment {
     14: bool is_deleted                   // 是否已删除
     15: optional string location          // 评论位置
     16: list<Comment> replies             // 子评论列表（用于展示）
+    17: bool is_liked                     // 当前用户是否已点赞
+    18: optional Author author            // 作者信息
 }
 
 struct CreateCommentRequest {
@@ -48,8 +56,13 @@ struct GetCommentListRequest {
 struct GetCommentListResponse {
     1: i32 code
     2: string message
-    3: list<Comment> comments
-    4: i32 total
+    3: CommentListData data
+}
+
+struct CommentListData {
+    1: list<Comment> list
+    2: i32 total
+    3: bool hasMore
 }
 
 // 点赞评论相关请求响应

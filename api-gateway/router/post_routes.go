@@ -1,6 +1,7 @@
 package router
 
 import (
+	"hupu/api-gateway/handler/like"
 	"hupu/api-gateway/handler/post"
 	"hupu/api-gateway/middleware"
 
@@ -31,15 +32,24 @@ func RegisterPostRoutes(h *server.Hertz) {
 			postAuthGroup.POST("/", post.CreatePostHandler)
 			postAuthGroup.PUT("/:id", post.UpdatePostHandler)
 			postAuthGroup.DELETE("/:id", post.DeletePostHandler)
+			// 点赞相关
+			postAuthGroup.POST("/:id/like", like.LikePostHandler)
+			postAuthGroup.DELETE("/:id/like", like.UnlikePostHandler)
+			// 收藏相关
 			postAuthGroup.POST("/:id/collect", post.CollectPostHandler)
 			postAuthGroup.DELETE("/:id/collect", post.UncollectPostHandler)
 			postAuthGroup.GET("/collected", post.GetCollectedPostsHandler)
+			// 评分相关
 			postAuthGroup.POST("/:id/rate", post.RatePostHandler)
 			postAuthGroup.GET("/:id/rating", post.GetUserRatingHandler)
 			postAuthGroup.PUT("/:id/rating", post.UpdateRatingHandler)
 			postAuthGroup.DELETE("/:id/rating", post.DeleteRatingHandler)
 			postAuthGroup.GET("/rating/rank", post.GetRatingRankHandler)
 		}
+
+		// 无需认证的点赞统计路由
+		postGroup.GET("/:id/like/count", like.GetPostLikeCountHandler)
+		postGroup.GET("/:id/like/status", like.CheckPostLikeStatusHandler)
 
 		// 话题相关路由
 		topicGroup := postGroup.Group("/topics")

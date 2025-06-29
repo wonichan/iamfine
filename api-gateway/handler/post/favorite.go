@@ -7,6 +7,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/api-gateway/handler"
+	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/post"
 )
 
@@ -14,14 +15,14 @@ import (
 func CollectPost(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 获取用户ID
-	userID, exists := GetUserID(c)
+	userID, exists := common.GetUserID(c)
 	if !exists {
-		RespondUnauthorized(c)
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 获取帖子ID参数
-	postID, valid := ValidateRequiredPathParam(c, "id", MsgPostIDEmpty)
+	postID, valid := common.ValidateRequiredPathParam(c, "id", "帖子ID")
 	if !valid {
 		return
 	}
@@ -35,7 +36,7 @@ func CollectPost(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.CollectPost(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgCollectPostFailed, err)
+		common.RespondInternalError(c, MsgCollectPostFailed, err)
 		return
 	}
 
@@ -46,14 +47,14 @@ func CollectPost(ctx context.Context, c *app.RequestContext) {
 func UncollectPost(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 获取用户ID
-	userID, exists := GetUserID(c)
+	userID, exists := common.GetUserID(c)
 	if !exists {
-		RespondUnauthorized(c)
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 获取帖子ID参数
-	postID, valid := ValidateRequiredPathParam(c, "id", MsgPostIDEmpty)
+	postID, valid := common.ValidateRequiredPathParam(c, "id", "帖子ID")
 	if !valid {
 		return
 	}
@@ -67,7 +68,7 @@ func UncollectPost(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.UncollectPost(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgUncollectFailed, err)
+		common.RespondInternalError(c, MsgUncollectFailed, err)
 		return
 	}
 
@@ -78,14 +79,14 @@ func UncollectPost(ctx context.Context, c *app.RequestContext) {
 func GetCollectedPosts(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 获取用户ID
-	userID, exists := GetUserID(c)
+	userID, exists := common.GetUserID(c)
 	if !exists {
-		RespondUnauthorized(c)
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 解析分页参数
-	page, pageSize := ParsePaginationParamsInt32(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 构建请求
 	req := &post.GetCollectedPostsRequest{
@@ -97,7 +98,7 @@ func GetCollectedPosts(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetCollectedPosts(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetCollectedFailed, err)
+		common.RespondInternalError(c, MsgGetCollectedFailed, err)
 		return
 	}
 

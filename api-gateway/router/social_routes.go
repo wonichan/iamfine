@@ -2,12 +2,14 @@ package router
 
 import (
 	"hupu/api-gateway/handler"
+	"hupu/api-gateway/handler/follow"
+	"hupu/api-gateway/handler/like"
 	"hupu/api-gateway/middleware"
 
 	"github.com/cloudwego/hertz/pkg/app/server"
 )
 
-// RegisterSocialRoutes 注册社交相关路由（评论、点赞、关注、通知）
+// RegisterSocialRoutes 注册社交相关路由（点赞、关注、通知）
 func RegisterSocialRoutes(h *server.Hertz) {
 	// API版本组
 	apiV1 := h.Group("/api/v1")
@@ -15,20 +17,25 @@ func RegisterSocialRoutes(h *server.Hertz) {
 	// 需要认证的路由
 	authGroup := apiV1.Group("", middleware.AuthMiddleware())
 	{
-		// 评论相关
-		authGroup.POST("/comment", handler.CreateComment)
-		authGroup.GET("/comments/:post_id", handler.GetCommentList)
-
-		// 点赞相关
-		authGroup.POST("/like", handler.Like)
-		authGroup.DELETE("/like", handler.Unlike)
-		authGroup.GET("/likes", handler.GetLikeList)
+		// 点赞相关（兼容旧接口）
+		authGroup.POST("/like", like.LikeHandler)
+		authGroup.DELETE("/like", like.UnlikeHandler)
+		authGroup.GET("/likes", like.GetLikeListHandler)
+		// 点赞查询接口
+		authGroup.GET("/like/status", like.IsLikedHandler)
+		authGroup.GET("/like/count", like.GetLikeCountHandler)
+		authGroup.GET("/like/users", like.GetLikeUsersHandler)
 
 		// 关注相关
-		authGroup.POST("/follow", handler.Follow)
-		authGroup.DELETE("/follow", handler.Unfollow)
-		authGroup.GET("/follows/:user_id", handler.GetFollowList)
-		authGroup.GET("/followers/:user_id", handler.GetFollowerList)
+		authGroup.POST("/follow", follow.FollowHandler)
+		authGroup.DELETE("/follow", follow.UnfollowHandler)
+		authGroup.GET("/follows/:user_id", follow.GetFollowListHandler)
+		authGroup.GET("/followers/:user_id", follow.GetFollowerListHandler)
+		authGroup.GET("/follow/status", follow.CheckFollowStatusHandler)
+		authGroup.GET("/follow/count/:user_id", follow.GetFollowCountHandler)
+		authGroup.GET("/follower/count/:user_id", follow.GetFollowerCountHandler)
+		authGroup.GET("/follow/mutual", follow.GetMutualFollowsHandler)
+		authGroup.POST("/follow/check", follow.IsFollowingHandler)
 
 		// 通知相关
 		authGroup.GET("/notifications", handler.GetNotificationList)

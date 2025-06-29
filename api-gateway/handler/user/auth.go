@@ -6,6 +6,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/api-gateway/handler"
+	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
 )
 
@@ -20,7 +21,7 @@ func WxLogin(ctx context.Context, c *app.RequestContext) {
 	// 解析请求参数
 	var req WxLoginRequest
 	if err := c.BindAndValidate(&req); err != nil {
-		ErrorResponse(c, HTTPStatusBadRequest, CodeError, MsgParamError+": "+err.Error())
+		common.ErrorResponseFunc(c, HTTPStatusBadRequest, CodeError, MsgParamError+": "+err.Error())
 		return
 	}
 
@@ -51,14 +52,14 @@ func WxLogin(ctx context.Context, c *app.RequestContext) {
 		},
 	}
 
-	SuccessResponse(c, responseData)
+	common.SuccessResponseFunc(c, responseData)
 }
 
 // GetUserInfo 获取用户信息
 // GET /api/user/info
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
-	userID, ok := RequireAuth(c)
+	userID, ok := common.RequireAuth(c)
 	if !ok {
 		return
 	}
@@ -70,7 +71,7 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 
 	resp, err := handler.GetUserClient().GetUser(ctx, req)
 	if err != nil {
-		HandleServiceError(c, "GetUserInfo", err, MsgGetUserInfoFailed)
+		common.HandleServiceError(c, "GetUserInfo", err, MsgGetUserInfoFailed)
 		return
 	}
 
@@ -94,5 +95,5 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 		},
 	}
 
-	SuccessResponse(c, responseData)
+	common.SuccessResponseFunc(c, responseData)
 }

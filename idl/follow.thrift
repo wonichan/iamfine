@@ -1,5 +1,12 @@
 namespace go follow
 
+// 用户基本信息结构体
+struct UserInfo {
+    1: string id
+    2: string nickname
+    3: string avatar
+}
+
 // 关注关系结构体
 struct Follow {
     1: string id
@@ -7,6 +14,7 @@ struct Follow {
     3: string following_id     // 被关注者ID
     4: i64 created_at
     5: bool is_mutual          // 是否互相关注
+    6: optional UserInfo user_info  // 用户信息
 }
 
 struct FollowRequest {
@@ -53,8 +61,9 @@ struct GetFollowListRequest {
 struct GetFollowListResponse {
     1: i32 code
     2: string message
-    3: list<string> user_ids
+    3: list<Follow> follows
     4: i32 total
+    5: bool has_more
 }
 
 // 添加 GetFollowerListRequest 和 GetFollowerListResponse
@@ -68,6 +77,8 @@ struct GetFollowerListResponse {
     1: i32 code
     2: string message
     3: list<Follow> followers
+    4: i32 total
+    5: bool has_more
 }
 
 // 获取关注数量请求
@@ -103,7 +114,9 @@ struct GetMutualFollowsRequest {
 struct GetMutualFollowsResponse {
     1: i32 code
     2: string message
-    3: list<string> user_ids
+    3: list<Follow> mutual_follows
+    4: i32 total
+    5: bool has_more
 }
 
 

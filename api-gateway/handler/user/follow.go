@@ -6,6 +6,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/api-gateway/handler"
+	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
 )
 
@@ -13,19 +14,23 @@ import (
 // POST /api/user/{id}/follow
 func FollowUser(ctx context.Context, c *app.RequestContext) {
 	// 从上下文获取用户ID
-	userID, ok := RequireAuth(c)
+	userID, ok := common.RequireAuth(c)
 	if !ok {
 		return
 	}
 
 	// 获取要关注的用户ID
-	targetUserID, ok := ValidateTargetUserIDParam(c, "id")
+	targetUserID, ok := common.ValidateTargetUserIDParam(c, "id")
 	if !ok {
 		return
 	}
 
 	// 不能关注自己
-	if !CheckSelfFollow(c, userID, targetUserID) {
+	if userID == targetUserID {
+		common.RespondBadRequest(c, "不能关注自己")
+		return
+	}
+	if false {
 		return
 	}
 
@@ -38,24 +43,24 @@ func FollowUser(ctx context.Context, c *app.RequestContext) {
 	// 调用用户服务
 	resp, err := handler.GetUserClient().FollowUser(ctx, req)
 	if err != nil {
-		HandleServiceError(c, "FollowUser", err, MsgFollowUserFailed)
+		common.HandleServiceError(c, "FollowUser", err, MsgFollowUserFailed)
 		return
 	}
 
-	SuccessResponse(c, resp)
+	common.SuccessResponseFunc(c, resp)
 }
 
 // UnfollowUser 取消关注用户
 // DELETE /api/user/{id}/follow
 func UnfollowUser(ctx context.Context, c *app.RequestContext) {
 	// 从上下文获取用户ID
-	userID, ok := RequireAuth(c)
+	userID, ok := common.RequireAuth(c)
 	if !ok {
 		return
 	}
 
 	// 获取要取消关注的用户ID
-	targetUserID, ok := ValidateTargetUserIDParam(c, "id")
+	targetUserID, ok := common.ValidateTargetUserIDParam(c, "id")
 	if !ok {
 		return
 	}
@@ -69,24 +74,24 @@ func UnfollowUser(ctx context.Context, c *app.RequestContext) {
 	// 调用用户服务
 	resp, err := handler.GetUserClient().UnfollowUser(ctx, req)
 	if err != nil {
-		HandleServiceError(c, "UnfollowUser", err, MsgUnfollowUserFailed)
+		common.HandleServiceError(c, "UnfollowUser", err, MsgUnfollowUserFailed)
 		return
 	}
 
-	SuccessResponse(c, resp)
+	common.SuccessResponseFunc(c, resp)
 }
 
 // GetFollowers 获取粉丝列表
 // GET /api/user/{id}/followers
 func GetFollowers(ctx context.Context, c *app.RequestContext) {
 	// 获取用户ID参数
-	userID, ok := ValidateUserIDParam(c, "id")
+	userID, ok := common.ValidateUserIDParam(c, "id")
 	if !ok {
 		return
 	}
 
 	// 解析分页参数
-	page, pageSize := ParsePaginationParams(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 构建请求
 	req := &user.GetFollowersRequest{
@@ -98,24 +103,24 @@ func GetFollowers(ctx context.Context, c *app.RequestContext) {
 	// 调用用户服务
 	resp, err := handler.GetUserClient().GetFollowers(ctx, req)
 	if err != nil {
-		HandleServiceError(c, "GetFollowers", err, MsgGetFollowersFailed)
+		common.HandleServiceError(c, "GetFollowers", err, MsgGetFollowersFailed)
 		return
 	}
 
-	SuccessResponse(c, resp)
+	common.SuccessResponseFunc(c, resp)
 }
 
 // GetFollowing 获取关注列表
 // GET /api/user/{id}/following
 func GetFollowing(ctx context.Context, c *app.RequestContext) {
 	// 获取用户ID参数
-	userID, ok := ValidateUserIDParam(c, "id")
+	userID, ok := common.ValidateUserIDParam(c, "id")
 	if !ok {
 		return
 	}
 
 	// 解析分页参数
-	page, pageSize := ParsePaginationParams(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 构建请求
 	req := &user.GetFollowingRequest{
@@ -127,9 +132,9 @@ func GetFollowing(ctx context.Context, c *app.RequestContext) {
 	// 调用用户服务
 	resp, err := handler.GetUserClient().GetFollowing(ctx, req)
 	if err != nil {
-		HandleServiceError(c, "GetFollowing", err, MsgGetFollowingFailed)
+		common.HandleServiceError(c, "GetFollowing", err, MsgGetFollowingFailed)
 		return
 	}
 
-	SuccessResponse(c, resp)
+	common.SuccessResponseFunc(c, resp)
 }

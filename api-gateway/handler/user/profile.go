@@ -6,6 +6,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/api-gateway/handler"
+	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
 )
 
@@ -24,7 +25,7 @@ type UpdateUserInfoRequest struct {
 // PUT /api/user/info
 func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
-	currentUserID, ok := RequireAuth(c)
+	currentUserID, ok := common.RequireAuth(c)
 	if !ok {
 		return
 	}
@@ -32,7 +33,7 @@ func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
 	// 解析请求体
 	var reqBody UpdateUserInfoRequest
 	if err := c.BindJSON(&reqBody); err != nil {
-		ErrorResponse(c, HTTPStatusBadRequest, CodeError, MsgRequestFormatError)
+		common.ErrorResponseFunc(c, HTTPStatusBadRequest, common.CodeError, MsgRequestFormatError)
 		return
 	}
 
@@ -58,18 +59,18 @@ func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
 	// 调用用户服务
 	resp, err := handler.GetUserClient().UpdateUser(ctx, req)
 	if err != nil {
-		HandleServiceError(c, "UpdateUserInfo", err, MsgUpdateUserInfoFailed)
+		common.HandleServiceError(c, "UpdateUserInfo", err, MsgUpdateUserInfoFailed)
 		return
 	}
 
-	SuccessResponse(c, resp)
+	common.SuccessResponseFunc(c, resp)
 }
 
 // GetUserStats 获取用户统计
 // GET /api/user/stats
 func GetUserStats(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
-	userID, ok := RequireAuth(c)
+	userID, ok := common.RequireAuth(c)
 	if !ok {
 		return
 	}
@@ -81,7 +82,7 @@ func GetUserStats(ctx context.Context, c *app.RequestContext) {
 
 	resp, err := handler.GetUserClient().GetUserStats(ctx, req)
 	if err != nil {
-		HandleServiceError(c, "GetUserStats", err, MsgGetUserStatsFailed)
+		common.HandleServiceError(c, "GetUserStats", err, MsgGetUserStatsFailed)
 		return
 	}
 
@@ -99,14 +100,14 @@ func GetUserStats(ctx context.Context, c *app.RequestContext) {
 		},
 	}
 
-	SuccessResponse(c, responseData)
+	common.SuccessResponseFunc(c, responseData)
 }
 
 // GetUnreadCount 获取未读消息数
 // GET /api/user/unread-count
 func GetUnreadCount(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
-	_, ok := RequireAuth(c)
+	_, ok := common.RequireAuth(c)
 	if !ok {
 		return
 	}
@@ -123,14 +124,14 @@ func GetUnreadCount(ctx context.Context, c *app.RequestContext) {
 		},
 	}
 
-	SuccessResponse(c, responseData)
+	common.SuccessResponseFunc(c, responseData)
 }
 
 // GetUser 获取指定用户信息（保留原有接口）
 // GET /api/user/{id}
 func GetUser(ctx context.Context, c *app.RequestContext) {
 	// 获取用户ID参数
-	userID, ok := ValidateUserIDParam(c, "id")
+	userID, ok := common.ValidateUserIDParam(c, "id")
 	if !ok {
 		return
 	}
@@ -141,30 +142,31 @@ func GetUser(ctx context.Context, c *app.RequestContext) {
 	}
 	resp, err := handler.GetUserClient().GetUser(ctx, req)
 	if err != nil {
-		HandleServiceError(c, "GetUser", err, MsgGetUserInfoFailed)
+		common.HandleServiceError(c, "GetUser", err, MsgGetUserInfoFailed)
 		return
 	}
 
-	SuccessResponse(c, resp)
+	common.SuccessResponseFunc(c, resp)
 }
 
 // UpdateUser 更新指定用户信息（保留原有接口）
 // PUT /api/user/{id}
 func UpdateUser(ctx context.Context, c *app.RequestContext) {
 	// 从上下文获取用户ID
-	currentUserID, ok := RequireAuth(c)
+	currentUserID, ok := common.RequireAuth(c)
 	if !ok {
 		return
 	}
 
 	// 获取要更新的用户ID
-	userID, ok := ValidateUserIDParam(c, "id")
+	userID, ok := common.ValidateUserIDParam(c, "id")
 	if !ok {
 		return
 	}
 
 	// 检查权限：只能更新自己的信息
-	if !CheckUserPermission(c, currentUserID, userID) {
+	if currentUserID != userID {
+		common.ErrorResponseFunc(c, common.HTTPStatusForbidden, common.CodeError, "无权限修改其他用户信息")
 		return
 	}
 
@@ -179,7 +181,7 @@ func UpdateUser(ctx context.Context, c *app.RequestContext) {
 	}
 
 	if err := c.BindJSON(&reqBody); err != nil {
-		ErrorResponse(c, HTTPStatusBadRequest, CodeError, MsgRequestFormatError)
+		common.ErrorResponseFunc(c, common.HTTPStatusBadRequest, common.CodeError, common.MsgRequestFormatError)
 		return
 	}
 
@@ -204,9 +206,9 @@ func UpdateUser(ctx context.Context, c *app.RequestContext) {
 	// 调用用户服务
 	resp, err := handler.GetUserClient().UpdateUser(ctx, req)
 	if err != nil {
-		HandleServiceError(c, "UpdateUser", err, MsgUpdateUserInfoFailed)
+		common.HandleServiceError(c, "UpdateUser", err, MsgUpdateUserInfoFailed)
 		return
 	}
 
-	SuccessResponse(c, resp)
+	common.SuccessResponseFunc(c, resp)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/api-gateway/handler"
+	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/post"
 )
 
@@ -15,14 +16,14 @@ func CreateTopic(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析请求参数
 	var req post.CreateTopicRequest
-	if !BindAndValidateRequest(c, &req) {
+	if !common.BindAndValidateRequest(c, &req) {
 		return
 	}
 
 	// 调用帖子服务
 	resp, err := postClient.CreateTopic(ctx, &req)
 	if err != nil {
-		RespondInternalError(c, MsgCreateTopicFailed, err)
+		common.RespondInternalError(c, MsgCreateTopicFailed, err)
 		return
 	}
 
@@ -33,7 +34,7 @@ func CreateTopic(ctx context.Context, c *app.RequestContext) {
 func GetTopic(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 获取话题ID参数
-	topicID, valid := ValidateRequiredPathParam(c, "id", MsgTopicIDEmpty)
+	topicID, valid := common.ValidateRequiredPathParam(c, "id", MsgTopicIDEmpty)
 	if !valid {
 		return
 	}
@@ -42,7 +43,7 @@ func GetTopic(ctx context.Context, c *app.RequestContext) {
 	req := &post.GetTopicRequest{TopicId: topicID}
 	resp, err := postClient.GetTopic(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetTopicFailed, err)
+		common.RespondInternalError(c, MsgGetTopicFailed, err)
 		return
 	}
 
@@ -53,10 +54,10 @@ func GetTopic(ctx context.Context, c *app.RequestContext) {
 func GetTopicList(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析分页参数
-	page, pageSize := ParsePaginationParamsInt32(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 解析排序类型
-	sortType := ParseOptionalStringParam(c, ParamSortType)
+	sortType := common.ParseOptionalStringParam(c, ParamSortType)
 
 	// 构建请求
 	req := &post.GetTopicListRequest{
@@ -68,7 +69,7 @@ func GetTopicList(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetTopicList(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetTopicListFailed, err)
+		common.RespondInternalError(c, MsgGetTopicListFailed, err)
 		return
 	}
 
@@ -79,7 +80,7 @@ func GetTopicList(ctx context.Context, c *app.RequestContext) {
 func GetHotTopics(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析限制数量参数
-	limit := ParseOptionalIntParam(c, ParamLimit)
+	limit := common.ParseOptionalIntParam(c, ParamLimit)
 
 	// 构建请求
 	req := &post.GetHotTopicsRequest{
@@ -89,7 +90,7 @@ func GetHotTopics(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetHotTopics(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetTopicListFailed, err)
+		common.RespondInternalError(c, MsgGetTopicListFailed, err)
 		return
 	}
 
@@ -100,7 +101,7 @@ func GetHotTopics(ctx context.Context, c *app.RequestContext) {
 func GetTopicCategories(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析限制数量参数
-	limit := ParseOptionalIntParam(c, ParamLimit)
+	limit := common.ParseOptionalIntParam(c, ParamLimit)
 
 	// 构建请求
 	req := &post.GetTopicCategoriesRequest{
@@ -110,7 +111,7 @@ func GetTopicCategories(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetTopicCategories(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetTopicListFailed, err)
+		common.RespondInternalError(c, MsgGetTopicListFailed, err)
 		return
 	}
 
@@ -123,12 +124,12 @@ func SearchTopics(ctx context.Context, c *app.RequestContext) {
 	// 获取搜索关键词
 	keyword := c.Query(ParamKeyword)
 	if keyword == "" {
-		RespondBadRequest(c, MsgKeywordEmpty)
+		common.RespondBadRequest(c, MsgKeywordEmpty)
 		return
 	}
 
 	// 解析分页参数
-	page, pageSize := ParsePaginationParamsInt32(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 构建请求
 	req := &post.SearchTopicsRequest{
@@ -140,7 +141,7 @@ func SearchTopics(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.SearchTopics(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgSearchTopicsFailed, err)
+		common.RespondInternalError(c, MsgSearchTopicsFailed, err)
 		return
 	}
 
@@ -151,14 +152,14 @@ func SearchTopics(ctx context.Context, c *app.RequestContext) {
 func ShareTopic(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 获取用户ID
-	userID, exists := GetUserID(c)
+	userID, exists := common.GetUserIDFromContext(c)
 	if !exists {
-		RespondUnauthorized(c)
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 获取话题ID参数
-	topicID, valid := ValidateRequiredPathParam(c, "id", MsgTopicIDEmpty)
+	topicID, valid := common.ValidateRequiredPathParam(c, "id", MsgTopicIDEmpty)
 	if !valid {
 		return
 	}
@@ -172,7 +173,7 @@ func ShareTopic(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.ShareTopic(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgShareTopicFailed, err)
+		common.RespondInternalError(c, MsgShareTopicFailed, err)
 		return
 	}
 

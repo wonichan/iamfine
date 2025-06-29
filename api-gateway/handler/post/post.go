@@ -3,11 +3,11 @@ package post
 import (
 	"context"
 	"net/http"
-	"strconv"
 
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/api-gateway/handler"
+	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/post"
 )
 
@@ -15,15 +15,15 @@ import (
 func CreatePost(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 获取用户ID
-	userID, exists := GetUserID(c)
+	userID, exists := common.GetUserIDFromContext(c)
 	if !exists {
-		RespondUnauthorized(c)
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 解析请求参数
 	var req post.CreatePostRequest
-	if !BindAndValidateRequest(c, &req) {
+	if !common.BindAndValidateRequest(c, &req) {
 		return
 	}
 
@@ -33,7 +33,7 @@ func CreatePost(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.CreatePost(ctx, &req)
 	if err != nil {
-		RespondInternalError(c, MsgCreatePostFailed, err)
+		common.RespondInternalError(c, MsgCreatePostFailed, err)
 		return
 	}
 
@@ -44,7 +44,7 @@ func CreatePost(ctx context.Context, c *app.RequestContext) {
 func GetPost(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 获取帖子ID参数
-	postID, valid := ValidateRequiredPathParam(c, "id", MsgPostIDEmpty)
+	postID, valid := common.ValidateRequiredPathParam(c, "id", MsgPostIDEmpty)
 	if !valid {
 		return
 	}
@@ -53,7 +53,7 @@ func GetPost(ctx context.Context, c *app.RequestContext) {
 	req := &post.GetPostRequest{PostId: postID}
 	resp, err := postClient.GetPost(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetPostFailed, err)
+		common.RespondInternalError(c, MsgGetPostFailed, err)
 		return
 	}
 
@@ -64,21 +64,21 @@ func GetPost(ctx context.Context, c *app.RequestContext) {
 func UpdatePost(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 获取用户ID
-	userID, exists := GetUserID(c)
+	userID, exists := common.GetUserIDFromContext(c)
 	if !exists {
-		RespondUnauthorized(c)
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 获取帖子ID参数
-	postID, valid := ValidateRequiredPathParam(c, "id", MsgPostIDEmpty)
+	postID, valid := common.ValidateRequiredPathParam(c, "id", "帖子ID")
 	if !valid {
 		return
 	}
 
 	// 解析请求参数
 	var req post.UpdatePostRequest
-	if !BindAndValidateRequest(c, &req) {
+	if !common.BindAndValidateRequest(c, &req) {
 		return
 	}
 
@@ -89,7 +89,7 @@ func UpdatePost(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.UpdatePost(ctx, &req)
 	if err != nil {
-		RespondInternalError(c, MsgUpdatePostFailed, err)
+		common.RespondInternalError(c, MsgUpdatePostFailed, err)
 		return
 	}
 
@@ -100,14 +100,14 @@ func UpdatePost(ctx context.Context, c *app.RequestContext) {
 func DeletePost(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 获取用户ID
-	userID, exists := GetUserID(c)
+	userID, exists := common.GetUserIDFromContext(c)
 	if !exists {
-		RespondUnauthorized(c)
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 获取帖子ID参数
-	postID, valid := ValidateRequiredPathParam(c, "id", MsgPostIDEmpty)
+	postID, valid := common.ValidateRequiredPathParam(c, "id", MsgPostIDEmpty)
 	if !valid {
 		return
 	}
@@ -121,7 +121,7 @@ func DeletePost(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.DeletePost(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgDeletePostFailed, err)
+		common.RespondInternalError(c, MsgDeletePostFailed, err)
 		return
 	}
 
@@ -132,14 +132,14 @@ func DeletePost(ctx context.Context, c *app.RequestContext) {
 func GetPostList(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析分页参数
-	page, pageSize := ParsePaginationParams(c)
+	page, pageSize := common.ParsePaginationParamsInt64(c)
 
 	// 解析其他查询参数
-	userIDStr := ParseOptionalStringParam(c, ParamUserID)
-	topicIDStr := ParseOptionalStringParam(c, ParamTopicID)
-	categoryStr := c.Query(ParamCategory)
-	sortType := ParseOptionalStringParam(c, ParamSortType)
-	isAnonymous := ParseOptionalBoolParam(c, ParamIsAnonymous)
+	userIDStr := common.ParseOptionalStringParam(c, ParamUserID)
+	topicIDStr := common.ParseOptionalStringParam(c, ParamTopicID)
+	// 解析排序类型
+	sortType := common.ParseOptionalStringParam(c, ParamSortType)
+	isAnonymous := common.ParseOptionalBoolParam(c, ParamIsAnonymous)
 
 	// 构建请求
 	req := &post.GetPostListRequest{
@@ -155,12 +155,13 @@ func GetPostList(ctx context.Context, c *app.RequestContext) {
 		req.TopicId = topicIDStr
 	}
 
-	if categoryStr != "" {
-		if category, err := strconv.ParseInt(categoryStr, 10, 32); err == nil {
-			categoryEnum := post.PostCategory(category)
-			req.Category = &categoryEnum
-		}
-	}
+	// categoryStr 变量未定义，暂时注释掉
+	// if categoryStr != "" {
+	//	if category, err := strconv.ParseInt(categoryStr, 10, 32); err == nil {
+	//		categoryEnum := post.PostCategory(category)
+	//		req.Category = &categoryEnum
+	//	}
+	// }
 
 	if sortType != nil {
 		req.SortType = sortType
@@ -173,7 +174,7 @@ func GetPostList(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetPostList(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetPostListFailed, err)
+		common.RespondInternalError(c, MsgGetPostListFailed, err)
 		return
 	}
 
@@ -184,11 +185,11 @@ func GetPostList(ctx context.Context, c *app.RequestContext) {
 func GetRecommendPosts(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析分页参数
-	page, pageSize := ParsePaginationParamsInt32(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 解析其他查询参数
-	category := ParseOptionalStringParam(c, ParamCategory)
-	tag := ParseOptionalStringParam(c, ParamTag)
+	category := common.ParseOptionalStringParam(c, ParamCategory)
+	tag := common.ParseOptionalStringParam(c, ParamTag)
 
 	// 构建请求
 	req := &post.GetRecommendPostsRequest{
@@ -201,7 +202,7 @@ func GetRecommendPosts(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetRecommendPosts(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetPostListFailed, err)
+		common.RespondInternalError(c, MsgGetPostListFailed, err)
 		return
 	}
 
@@ -212,11 +213,11 @@ func GetRecommendPosts(ctx context.Context, c *app.RequestContext) {
 func GetHotPosts(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析分页参数
-	page, pageSize := ParsePaginationParamsInt32(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 解析其他查询参数
-	category := ParseOptionalStringParam(c, ParamCategory)
-	tag := ParseOptionalStringParam(c, ParamTag)
+	category := common.ParseOptionalStringParam(c, ParamCategory)
+	tag := common.ParseOptionalStringParam(c, ParamTag)
 
 	// 构建请求
 	req := &post.GetHotPostsRequest{
@@ -229,7 +230,7 @@ func GetHotPosts(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetHotPosts(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetPostListFailed, err)
+		common.RespondInternalError(c, MsgGetPostListFailed, err)
 		return
 	}
 
@@ -240,11 +241,11 @@ func GetHotPosts(ctx context.Context, c *app.RequestContext) {
 func GetHighScorePosts(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析分页参数
-	page, pageSize := ParsePaginationParamsInt32(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 解析其他查询参数
-	category := ParseOptionalStringParam(c, ParamCategory)
-	tag := ParseOptionalStringParam(c, ParamTag)
+	category := common.ParseOptionalStringParam(c, ParamCategory)
+	tag := common.ParseOptionalStringParam(c, ParamTag)
 
 	// 构建请求
 	req := &post.GetHighScorePostsRequest{
@@ -257,7 +258,7 @@ func GetHighScorePosts(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetHighScorePosts(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetPostListFailed, err)
+		common.RespondInternalError(c, MsgGetPostListFailed, err)
 		return
 	}
 
@@ -268,11 +269,11 @@ func GetHighScorePosts(ctx context.Context, c *app.RequestContext) {
 func GetLowScorePosts(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析分页参数
-	page, pageSize := ParsePaginationParamsInt32(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 解析其他查询参数
-	category := ParseOptionalStringParam(c, ParamCategory)
-	tag := ParseOptionalStringParam(c, ParamTag)
+	category := common.ParseOptionalStringParam(c, ParamCategory)
+	tag := common.ParseOptionalStringParam(c, ParamTag)
 
 	// 构建请求
 	req := &post.GetLowScorePostsRequest{
@@ -285,7 +286,7 @@ func GetLowScorePosts(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetLowScorePosts(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetPostListFailed, err)
+		common.RespondInternalError(c, MsgGetPostListFailed, err)
 		return
 	}
 
@@ -296,11 +297,11 @@ func GetLowScorePosts(ctx context.Context, c *app.RequestContext) {
 func GetControversialPosts(ctx context.Context, c *app.RequestContext) {
 	postClient := handler.GetPostClient()
 	// 解析分页参数
-	page, pageSize := ParsePaginationParamsInt32(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 解析其他查询参数
-	category := ParseOptionalStringParam(c, ParamCategory)
-	tag := ParseOptionalStringParam(c, ParamTag)
+	category := common.ParseOptionalStringParam(c, ParamCategory)
+	tag := common.ParseOptionalStringParam(c, ParamTag)
 
 	// 构建请求
 	req := &post.GetControversialPostsRequest{
@@ -313,7 +314,7 @@ func GetControversialPosts(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.GetControversialPosts(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgGetPostListFailed, err)
+		common.RespondInternalError(c, MsgGetPostListFailed, err)
 		return
 	}
 
@@ -326,12 +327,12 @@ func SearchPosts(ctx context.Context, c *app.RequestContext) {
 	// 获取搜索关键词
 	keyword := c.Query(ParamKeyword)
 	if keyword == "" {
-		RespondBadRequest(c, MsgKeywordEmpty)
+		common.RespondBadRequest(c, MsgKeywordEmpty)
 		return
 	}
 
 	// 解析分页参数
-	page, pageSize := ParsePaginationParamsInt32(c)
+	page, pageSize := common.ParsePaginationParams(c)
 
 	// 构建请求
 	req := &post.SearchPostsRequest{
@@ -343,7 +344,7 @@ func SearchPosts(ctx context.Context, c *app.RequestContext) {
 	// 调用帖子服务
 	resp, err := postClient.SearchPosts(ctx, req)
 	if err != nil {
-		RespondInternalError(c, MsgSearchPostsFailed, err)
+		common.RespondInternalError(c, MsgSearchPostsFailed, err)
 		return
 	}
 

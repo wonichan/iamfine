@@ -1,32 +1,42 @@
 package user
 
-// HTTP状态码常量
+import "hupu/api-gateway/handler/common"
+
+// 引用共享常量
 const (
-	HTTPStatusOK                  = 200
-	HTTPStatusBadRequest          = 400
-	HTTPStatusUnauthorized        = 401
-	HTTPStatusForbidden           = 403
-	HTTPStatusNotFound            = 404
-	HTTPStatusInternalServerError = 500
+	// HTTP状态码
+	HTTPStatusOK                  = common.HTTPStatusOK
+	HTTPStatusBadRequest          = common.HTTPStatusBadRequest
+	HTTPStatusUnauthorized        = common.HTTPStatusUnauthorized
+	HTTPStatusForbidden           = common.HTTPStatusForbidden
+	HTTPStatusNotFound            = common.HTTPStatusNotFound
+	HTTPStatusInternalServerError = common.HTTPStatusInternalServerError
+
+	// 业务状态码
+	CodeSuccess = common.CodeSuccess
+	CodeError   = common.CodeError
+
+	// 通用消息
+	MsgSuccess            = common.MsgSuccess
+	MsgParamError         = common.MsgParamError
+	MsgUnauthorized       = common.MsgUnauthorized
+	MsgForbidden          = common.MsgForbidden
+	MsgRequestFormatError = common.MsgRequestFormatError
+
+	// 分页参数
+	DefaultPage     = common.DefaultPage
+	DefaultPageSize = common.DefaultPageSize
+
+	// 上下文键
+	ContextKeyUserID = common.ContextKeyUserID
 )
 
-// 业务状态码常量
+// 用户服务特有的错误消息常量
 const (
-	CodeSuccess = 200
-	CodeError   = 500
-)
-
-// 错误消息常量
-const (
-	MsgSuccess                 = "success"
-	MsgParamError              = "参数错误"
-	MsgUnauthorized            = "未授权"
-	MsgForbidden               = "禁止访问"
 	MsgUserIDEmpty             = "用户ID不能为空"
 	MsgTargetUserIDEmpty       = "目标用户ID不能为空"
 	MsgProfileIDEmpty          = "profile_id不能为空"
 	MsgCannotFollowSelf        = "不能关注自己"
-	MsgRequestFormatError      = "请求参数格式错误"
 	MsgNoPermissionUpdateOther = "无权限更新其他用户信息"
 	MsgWxLoginFailed           = "微信登录失败"
 	MsgRegisterFailed          = "注册失败"
@@ -42,15 +52,4 @@ const (
 	MsgCreateAnonymousFailed   = "创建匿名马甲失败"
 	MsgGetAnonymousListFailed  = "获取匿名马甲列表失败"
 	MsgUpdateAnonymousFailed   = "更新匿名马甲失败"
-)
-
-// 默认分页参数
-const (
-	DefaultPage     = 1
-	DefaultPageSize = 10
-)
-
-// 上下文键常量
-const (
-	ContextKeyUserID = "user_id"
 )

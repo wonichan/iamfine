@@ -24,5 +24,6 @@ func RegisterRoutes(h *server.Hertz) {
 	// 注册各模块路由
 	RegisterUserRoutes(h)
 	RegisterPostRoutes(h)
+	RegisterCommentRoutes(h)
 	RegisterSocialRoutes(h)
 }
