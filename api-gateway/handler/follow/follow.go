@@ -23,7 +23,7 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 	// 解析请求参数
 	var req follow.FollowRequest
 	if err := c.BindAndValidate(&req); err != nil {
-		common.RespondWithError(c, constants.HTTPStatusBadRequest, common.CodeError, constants.MsgParamError+": "+err.Error())
+		common.RespondBadRequest(c, constants.MsgParamError+": "+err.Error())
 		return
 	}
 
