@@ -20,13 +20,3 @@ func CreateCommentHandler(ctx context.Context, c *app.RequestContext) {
 func DeleteCommentHandler(ctx context.Context, c *app.RequestContext) {
 	DeleteComment(ctx, c)
 }
-
-// LikeCommentHandler 点赞评论
-func LikeCommentHandler(ctx context.Context, c *app.RequestContext) {
-	LikeComment(ctx, c)
-}
-
-// UnlikeCommentHandler 取消点赞评论
-func UnlikeCommentHandler(ctx context.Context, c *app.RequestContext) {
-	UnlikeComment(ctx, c)
-}

@@ -15,8 +15,6 @@ type Client interface {
 	GetCommentList(ctx context.Context, req *comment.GetCommentListRequest, callOptions ...callopt.Option) (r *comment.GetCommentListResponse, err error)
 	GetComment(ctx context.Context, req *comment.GetCommentRequest, callOptions ...callopt.Option) (r *comment.GetCommentResponse, err error)
 	GetUserComments(ctx context.Context, req *comment.GetUserCommentsRequest, callOptions ...callopt.Option) (r *comment.GetUserCommentsResponse, err error)
-	LikeComment(ctx context.Context, req *comment.LikeCommentRequest, callOptions ...callopt.Option) (r *comment.LikeCommentResponse, err error)
-	UnlikeComment(ctx context.Context, req *comment.UnlikeCommentRequest, callOptions ...callopt.Option) (r *comment.UnlikeCommentResponse, err error)
 	DeleteComment(ctx context.Context, req *comment.DeleteCommentRequest, callOptions ...callopt.Option) (r *comment.DeleteCommentResponse, err error)
 }
 
@@ -67,16 +65,6 @@ func (p *kCommentServiceClient) GetComment(ctx context.Context, req *comment.Get
 func (p *kCommentServiceClient) GetUserComments(ctx context.Context, req *comment.GetUserCommentsRequest, callOptions ...callopt.Option) (r *comment.GetUserCommentsResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetUserComments(ctx, req)
-}
-
-func (p *kCommentServiceClient) LikeComment(ctx context.Context, req *comment.LikeCommentRequest, callOptions ...callopt.Option) (r *comment.LikeCommentResponse, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.LikeComment(ctx, req)
-}
-
-func (p *kCommentServiceClient) UnlikeComment(ctx context.Context, req *comment.UnlikeCommentRequest, callOptions ...callopt.Option) (r *comment.UnlikeCommentResponse, err error) {
-	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.UnlikeComment(ctx, req)
 }
 
 func (p *kCommentServiceClient) DeleteComment(ctx context.Context, req *comment.DeleteCommentRequest, callOptions ...callopt.Option) (r *comment.DeleteCommentResponse, err error) {

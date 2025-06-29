@@ -65,29 +65,6 @@ struct CommentListData {
     3: bool hasMore
 }
 
-// 点赞评论相关请求响应
-struct LikeCommentRequest {
-    1: string user_id
-    2: string comment_id
-}
-
-struct LikeCommentResponse {
-    1: i32 code
-    2: string message
-    3: i32 like_count
-}
-
-struct UnlikeCommentRequest {
-    1: string user_id
-    2: string comment_id
-}
-
-struct UnlikeCommentResponse {
-    1: i32 code
-    2: string message
-    3: i32 like_count
-}
-
 // 删除评论
 struct DeleteCommentRequest {
     1: string user_id
@@ -131,10 +108,6 @@ service CommentService {
     GetCommentListResponse GetCommentList(1: GetCommentListRequest req)
     GetCommentResponse GetComment(1: GetCommentRequest req)
     GetUserCommentsResponse GetUserComments(1: GetUserCommentsRequest req)
-    
-    // 点赞功能
-    LikeCommentResponse LikeComment(1: LikeCommentRequest req)
-    UnlikeCommentResponse UnlikeComment(1: UnlikeCommentRequest req)
     
     // 删除功能
     DeleteCommentResponse DeleteComment(1: DeleteCommentRequest req)

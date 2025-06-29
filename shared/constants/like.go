@@ -1,5 +1,14 @@
 package constants
 
+const (
+	LikeMethodName            = "Like"
+	UnlikeMethodName          = "Unlike"
+	GetLikeListMethodName     = "GetLikeList"
+	CheckLikeStatusMethodName = "CheckLikeStatus"
+	GetLikeCountMethodName    = "GetLikeCount"
+	GetLikeUsersMethodName    = "GetLikeUsers"
+)
+
 // 点赞服务特有的错误消息常量
 const (
 	MsgTargetIDRequired      = "目标ID不能为空"

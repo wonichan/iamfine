@@ -55,7 +55,7 @@ func GetCommentList(ctx context.Context, c *app.RequestContext) {
 	// 调用评论服务
 	common.CallService(c, common.ServiceCall(func() (any, error) {
 		return handler.GetCommentClient().GetCommentList(ctx, req)
-	}), "GetCommentList", constants.MsgGetCommentListFailed)
+	}), constants.GetCommentListMethodName, constants.MsgGetCommentListFailed)
 }
 
 // CreateComment 创建评论
@@ -89,7 +89,7 @@ func CreateComment(ctx context.Context, c *app.RequestContext) {
 	// 调用评论服务
 	common.CallService(c, common.ServiceCall(func() (any, error) {
 		return handler.GetCommentClient().CreateComment(ctx, req)
-	}), "CreateComment", constants.MsgCreateCommentFailed)
+	}), constants.CreateCommentMethodName, constants.MsgCreateCommentFailed)
 }
 
 // DeleteComment 删除评论
@@ -118,63 +118,5 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 	// 调用评论服务
 	common.CallService(c, common.ServiceCall(func() (any, error) {
 		return handler.GetCommentClient().DeleteComment(ctx, req)
-	}), "DeleteComment", constants.MsgDeleteCommentFailed)
-}
-
-// LikeComment 点赞评论
-// POST /api/comments/{id}/like
-func LikeComment(ctx context.Context, c *app.RequestContext) {
-	// 需要认证
-	userID, ok := common.RequireAuth(c)
-	if !ok {
-		common.RespondUnauthorized(c)
-		return
-	}
-
-	// 获取评论ID参数
-	commentID, ok := common.ValidateCommentIDParam(c, "id")
-	if !ok {
-		common.RespondBadRequest(c, constants.MsgParamError)
-		return
-	}
-
-	// 构建请求
-	req := &comment.LikeCommentRequest{
-		UserId:    userID,
-		CommentId: commentID,
-	}
-
-	// 调用评论服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetCommentClient().LikeComment(ctx, req)
-	}), "LikeComment", constants.MsgLikeCommentFailed)
-}
-
-// UnlikeComment 取消点赞评论
-// DELETE /api/comments/{id}/like
-func UnlikeComment(ctx context.Context, c *app.RequestContext) {
-	// 需要认证
-	userID, ok := common.RequireAuth(c)
-	if !ok {
-		common.RespondUnauthorized(c)
-		return
-	}
-
-	// 获取评论ID参数
-	commentID, ok := common.ValidateCommentIDParam(c, "id")
-	if !ok {
-		common.RespondBadRequest(c, constants.MsgParamError)
-		return
-	}
-
-	// 构建请求
-	req := &comment.UnlikeCommentRequest{
-		UserId:    userID,
-		CommentId: commentID,
-	}
-
-	// 调用评论服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetCommentClient().UnlikeComment(ctx, req)
-	}), "UnlikeComment", constants.MsgUnlikeCommentFailed)
+	}), constants.DeleteCommentMethodName, constants.MsgDeleteCommentFailed)
 }
