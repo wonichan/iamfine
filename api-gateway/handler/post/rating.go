@@ -2,13 +2,13 @@ package post
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/api-gateway/handler"
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/post"
+	"hupu/shared/constants"
 )
 
 // 评分帖子
@@ -31,13 +31,9 @@ func RatePost(ctx context.Context, c *app.RequestContext) {
 	req.UserId = userID
 
 	// 调用帖子服务
-	resp, err := postClient.RatePost(ctx, &req)
-	if err != nil {
-		common.RespondInternalError(c, MsgRatePostFailed, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return postClient.RatePost(ctx, &req)
+	}), "RatePost", constants.MsgRatePostFailed)
 }
 
 // 获取用户对帖子的评分
@@ -51,7 +47,7 @@ func GetUserRating(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 获取帖子ID参数
-	postID, valid := common.ValidateRequiredPathParam(c, "postId", MsgPostIDEmpty)
+	postID, valid := common.ValidateRequiredPathParam(c, "postId", constants.MsgPostIDEmpty)
 	if !valid {
 		return
 	}
@@ -63,13 +59,9 @@ func GetUserRating(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	resp, err := postClient.GetUserRating(ctx, req)
-	if err != nil {
-		common.RespondInternalError(c, MsgGetRatingFailed, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return postClient.GetUserRating(ctx, req)
+	}), "GetUserRating", constants.MsgGetRatingFailed)
 }
 
 // 更新评分
@@ -83,7 +75,7 @@ func UpdateRating(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 获取帖子ID参数
-	postID, valid := common.ValidateRequiredPathParam(c, "postId", MsgPostIDEmpty)
+	postID, valid := common.ValidateRequiredPathParam(c, "postId", constants.MsgPostIDEmpty)
 	if !valid {
 		return
 	}
@@ -99,13 +91,9 @@ func UpdateRating(ctx context.Context, c *app.RequestContext) {
 	req.PostId = postID
 
 	// 调用帖子服务
-	resp, err := postClient.UpdateRating(ctx, &req)
-	if err != nil {
-		common.RespondInternalError(c, MsgUpdateRatingFailed, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return postClient.UpdateRating(ctx, &req)
+	}), "UpdateRating", constants.MsgUpdateRatingFailed)
 }
 
 // 删除评分
@@ -119,7 +107,7 @@ func DeleteRating(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 获取帖子ID参数
-	postID, valid := common.ValidateRequiredPathParam(c, "postId", MsgPostIDEmpty)
+	postID, valid := common.ValidateRequiredPathParam(c, "postId", constants.MsgPostIDEmpty)
 	if !valid {
 		return
 	}
@@ -131,13 +119,9 @@ func DeleteRating(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	resp, err := postClient.DeleteRating(ctx, req)
-	if err != nil {
-		common.RespondInternalError(c, MsgDeleteRatingFailed, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return postClient.DeleteRating(ctx, req)
+	}), "DeleteRating", constants.MsgDeleteRatingFailed)
 }
 
 // 获取评分排行榜
@@ -147,11 +131,11 @@ func GetRatingRank(ctx context.Context, c *app.RequestContext) {
 	page, pageSize := common.ParsePaginationParams(c)
 
 	// 解析排行榜类型和日期参数
-	rankType := c.Query(ParamRankType)
+	rankType := c.Query(constants.ParamRankType)
 	if rankType == "" {
-		rankType = RankTypeDailyHigh // 默认为每日高分榜
+		rankType = constants.RankTypeDailyHigh // 默认为每日高分榜
 	}
-	date := common.ParseOptionalStringParam(c, ParamDate)
+	date := common.ParseOptionalStringParam(c, constants.ParamDate)
 
 	// 构建请求
 	req := &post.GetRatingRankRequest{
@@ -162,11 +146,7 @@ func GetRatingRank(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	resp, err := postClient.GetRatingRank(ctx, req)
-	if err != nil {
-		common.RespondInternalError(c, MsgGetRankFailed, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return postClient.GetRatingRank(ctx, req)
+	}), "GetRatingRank", constants.MsgGetRankFailed)
 }

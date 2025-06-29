@@ -33,7 +33,7 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 	// 调用关注服务
 	resp, err := handler.GetFollowClient().Follow(ctx, &req)
 	if err != nil {
-		common.RespondWithError(c, constants.HTTPStatusInternalServerError, common.CodeError, constants.MsgParamError+": "+err.Error())
+		common.HandleServiceError(c, "Follow", err, constants.MsgFollowFailed)
 		return
 	}
 	common.RespondWithSuccess(c, resp)
@@ -61,7 +61,7 @@ func Unfollow(ctx context.Context, c *app.RequestContext) {
 	// 调用取消关注服务
 	resp, err := handler.GetFollowClient().Unfollow(ctx, &req)
 	if err != nil {
-		common.RespondInternalError(c, constants.MsgUnfollowFailed, err)
+		common.HandleServiceError(c, "Unfollow", err, constants.MsgUnfollowFailed)
 		return
 	}
 
@@ -88,7 +88,7 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 	}
 	resp, err := handler.GetFollowClient().GetFollowList(ctx, req)
 	if err != nil {
-		common.RespondInternalError(c, constants.MsgGetFollowListFailed, err)
+		common.HandleServiceError(c, "GetFollowList", err, constants.MsgGetFollowListFailed)
 		return
 	}
 
@@ -115,7 +115,7 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 	}
 	resp, err := handler.GetFollowClient().GetFollowerList(ctx, req)
 	if err != nil {
-		common.RespondInternalError(c, constants.MsgGetFollowerListFailed, err)
+		common.HandleServiceError(c, "GetFollowerList", err, constants.MsgGetFollowerListFailed)
 		return
 	}
 
@@ -147,7 +147,7 @@ func CheckFollowStatus(ctx context.Context, c *app.RequestContext) {
 	// 调用关注服务
 	resp, err := handler.GetFollowClient().CheckFollowStatus(ctx, req)
 	if err != nil {
-		common.RespondInternalError(c, constants.MsgCheckFollowStatusFailed, err)
+		common.HandleServiceError(c, "GetFollowerList", err, constants.MsgCheckFollowStatusFailed)
 		return
 	}
 
@@ -176,7 +176,7 @@ func IsFollowing(ctx context.Context, c *app.RequestContext) {
 	// 调用关注服务
 	resp, err := handler.GetFollowClient().IsFollowing(ctx, &req)
 	if err != nil {
-		common.RespondInternalError(c, constants.MsgCheckFollowStatusFailed, err)
+		common.HandleServiceError(c, "IsFollowing", err, constants.MsgCheckFollowStatusFailed)
 		return
 	}
 
@@ -200,7 +200,7 @@ func GetFollowCount(ctx context.Context, c *app.RequestContext) {
 	// 调用关注服务
 	resp, err := handler.GetFollowClient().GetFollowCount(ctx, req)
 	if err != nil {
-		common.RespondInternalError(c, constants.MsgGetFollowCountFailed, err)
+		common.HandleServiceError(c, "GetFollowCount", err, constants.MsgGetFollowCountFailed)
 		return
 	}
 
@@ -224,7 +224,7 @@ func GetFollowerCount(ctx context.Context, c *app.RequestContext) {
 	// 调用关注服务
 	resp, err := handler.GetFollowClient().GetFollowerCount(ctx, req)
 	if err != nil {
-		common.RespondInternalError(c, constants.MsgGetFollowerCountFailed, err)
+		common.HandleServiceError(c, "GetFollowerCount", err, constants.MsgGetFollowerCountFailed)
 		return
 	}
 
@@ -261,7 +261,7 @@ func GetMutualFollows(ctx context.Context, c *app.RequestContext) {
 	// 调用关注服务
 	resp, err := handler.GetFollowClient().GetMutualFollows(ctx, req)
 	if err != nil {
-		common.RespondInternalError(c, constants.MsgGetMutualFollowsFailed, err)
+		common.HandleServiceError(c, "GetMutualFollows", err, constants.MsgGetMutualFollowsFailed)
 		return
 	}
 

@@ -5,18 +5,8 @@ import (
 
 	"github.com/cloudwego/hertz/pkg/app"
 
+	"hupu/shared/constants"
 	"hupu/shared/log"
-)
-
-// HTTP状态码常量
-const (
-	// HTTP状态码
-	HTTPStatusOK                  = 200
-	HTTPStatusBadRequest          = 400
-	HTTPStatusUnauthorized        = 401
-	HTTPStatusForbidden           = 403
-	HTTPStatusNotFound            = 404
-	HTTPStatusInternalServerError = 500
 )
 
 // 业务状态码常量
@@ -27,25 +17,6 @@ const (
 	CodeServerError = 500
 )
 
-// 通用错误消息常量
-const (
-	// 通用消息
-	MsgSuccess            = "操作成功"
-	MsgParamError         = "参数错误"
-	MsgUnauthorized       = "未授权访问"
-	MsgForbidden          = "禁止访问"
-	MsgServerError        = "服务器内部错误"
-	MsgRequestFormatError = "请求格式错误"
-)
-
-// 分页默认值常量
-const (
-	// 分页参数
-	DefaultPage     = 1
-	DefaultPageSize = 10
-	MaxPageSize     = 100
-)
-
 // 上下文键常量
 const (
 	// 上下文键
@@ -53,20 +24,8 @@ const (
 	ContextKeyUserID = "user_id"
 )
 
-// 通用排序类型常量
-const (
-	// 排序类型
-	SortTypeLatest = "latest"
-	SortTypeHot    = "hot"
-)
-
 // 关注状态常量
-const (
-	// 关注状态
-	FollowStatusNotFollowing = 0 // 未关注
-	FollowStatusFollowing    = 1 // 已关注
-	FollowStatusMutual       = 2 // 相互关注
-)
+const ()
 
 // 通用响应结构
 type ResponseData struct {
@@ -98,7 +57,7 @@ func ErrorResponseFunc(c *app.RequestContext, httpCode int, code int, message st
 
 // SuccessResponseFunc 成功响应函数
 func SuccessResponseFunc(c *app.RequestContext, data interface{}) {
-	c.JSON(HTTPStatusOK, data)
+	c.JSON(constants.HTTPStatusOK, data)
 }
 
 // GetUserIDFromContext 从上下文获取用户ID
@@ -114,7 +73,7 @@ func GetUserIDFromContext(c *app.RequestContext) (string, bool) {
 func RequireAuth(c *app.RequestContext) (string, bool) {
 	userID, exists := GetUserIDFromContext(c)
 	if !exists {
-		ErrorResponseFunc(c, HTTPStatusUnauthorized, CodeError, MsgUnauthorized)
+		ErrorResponseFunc(c, constants.HTTPStatusUnauthorized, CodeError, constants.MsgUnauthorized)
 		return "", false
 	}
 	return userID, true
@@ -127,16 +86,16 @@ func ParsePaginationParams(c *app.RequestContext) (int32, int32) {
 
 	page, err := strconv.ParseInt(pageStr, 10, 32)
 	if err != nil || page <= 0 {
-		page = DefaultPage
+		page = constants.DefaultPage
 	}
 
 	pageSize, err := strconv.ParseInt(pageSizeStr, 10, 32)
 	if err != nil || pageSize <= 0 {
-		pageSize = DefaultPageSize
+		pageSize = constants.DefaultPageSize
 	}
 
-	if pageSize > MaxPageSize {
-		pageSize = MaxPageSize
+	if pageSize > constants.MaxPageSize {
+		pageSize = constants.MaxPageSize
 	}
 
 	return int32(page), int32(pageSize)
@@ -184,13 +143,13 @@ func LogError(operation string, err error) {
 // HandleServiceError 处理服务调用错误
 func HandleServiceError(c *app.RequestContext, operation string, err error, message string) {
 	LogError(operation, err)
-	ErrorResponseFunc(c, HTTPStatusInternalServerError, CodeError, message)
+	ErrorResponseFunc(c, constants.HTTPStatusInternalServerError, CodeError, message)
 }
 
 // ValidateRequiredParam 验证必需参数
 func ValidateRequiredParam(c *app.RequestContext, value, paramName string) bool {
 	if value == "" {
-		ErrorResponseFunc(c, HTTPStatusBadRequest, CodeError, paramName+"不能为空")
+		ErrorResponseFunc(c, constants.HTTPStatusBadRequest, CodeError, paramName+"不能为空")
 		return false
 	}
 	return true
@@ -261,18 +220,18 @@ func ValidatePostIDPathParam(c *app.RequestContext, paramName string) (string, b
 
 // RespondUnauthorized 返回未授权错误
 func RespondUnauthorized(c *app.RequestContext) {
-	ErrorResponseFunc(c, HTTPStatusUnauthorized, CodeError, MsgUnauthorized)
+	ErrorResponseFunc(c, constants.HTTPStatusUnauthorized, CodeError, constants.MsgUnauthorized)
 }
 
 // RespondBadRequest 返回参数错误
 func RespondBadRequest(c *app.RequestContext, message string) {
-	ErrorResponseFunc(c, HTTPStatusBadRequest, CodeError, message)
+	ErrorResponseFunc(c, constants.HTTPStatusBadRequest, CodeError, message)
 }
 
 // RespondInternalError 返回内部服务器错误
 func RespondInternalError(c *app.RequestContext, message string, err error) {
 	LogError(message, err)
-	ErrorResponseFunc(c, HTTPStatusInternalServerError, CodeServerError, message)
+	ErrorResponseFunc(c, constants.HTTPStatusInternalServerError, CodeServerError, message)
 }
 
 // RespondWithError 统一错误响应（别名）
@@ -313,7 +272,7 @@ func ParseOptionalBoolParamValue(c *app.RequestContext, key string) bool {
 // BindAndValidateRequest 绑定和验证请求参数
 func BindAndValidateRequest(c *app.RequestContext, req interface{}) bool {
 	if err := c.BindAndValidate(req); err != nil {
-		RespondBadRequest(c, MsgParamError+": "+err.Error())
+		RespondBadRequest(c, constants.MsgParamError+": "+err.Error())
 		return false
 	}
 	return true

@@ -2,13 +2,13 @@ package post
 
 import (
 	"context"
-	"net/http"
 
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/api-gateway/handler"
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/post"
+	"hupu/shared/constants"
 )
 
 // 收藏帖子
@@ -34,13 +34,9 @@ func CollectPost(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	resp, err := postClient.CollectPost(ctx, req)
-	if err != nil {
-		common.RespondInternalError(c, MsgCollectPostFailed, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return postClient.CollectPost(ctx, req)
+	}), "CollectPost", constants.MsgCollectPostFailed)
 }
 
 // 取消收藏帖子
@@ -66,13 +62,9 @@ func UncollectPost(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	resp, err := postClient.UncollectPost(ctx, req)
-	if err != nil {
-		common.RespondInternalError(c, MsgUncollectFailed, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return postClient.UncollectPost(ctx, req)
+	}), "UncollectPost", constants.MsgUncollectFailed)
 }
 
 // 获取收藏的帖子列表
@@ -96,11 +88,7 @@ func GetCollectedPosts(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	resp, err := postClient.GetCollectedPosts(ctx, req)
-	if err != nil {
-		common.RespondInternalError(c, MsgGetCollectedFailed, err)
-		return
-	}
-
-	c.JSON(http.StatusOK, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return postClient.GetCollectedPosts(ctx, req)
+	}), "GetCollectedPosts", constants.MsgCollectPostFailed)
 }

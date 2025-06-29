@@ -1,27 +1,4 @@
-package post
-
-import "hupu/api-gateway/handler/common"
-
-// 引用共享常量
-const (
-	// HTTP状态码
-	HTTPStatusOK                  = common.HTTPStatusOK
-	HTTPStatusBadRequest          = common.HTTPStatusBadRequest
-	HTTPStatusUnauthorized        = common.HTTPStatusUnauthorized
-	HTTPStatusForbidden           = common.HTTPStatusForbidden
-	HTTPStatusNotFound            = common.HTTPStatusNotFound
-	HTTPStatusInternalServerError = common.HTTPStatusInternalServerError
-
-	// 通用消息
-	MsgSuccess      = common.MsgSuccess
-	MsgUnauthorized = common.MsgUnauthorized
-	MsgParamError   = common.MsgParamError
-
-	// 分页参数
-	DefaultPage     = common.DefaultPage
-	DefaultPageSize = common.DefaultPageSize
-	MaxPageSize     = common.MaxPageSize
-)
+package constants
 
 // 帖子服务特有的错误消息常量
 const (
@@ -47,36 +24,6 @@ const (
 	MsgUpdateRatingFailed = "更新评分失败"
 	MsgDeleteRatingFailed = "删除评分失败"
 	MsgGetRankFailed      = "获取排行榜失败"
-)
-
-// 排序类型常量
-const (
-	SortTypeLatest  = "latest"
-	SortTypeHot     = "hot"
-	SortTypeScore   = "score"
-	SortTypeDaily   = "daily"
-	SortTypeWeekly  = "weekly"
-	SortTypeMonthly = "monthly"
-)
-
-// 排行榜类型常量
-const (
-	RankTypeDailyHigh     = "daily_high"
-	RankTypeDailyLow      = "daily_low"
-	RankTypeWeeklyBest    = "weekly_best"
-	RankTypeControversial = "controversial"
-)
-
-// 话题排序类型常量
-const (
-	TopicSortTypeHot         = "hot"
-	TopicSortTypeLatest      = "latest"
-	TopicSortTypeParticipant = "participant"
-)
-
-// 上下文键常量
-const (
-	UserIDKey = common.UserIDKey
 )
 
 // 查询参数键常量

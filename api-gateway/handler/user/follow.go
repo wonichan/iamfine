@@ -8,6 +8,7 @@ import (
 	"hupu/api-gateway/handler"
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
+	"hupu/shared/constants"
 )
 
 // FollowUser 关注用户
@@ -41,13 +42,9 @@ func FollowUser(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	resp, err := handler.GetUserClient().FollowUser(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "FollowUser", err, MsgFollowUserFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().FollowUser(ctx, req)
+	}), "FollowUser", constants.MsgFollowUserFailed)
 }
 
 // UnfollowUser 取消关注用户
@@ -72,13 +69,9 @@ func UnfollowUser(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	resp, err := handler.GetUserClient().UnfollowUser(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "UnfollowUser", err, MsgUnfollowUserFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().UnfollowUser(ctx, req)
+	}), "UnfollowUser", constants.MsgUnfollowUserFailed)
 }
 
 // GetFollowers 获取粉丝列表
@@ -101,13 +94,9 @@ func GetFollowers(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	resp, err := handler.GetUserClient().GetFollowers(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetFollowers", err, MsgGetFollowersFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().GetFollowers(ctx, req)
+	}), "GetFollowers", constants.MsgGetFollowersFailed)
 }
 
 // GetFollowing 获取关注列表
@@ -130,11 +119,7 @@ func GetFollowing(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	resp, err := handler.GetUserClient().GetFollowing(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetFollowing", err, MsgGetFollowingFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().GetFollowing(ctx, req)
+	}), "GetFollowing", constants.MsgGetFollowingFailed)
 }

@@ -8,6 +8,7 @@ import (
 	"hupu/api-gateway/handler"
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
+	"hupu/shared/constants"
 )
 
 // WxLoginRequest 微信登录请求结构
@@ -21,7 +22,7 @@ func WxLogin(ctx context.Context, c *app.RequestContext) {
 	// 解析请求参数
 	var req WxLoginRequest
 	if err := c.BindAndValidate(&req); err != nil {
-		common.ErrorResponseFunc(c, HTTPStatusBadRequest, CodeError, MsgParamError+": "+err.Error())
+		common.RespondBadRequest(c, constants.MsgParamError+": "+err.Error())
 		return
 	}
 
@@ -31,8 +32,8 @@ func WxLogin(ctx context.Context, c *app.RequestContext) {
 
 	// 示例响应数据
 	responseData := map[string]interface{}{
-		"code":    CodeSuccess,
-		"message": MsgSuccess,
+		"code":    common.CodeSuccess,
+		"message": constants.MsgSuccess,
 		"data": map[string]interface{}{
 			"token": "example_jwt_token",
 			"user": map[string]interface{}{
@@ -61,6 +62,7 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
@@ -71,14 +73,14 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 
 	resp, err := handler.GetUserClient().GetUser(ctx, req)
 	if err != nil {
-		common.HandleServiceError(c, "GetUserInfo", err, MsgGetUserInfoFailed)
+		common.HandleServiceError(c, "GetUserInfo", err, constants.MsgGetUserInfoFailed)
 		return
 	}
 
 	// 转换响应格式以符合API文档
 	responseData := map[string]interface{}{
-		"code":    CodeSuccess,
-		"message": MsgSuccess,
+		"code":    common.CodeSuccess,
+		"message": constants.MsgSuccess,
 		"data": map[string]interface{}{
 			"id":        resp.User.Id,
 			"openId":    "", // 需要根据实际情况填充

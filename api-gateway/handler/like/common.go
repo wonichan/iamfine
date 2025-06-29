@@ -1,14 +1,12 @@
 package like
 
 import (
-	"context"
-
 	"github.com/cloudwego/hertz/pkg/app"
 
 	"hupu/api-gateway/handler"
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/like/likeservice"
-	"hupu/shared/log"
+	"hupu/shared/constants"
 )
 
 // 所有公共方法都已迁移到 common 包中
@@ -21,12 +19,12 @@ import (
 // ValidateTargetParams 验证目标参数
 func ValidateTargetParams(targetID, targetType string) error {
 	if targetID == "" {
-		return &ValidationError{Message: MsgTargetIDRequired}
+		return &ValidationError{Message: constants.MsgTargetIDRequired}
 	}
 	if targetType == "" {
-		return &ValidationError{Message: MsgTargetTypeRequired}
+		return &ValidationError{Message: constants.MsgTargetTypeRequired}
 	}
-	if targetType != TargetTypePost && targetType != TargetTypeComment {
+	if targetType != constants.TargetTypePost && targetType != constants.TargetTypeComment {
 		return &ValidationError{Message: "目标类型必须是post或comment"}
 	}
 	return nil
@@ -42,11 +40,10 @@ func (e *ValidationError) Error() string {
 }
 
 // CallLikeService 统一调用点赞服务的函数
-func CallLikeService(ctx context.Context, c *app.RequestContext, serviceCall func() (interface{}, error), errorMsg string) {
+func CallLikeService(c *app.RequestContext, serviceCall func() (interface{}, error), callName string, errorMsg string) {
 	resp, err := serviceCall()
 	if err != nil {
-		log.GetLogger().Errorf("%s error: %v", errorMsg, err)
-		common.RespondWithError(c, HTTPStatusInternalServerError, CodeError, errorMsg)
+		common.HandleServiceError(c, callName, err, errorMsg)
 		return
 	}
 	common.RespondWithSuccess(c, resp)

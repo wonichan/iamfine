@@ -8,6 +8,7 @@ import (
 	"hupu/api-gateway/handler"
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/comment"
+	"hupu/shared/constants"
 )
 
 // CreateCommentRequest 创建评论请求结构
@@ -51,13 +52,9 @@ func GetCommentList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用评论服务
-	resp, err := handler.GetCommentClient().GetCommentList(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetCommentList", err, MsgGetCommentListFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetCommentClient().GetCommentList(ctx, req)
+	}), "GetCommentList", constants.MsgGetCommentListFailed)
 }
 
 // CreateComment 创建评论
@@ -72,7 +69,7 @@ func CreateComment(ctx context.Context, c *app.RequestContext) {
 	// 解析请求体
 	var reqBody CreateCommentRequest
 	if err := c.BindJSON(&reqBody); err != nil {
-		common.ErrorResponseFunc(c, HTTPStatusBadRequest, CodeError, MsgParamError)
+		common.ErrorResponseFunc(c, constants.HTTPStatusBadRequest, common.CodeError, constants.MsgParamError)
 		return
 	}
 
@@ -88,13 +85,9 @@ func CreateComment(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用评论服务
-	resp, err := handler.GetCommentClient().CreateComment(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "CreateComment", err, MsgCreateCommentFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetCommentClient().CreateComment(ctx, req)
+	}), "CreateComment", constants.MsgCreateCommentFailed)
 }
 
 // DeleteComment 删除评论
@@ -119,13 +112,9 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用评论服务
-	resp, err := handler.GetCommentClient().DeleteComment(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "DeleteComment", err, MsgDeleteCommentFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetCommentClient().DeleteComment(ctx, req)
+	}), "DeleteComment", constants.MsgDeleteCommentFailed)
 }
 
 // LikeComment 点赞评论
@@ -150,13 +139,9 @@ func LikeComment(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用评论服务
-	resp, err := handler.GetCommentClient().LikeComment(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "LikeComment", err, MsgLikeCommentFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetCommentClient().LikeComment(ctx, req)
+	}), "LikeComment", constants.MsgLikeCommentFailed)
 }
 
 // UnlikeComment 取消点赞评论
@@ -181,11 +166,7 @@ func UnlikeComment(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用评论服务
-	resp, err := handler.GetCommentClient().UnlikeComment(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "UnlikeComment", err, MsgUnlikeCommentFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetCommentClient().UnlikeComment(ctx, req)
+	}), "UnlikeComment", constants.MsgUnlikeCommentFailed)
 }

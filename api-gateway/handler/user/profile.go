@@ -8,6 +8,7 @@ import (
 	"hupu/api-gateway/handler"
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
+	"hupu/shared/constants"
 )
 
 // UpdateUserInfoRequest 更新用户信息请求结构
@@ -27,13 +28,14 @@ func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
 	currentUserID, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 解析请求体
 	var reqBody UpdateUserInfoRequest
 	if err := c.BindJSON(&reqBody); err != nil {
-		common.ErrorResponseFunc(c, HTTPStatusBadRequest, common.CodeError, MsgRequestFormatError)
+		common.RespondBadRequest(c, constants.MsgRequestFormatError)
 		return
 	}
 
@@ -57,13 +59,9 @@ func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	resp, err := handler.GetUserClient().UpdateUser(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "UpdateUserInfo", err, MsgUpdateUserInfoFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().UpdateUser(ctx, req)
+	}), "UpdateUserInfo", constants.MsgUpdateUserInfoFailed)
 }
 
 // GetUserStats 获取用户统计
@@ -72,6 +70,7 @@ func GetUserStats(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
@@ -82,14 +81,14 @@ func GetUserStats(ctx context.Context, c *app.RequestContext) {
 
 	resp, err := handler.GetUserClient().GetUserStats(ctx, req)
 	if err != nil {
-		common.HandleServiceError(c, "GetUserStats", err, MsgGetUserStatsFailed)
+		common.HandleServiceError(c, "GetUserStats", err, constants.MsgGetUserStatsFailed)
 		return
 	}
 
 	// 转换响应格式以符合API文档
 	responseData := map[string]interface{}{
-		"code":    CodeSuccess,
-		"message": MsgSuccess,
+		"code":    common.CodeSuccess,
+		"message": constants.MsgSuccess,
 		"data": map[string]interface{}{
 			"posts":     resp.PostCount,
 			"comments":  resp.CommentCount,
@@ -109,6 +108,7 @@ func GetUnreadCount(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
 	_, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
@@ -117,8 +117,8 @@ func GetUnreadCount(ctx context.Context, c *app.RequestContext) {
 	// 由于当前没有相应的thrift接口，先返回示例数据
 
 	responseData := map[string]interface{}{
-		"code":    CodeSuccess,
-		"message": MsgSuccess,
+		"code":    common.CodeSuccess,
+		"message": constants.MsgSuccess,
 		"data": map[string]interface{}{
 			"count": 0,
 		},
@@ -140,13 +140,9 @@ func GetUser(ctx context.Context, c *app.RequestContext) {
 	req := &user.GetUserRequest{
 		UserId: userID,
 	}
-	resp, err := handler.GetUserClient().GetUser(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetUser", err, MsgGetUserInfoFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().GetUser(ctx, req)
+	}), "GetUser", constants.MsgGetUserInfoFailed)
 }
 
 // UpdateUser 更新指定用户信息（保留原有接口）
@@ -166,7 +162,7 @@ func UpdateUser(ctx context.Context, c *app.RequestContext) {
 
 	// 检查权限：只能更新自己的信息
 	if currentUserID != userID {
-		common.ErrorResponseFunc(c, common.HTTPStatusForbidden, common.CodeError, "无权限修改其他用户信息")
+		common.ErrorResponseFunc(c, constants.HTTPStatusForbidden, common.CodeError, constants.MsgNoPermissionUpdateOther)
 		return
 	}
 
@@ -181,7 +177,7 @@ func UpdateUser(ctx context.Context, c *app.RequestContext) {
 	}
 
 	if err := c.BindJSON(&reqBody); err != nil {
-		common.ErrorResponseFunc(c, common.HTTPStatusBadRequest, common.CodeError, common.MsgRequestFormatError)
+		common.RespondBadRequest(c, constants.MsgRequestFormatError)
 		return
 	}
 
@@ -204,11 +200,7 @@ func UpdateUser(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	resp, err := handler.GetUserClient().UpdateUser(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "UpdateUser", err, MsgUpdateUserInfoFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().UpdateUser(ctx, req)
+	}), "UpdateUser", constants.MsgUpdateUserInfoFailed)
 }

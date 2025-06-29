@@ -9,6 +9,7 @@ import (
 	"hupu/api-gateway/handler"
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
+	"hupu/shared/constants"
 )
 
 // CreateAnonymousProfileRequest 创建匿名马甲请求结构
@@ -23,13 +24,14 @@ func CreateAnonymousProfile(ctx context.Context, c *app.RequestContext) {
 	// 从上下文获取用户ID
 	userID, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 解析请求体
 	var reqBody CreateAnonymousProfileRequest
 	if err := c.BindJSON(&reqBody); err != nil {
-		common.ErrorResponseFunc(c, HTTPStatusBadRequest, CodeError, MsgRequestFormatError)
+		common.RespondBadRequest(c, constants.MsgRequestFormatError)
 		return
 	}
 
@@ -41,13 +43,9 @@ func CreateAnonymousProfile(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	resp, err := handler.GetUserClient().CreateAnonymousProfile(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "CreateAnonymousProfile", err, MsgCreateAnonymousFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().CreateAnonymousProfile(ctx, req)
+	}), "CreateAnonymousProfile", constants.MsgCreateAnonymousFailed)
 }
 
 // GetAnonymousProfiles 获取匿名马甲列表
@@ -56,6 +54,7 @@ func GetAnonymousProfiles(ctx context.Context, c *app.RequestContext) {
 	// 从上下文获取用户ID
 	userID, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
@@ -65,13 +64,9 @@ func GetAnonymousProfiles(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	resp, err := handler.GetUserClient().GetAnonymousProfiles(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetAnonymousProfiles", err, MsgGetAnonymousListFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().GetAnonymousProfiles(ctx, req)
+	}), "GetAnonymousProfiles", constants.MsgGetAnonymousListFailed)
 }
 
 // UpdateAnonymousProfile 更新匿名马甲
@@ -80,6 +75,7 @@ func UpdateAnonymousProfile(ctx context.Context, c *app.RequestContext) {
 	// 获取profile_id
 	profileID, ok := common.ValidateProfileIDParam(c, "profile_id")
 	if !ok {
+		common.RespondBadRequest(c, constants.MsgProfileIDEmpty)
 		return
 	}
 
@@ -102,11 +98,7 @@ func UpdateAnonymousProfile(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	resp, err := handler.GetUserClient().UpdateAnonymousProfile(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "UpdateAnonymousProfile", err, MsgUpdateAnonymousFailed)
-		return
-	}
-
-	common.SuccessResponseFunc(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetUserClient().UpdateAnonymousProfile(ctx, req)
+	}), "UpdateAnonymousProfile", constants.MsgUpdateAnonymousFailed)
 }
