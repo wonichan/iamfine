@@ -13,7 +13,7 @@ import (
 const (
 	// 业务状态码
 	CodeSuccess     = 0
-	CodeError       = 1
+	CodeError       = 200500
 	CodeServerError = 500
 )
 

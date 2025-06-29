@@ -24,6 +24,7 @@ func GetCommentList(ctx context.Context, c *app.RequestContext) {
 	// 获取帖子ID参数
 	postID, ok := common.ValidatePostIDParam(c, "postId")
 	if !ok {
+		common.RespondBadRequest(c, constants.MsgParamError)
 		return
 	}
 
@@ -63,13 +64,14 @@ func CreateComment(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 解析请求体
 	var reqBody CreateCommentRequest
 	if err := c.BindJSON(&reqBody); err != nil {
-		common.ErrorResponseFunc(c, constants.HTTPStatusBadRequest, common.CodeError, constants.MsgParamError)
+		common.RespondBadRequest(c, constants.MsgParamError)
 		return
 	}
 
@@ -96,12 +98,14 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 获取评论ID参数
 	commentID, ok := common.ValidateCommentIDParam(c, "id")
 	if !ok {
+		common.RespondBadRequest(c, constants.MsgParamError)
 		return
 	}
 
@@ -123,12 +127,14 @@ func LikeComment(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 获取评论ID参数
 	commentID, ok := common.ValidateCommentIDParam(c, "id")
 	if !ok {
+		common.RespondBadRequest(c, constants.MsgParamError)
 		return
 	}
 
@@ -150,12 +156,14 @@ func UnlikeComment(ctx context.Context, c *app.RequestContext) {
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 获取评论ID参数
 	commentID, ok := common.ValidateCommentIDParam(c, "id")
 	if !ok {
+		common.RespondBadRequest(c, constants.MsgParamError)
 		return
 	}
 

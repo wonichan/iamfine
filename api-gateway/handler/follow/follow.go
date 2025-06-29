@@ -31,12 +31,9 @@ func Follow(ctx context.Context, c *app.RequestContext) {
 	req.FollowerId = userID
 
 	// 调用关注服务
-	resp, err := handler.GetFollowClient().Follow(ctx, &req)
-	if err != nil {
-		common.HandleServiceError(c, "Follow", err, constants.MsgFollowFailed)
-		return
-	}
-	common.RespondWithSuccess(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetFollowClient().Follow(ctx, &req)
+	}), "Follow", constants.MsgFollowFailed)
 }
 
 // Unfollow 取消关注
@@ -59,13 +56,9 @@ func Unfollow(ctx context.Context, c *app.RequestContext) {
 	req.FollowerId = userID
 
 	// 调用取消关注服务
-	resp, err := handler.GetFollowClient().Unfollow(ctx, &req)
-	if err != nil {
-		common.HandleServiceError(c, "Unfollow", err, constants.MsgUnfollowFailed)
-		return
-	}
-
-	common.RespondWithSuccess(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetFollowClient().Unfollow(ctx, &req)
+	}), "Unfollow", constants.MsgUnfollowFailed)
 }
 
 // GetFollowList 获取关注列表
@@ -81,18 +74,15 @@ func GetFollowList(ctx context.Context, c *app.RequestContext) {
 	page, pageSize := common.ParsePaginationParams(c)
 
 	// 调用关注服务
-	req := &follow.GetFollowListRequest{
+	req := follow.GetFollowListRequest{
 		UserId:   userID,
 		Page:     int32(page),
 		PageSize: int32(pageSize),
 	}
-	resp, err := handler.GetFollowClient().GetFollowList(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetFollowList", err, constants.MsgGetFollowListFailed)
-		return
-	}
 
-	common.RespondWithSuccess(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetFollowClient().GetFollowList(ctx, &req)
+	}), "GetFollowList", constants.MsgGetFollowListFailed)
 }
 
 // GetFollowerList 获取粉丝列表
@@ -108,18 +98,15 @@ func GetFollowerList(ctx context.Context, c *app.RequestContext) {
 	page, pageSize := common.ParsePaginationParams(c)
 
 	// 调用关注服务
-	req := &follow.GetFollowerListRequest{
+	req := follow.GetFollowerListRequest{
 		UserId:   userID,
 		Page:     int32(page),
 		PageSize: int32(pageSize),
 	}
-	resp, err := handler.GetFollowClient().GetFollowerList(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetFollowerList", err, constants.MsgGetFollowerListFailed)
-		return
-	}
 
-	common.RespondWithSuccess(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetFollowClient().GetFollowerList(ctx, &req)
+	}), "GetFollowerList", constants.MsgGetFollowerListFailed)
 }
 
 // CheckFollowStatus 检查关注状态
@@ -139,19 +126,15 @@ func CheckFollowStatus(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 构建请求
-	req := &follow.CheckFollowStatusRequest{
+	req := follow.CheckFollowStatusRequest{
 		FollowerId:  userID,
 		FollowingId: targetUserID,
 	}
 
 	// 调用关注服务
-	resp, err := handler.GetFollowClient().CheckFollowStatus(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetFollowerList", err, constants.MsgCheckFollowStatusFailed)
-		return
-	}
-
-	common.RespondWithSuccess(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetFollowClient().CheckFollowStatus(ctx, &req)
+	}), "CheckFollowStatus", constants.MsgCheckFollowStatusFailed)
 }
 
 // IsFollowing 检查是否关注
@@ -174,13 +157,9 @@ func IsFollowing(ctx context.Context, c *app.RequestContext) {
 	req.FollowerId = userID
 
 	// 调用关注服务
-	resp, err := handler.GetFollowClient().IsFollowing(ctx, &req)
-	if err != nil {
-		common.HandleServiceError(c, "IsFollowing", err, constants.MsgCheckFollowStatusFailed)
-		return
-	}
-
-	common.RespondWithSuccess(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetFollowClient().IsFollowing(ctx, &req)
+	}), "IsFollowing", constants.MsgCheckFollowStatusFailed)
 }
 
 // GetFollowCount 获取关注数量
@@ -193,18 +172,14 @@ func GetFollowCount(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 构建请求
-	req := &follow.GetFollowCountRequest{
+	req := follow.GetFollowCountRequest{
 		UserId: userID,
 	}
 
 	// 调用关注服务
-	resp, err := handler.GetFollowClient().GetFollowCount(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetFollowCount", err, constants.MsgGetFollowCountFailed)
-		return
-	}
-
-	common.RespondWithSuccess(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetFollowClient().GetFollowCount(ctx, &req)
+	}), "GetFollowCount", constants.MsgGetFollowCountFailed)
 }
 
 // GetFollowerCount 获取粉丝数量
@@ -217,18 +192,14 @@ func GetFollowerCount(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 构建请求
-	req := &follow.GetFollowerCountRequest{
+	req := follow.GetFollowerCountRequest{
 		UserId: userID,
 	}
 
 	// 调用关注服务
-	resp, err := handler.GetFollowClient().GetFollowerCount(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetFollowerCount", err, constants.MsgGetFollowerCountFailed)
-		return
-	}
-
-	common.RespondWithSuccess(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetFollowClient().GetFollowerCount(ctx, &req)
+	}), "GetFollowerCount", constants.MsgGetFollowerCountFailed)
 }
 
 // GetMutualFollows 获取共同关注
@@ -251,7 +222,7 @@ func GetMutualFollows(ctx context.Context, c *app.RequestContext) {
 	page, pageSize := common.ParsePaginationParams(c)
 
 	// 构建请求
-	req := &follow.GetMutualFollowsRequest{
+	req := follow.GetMutualFollowsRequest{
 		UserId:       userID,
 		TargetUserId: targetUserID,
 		Page:         int32(page),
@@ -259,11 +230,7 @@ func GetMutualFollows(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用关注服务
-	resp, err := handler.GetFollowClient().GetMutualFollows(ctx, req)
-	if err != nil {
-		common.HandleServiceError(c, "GetMutualFollows", err, constants.MsgGetMutualFollowsFailed)
-		return
-	}
-
-	common.RespondWithSuccess(c, resp)
+	common.CallService(c, common.ServiceCall(func() (any, error) {
+		return handler.GetFollowClient().GetMutualFollows(ctx, &req)
+	}), "GetMutualFollows", constants.MsgGetMutualFollowsFailed)
 }

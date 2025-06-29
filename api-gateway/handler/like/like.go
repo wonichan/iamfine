@@ -37,9 +37,9 @@ func LikePost(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用服务
-	common.CallService(c, func() (interface{}, error) {
+	common.CallService(c, common.ServiceCall(func() (interface{}, error) {
 		return GetLikeClient().Like(ctx, req)
-	}, "Like", constants.MsgLikeFailed)
+	}), "Like", constants.MsgLikeFailed)
 }
 
 // UnlikePost 取消点赞帖子
@@ -66,9 +66,9 @@ func UnlikePost(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用服务
-	common.CallService(c, func() (interface{}, error) {
+	common.CallService(c, common.ServiceCall(func() (interface{}, error) {
 		return GetLikeClient().Unlike(ctx, req)
-	}, "Unlike", constants.MsgUnlikeFailed)
+	}), "Unlike", constants.MsgUnlikeFailed)
 }
 
 // GetPostLikeCount 获取帖子点赞数量
@@ -87,9 +87,9 @@ func GetPostLikeCount(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用服务
-	common.CallService(c, func() (interface{}, error) {
+	common.CallService(c, common.ServiceCall(func() (interface{}, error) {
 		return GetLikeClient().GetLikeCount(ctx, req)
-	}, "GetLikeCount", constants.MsgGetLikeCountFailed)
+	}), "GetLikeCount", constants.MsgGetLikeCountFailed)
 }
 
 // CheckPostLikeStatus 检查帖子点赞状态
@@ -371,9 +371,9 @@ func Like(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用服务
-	common.CallService(c, func() (interface{}, error) {
+	common.CallService(c, common.ServiceCall(func() (interface{}, error) {
 		return GetLikeClient().Like(ctx, &req)
-	}, "Like", constants.MsgLikeFailed)
+	}), "Like", constants.MsgLikeFailed)
 }
 
 // Unlike 兼容旧的取消点赞接口
