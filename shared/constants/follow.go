@@ -1,5 +1,16 @@
 package constants
 
+const (
+	FollowMethodName            = "Follow"
+	UnFollowMethodName          = "Unfollow"
+	GetFollowListMethodName     = "GetFollowList"
+	GetFollowCountMethodName    = "GetFollowCount"
+	GetFollowerCountMethodName  = "GetFollowerCount"
+	GetMutualFollowsMethodName  = "GetMutualFollows"
+	CheckFollowStatusMethodName = "CheckFollowStatus"
+	IsFollowingMethodName       = "IsFollowing"
+)
+
 // 关注服务特有的错误消息常量
 const (
 	MsgUserIDRequired          = "用户ID不能为空"
