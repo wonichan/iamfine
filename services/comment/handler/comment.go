@@ -77,41 +77,14 @@ func (h *CommentHandler) GetCommentList(ctx context.Context, req *comment.GetCom
 	for _, c := range comments {
 		commentList = append(commentList, h.convertToCommentResponse(c))
 	}
-
 	return &comment.GetCommentListResponse{
-		Code:     0,
-		Message:  "查询成功",
-		Comments: commentList,
-	}, nil
-}
-
-func (h *CommentHandler) LikeComment(ctx context.Context, req *comment.LikeCommentRequest) (*comment.LikeCommentResponse, error) {
-	err := h.rdb.LikeComment(ctx, req.CommentId, req.UserId)
-	if err != nil {
-		return &comment.LikeCommentResponse{
-			Code:    500,
-			Message: "点赞失败",
-		}, err
-	}
-
-	return &comment.LikeCommentResponse{
 		Code:    0,
-		Message: "点赞成功",
-	}, nil
-}
-
-func (h *CommentHandler) UnlikeComment(ctx context.Context, req *comment.UnlikeCommentRequest) (*comment.UnlikeCommentResponse, error) {
-	err := h.rdb.UnlikeComment(ctx, req.CommentId, req.UserId)
-	if err != nil {
-		return &comment.UnlikeCommentResponse{
-			Code:    500,
-			Message: "取消点赞失败",
-		}, err
-	}
-
-	return &comment.UnlikeCommentResponse{
-		Code:    0,
-		Message: "取消点赞成功",
+		Message: "查询成功",
+		Data: &comment.CommentListData{
+			List:    commentList,
+			Total:   int32(len(commentList)),
+			HasMore: false,
+		},
 	}, nil
 }
 
