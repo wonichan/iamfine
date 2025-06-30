@@ -30,7 +30,7 @@ const ()
 
 // 通用响应结构
 type ResponseData struct {
-	Code    int         `json:"code"`
+	Code    int32       `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data,omitempty"`
 }
@@ -49,7 +49,7 @@ type SuccessResponse struct {
 }
 
 // ErrorResponseFunc 错误响应函数
-func ErrorResponseFunc(c *app.RequestContext, httpCode int, code int, message string) {
+func ErrorResponseFunc(c *app.RequestContext, httpCode int, code int32, message string) {
 	c.JSON(httpCode, ResponseData{
 		Code:    code,
 		Message: message,
@@ -146,14 +146,23 @@ func ParseOptionalIntParam(c *app.RequestContext, key string) *int32 {
 }
 
 // LogError 记录错误日志
-func LogError(operation string, err error) {
-	log.GetLogger().Errorf("%s error: %v", operation, err)
+func LogError(operation, traceID string, err string) {
+	logger := log.GetLogger()
+	if traceID != "" {
+		logger.WithField(constants.TraceIdKey, traceID)
+	}
+	logger.Errorf("%s error: %s", operation, err)
 }
 
 // HandleServiceError 处理服务调用错误
-func HandleServiceError(c *app.RequestContext, operation string, err error, message string) {
-	LogError(operation, err)
-	ErrorResponseFunc(c, constants.HTTPStatusInternalServerError, CodeError, message)
+func HandleServiceError(c *app.RequestContext, operation, traceID string, code int32, errMsg string) {
+	LogError(operation, traceID, errMsg)
+	ErrorResponseFunc(c, constants.HTTPStatusInternalServerError, code, constants.ErrCodeToMsg(code))
+}
+
+func HandleRpcError(c *app.RequestContext, operation, traceID string) {
+	LogError(operation, traceID, constants.MsgServerError)
+	HandleServiceError(c, operation, traceID, constants.InternalErrCode, constants.MsgServerError)
 }
 
 // ValidateRequiredParam 验证必需参数
@@ -236,17 +245,6 @@ func RespondUnauthorized(c *app.RequestContext) {
 // RespondBadRequest 返回参数错误
 func RespondBadRequest(c *app.RequestContext, message string) {
 	ErrorResponseFunc(c, constants.HTTPStatusBadRequest, CodeError, message)
-}
-
-// RespondInternalError 返回内部服务器错误
-func RespondInternalError(c *app.RequestContext, message string, err error) {
-	LogError(message, err)
-	ErrorResponseFunc(c, constants.HTTPStatusInternalServerError, CodeServerError, message)
-}
-
-// RespondWithError 统一错误响应（别名）
-func RespondWithError(c *app.RequestContext, httpCode int, code int, message string) {
-	ErrorResponseFunc(c, httpCode, code, message)
 }
 
 // RespondWithSuccess 统一成功响应（别名）

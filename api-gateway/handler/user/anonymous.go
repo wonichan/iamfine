@@ -21,6 +21,7 @@ type CreateAnonymousProfileRequest struct {
 // CreateAnonymousProfile 创建匿名马甲
 // POST /api/user/anonymous-profiles
 func CreateAnonymousProfile(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 从上下文获取用户ID
 	userID, ok := common.RequireAuth(c)
 	if !ok {
@@ -43,14 +44,22 @@ func CreateAnonymousProfile(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().CreateAnonymousProfile(ctx, req)
-	}), "CreateAnonymousProfile", constants.MsgCreateAnonymousFailed)
+	resp, err := handler.GetUserClient().CreateAnonymousProfile(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "CreateAnonymousProfile", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "CreateAnonymousProfile", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // GetAnonymousProfiles 获取匿名马甲列表
 // GET /api/user/anonymous-profiles
 func GetAnonymousProfiles(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 从上下文获取用户ID
 	userID, ok := common.RequireAuth(c)
 	if !ok {
@@ -64,14 +73,22 @@ func GetAnonymousProfiles(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().GetAnonymousProfiles(ctx, req)
-	}), "GetAnonymousProfiles", constants.MsgGetAnonymousListFailed)
+	resp, err := handler.GetUserClient().GetAnonymousProfiles(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetAnonymousProfiles", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetAnonymousProfiles", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // UpdateAnonymousProfile 更新匿名马甲
 // PUT /api/user/anonymous-profiles/{profile_id}
 func UpdateAnonymousProfile(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 获取profile_id
 	profileID, ok := common.ValidateProfileIDParam(c, "profile_id")
 	if !ok {
@@ -98,7 +115,14 @@ func UpdateAnonymousProfile(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().UpdateAnonymousProfile(ctx, req)
-	}), "UpdateAnonymousProfile", constants.MsgUpdateAnonymousFailed)
+	resp, err := handler.GetUserClient().UpdateAnonymousProfile(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "UpdateAnonymousProfile", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "UpdateAnonymousProfile", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }

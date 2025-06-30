@@ -59,6 +59,7 @@ func WxLogin(ctx context.Context, c *app.RequestContext) {
 // GetUserInfo 获取用户信息
 // GET /api/user/info
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
@@ -73,7 +74,11 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 
 	resp, err := handler.GetUserClient().GetUser(ctx, req)
 	if err != nil {
-		common.HandleServiceError(c, "GetUserInfo", err, constants.MsgGetUserInfoFailed)
+		common.HandleRpcError(c, "GetUserInfo", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetUserInfo", traceId.(string), resp.Code, resp.Message)
 		return
 	}
 

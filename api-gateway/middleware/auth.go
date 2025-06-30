@@ -5,11 +5,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/bytedance/gopkg/cloud/metainfo"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/rs/xid"
 
-	"hupu/shared/constants"
 	"hupu/shared/log"
 	"hupu/shared/utils"
 )
@@ -57,14 +54,5 @@ func AuthMiddleware() app.HandlerFunc {
 		c.Set("username", claims.Username)
 		c.Set("role", claims.Role)
 		c.Next(ctx)
-	}
-}
-
-func TraceIdMiddleware() app.HandlerFunc {
-	return func(ctx context.Context, c *app.RequestContext) {
-		// 生成 traceId 并设置到 context
-		traceId := xid.New().String()
-		newCtx := metainfo.WithPersistentValue(ctx, constants.TraceIdKey, traceId)
-		c.Next(newCtx)
 	}
 }

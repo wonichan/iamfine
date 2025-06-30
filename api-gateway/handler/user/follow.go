@@ -14,6 +14,7 @@ import (
 // FollowUser 关注用户
 // POST /api/user/{id}/follow
 func FollowUser(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 从上下文获取用户ID
 	userID, ok := common.RequireAuth(c)
 	if !ok {
@@ -42,14 +43,22 @@ func FollowUser(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().FollowUser(ctx, req)
-	}), "FollowUser", constants.MsgFollowUserFailed)
+	resp, err := handler.GetUserClient().FollowUser(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "FollowUser", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "FollowUser", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // UnfollowUser 取消关注用户
 // DELETE /api/user/{id}/follow
 func UnfollowUser(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 从上下文获取用户ID
 	userID, ok := common.RequireAuth(c)
 	if !ok {
@@ -69,14 +78,22 @@ func UnfollowUser(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().UnfollowUser(ctx, req)
-	}), "UnfollowUser", constants.MsgUnfollowUserFailed)
+	resp, err := handler.GetUserClient().UnfollowUser(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "UnfollowUser", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "UnfollowUser", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // GetFollowers 获取粉丝列表
 // GET /api/user/{id}/followers
 func GetFollowers(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 获取用户ID参数
 	userID, ok := common.ValidateUserIDParam(c, "id")
 	if !ok {
@@ -94,14 +111,22 @@ func GetFollowers(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().GetFollowers(ctx, req)
-	}), "GetFollowers", constants.MsgGetFollowersFailed)
+	resp, err := handler.GetUserClient().GetFollowers(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetFollowers", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetFollowers", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // GetFollowing 获取关注列表
 // GET /api/user/{id}/following
 func GetFollowing(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 获取用户ID参数
 	userID, ok := common.ValidateUserIDParam(c, "id")
 	if !ok {
@@ -119,7 +144,14 @@ func GetFollowing(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().GetFollowing(ctx, req)
-	}), "GetFollowing", constants.MsgGetFollowingFailed)
+	resp, err := handler.GetUserClient().GetFollowing(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetFollowing", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetFollowing", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }

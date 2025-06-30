@@ -25,6 +25,7 @@ type UpdateUserInfoRequest struct {
 // UpdateUserInfo 更新用户信息
 // PUT /api/user/info
 func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 需要认证
 	currentUserID, ok := common.RequireAuth(c)
 	if !ok {
@@ -59,14 +60,22 @@ func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().UpdateUser(ctx, req)
-	}), "UpdateUserInfo", constants.MsgUpdateUserInfoFailed)
+	resp, err := handler.GetUserClient().UpdateUser(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "UpdateUserInfo", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "UpdateUserInfo", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // GetUserStats 获取用户统计
 // GET /api/user/stats
 func GetUserStats(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
@@ -81,7 +90,11 @@ func GetUserStats(ctx context.Context, c *app.RequestContext) {
 
 	resp, err := handler.GetUserClient().GetUserStats(ctx, req)
 	if err != nil {
-		common.HandleServiceError(c, "GetUserStats", err, constants.MsgGetUserStatsFailed)
+		common.HandleRpcError(c, "GetUserStats", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetUserStats", traceId.(string), resp.Code, resp.Message)
 		return
 	}
 
@@ -130,6 +143,7 @@ func GetUnreadCount(ctx context.Context, c *app.RequestContext) {
 // GetUser 获取指定用户信息（保留原有接口）
 // GET /api/user/{id}
 func GetUser(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 获取用户ID参数
 	userID, ok := common.ValidateUserIDParam(c, "id")
 	if !ok {
@@ -140,14 +154,22 @@ func GetUser(ctx context.Context, c *app.RequestContext) {
 	req := &user.GetUserRequest{
 		UserId: userID,
 	}
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().GetUser(ctx, req)
-	}), "GetUser", constants.MsgGetUserInfoFailed)
+	resp, err := handler.GetUserClient().GetUser(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetUser", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetUser", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // UpdateUser 更新指定用户信息（保留原有接口）
 // PUT /api/user/{id}
 func UpdateUser(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 从上下文获取用户ID
 	currentUserID, ok := common.RequireAuth(c)
 	if !ok {
@@ -200,7 +222,14 @@ func UpdateUser(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用用户服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetUserClient().UpdateUser(ctx, req)
-	}), "UpdateUser", constants.MsgUpdateUserInfoFailed)
+	resp, err := handler.GetUserClient().UpdateUser(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "UpdateUser", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "UpdateUser", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }

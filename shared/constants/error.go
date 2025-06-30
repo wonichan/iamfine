@@ -1,5 +1,7 @@
 package constants
 
+const SuccessCode = 0
+
 const (
 	InternalErrCode = 500
 )
@@ -27,9 +29,9 @@ const (
 	EncryptErrCode = 500106
 )
 
-func ErrMsgToCode(msg string) int32 {
-	if code, ok := errMsgToCode[msg]; ok {
-		return code
+func ErrCodeToMsg(code int32) string {
+	if msg, ok := errCodeToMsg[code]; ok {
+		return msg
 	}
-	return InternalErrCode
+	return MsgServerError
 }
