@@ -51,6 +51,7 @@ func (AnonymousAvatar) TableName() string {
 
 type User struct {
 	ID                 string              `gorm:"primaryKey;type:varchar(32)" json:"id"`
+	Role               string              `gorm:"type:varchar(20);default:'user'" json:"role"`
 	Username           string              `gorm:"uniqueIndex;type:varchar(50);not null" json:"username"`
 	Password           string              `gorm:"type:varchar(255);not null" json:"password"`
 	Nickname           string              `gorm:"type:varchar(50)" json:"nickname"`

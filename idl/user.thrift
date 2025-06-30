@@ -37,28 +37,29 @@ struct AnonymousProfile {
 
 struct User {
     1: string id
-    2: string username
-    3: string nickname
-    4: string avatar
-    5: string phone
-    6: string email
-    7: UserStatus status
-    8: i64 created_at
-    9: i64 updated_at
-    10: optional string bio                    // 个人简介
-    11: RelationshipStatus relationship_status // 感情状态
-    12: AgeGroup age_group                     // 年龄段
-    13: optional string location              // 所在地
-    14: i32 post_count                        // 发帖数
-    15: i32 comment_count                     // 评论数
-    16: i32 like_count                        // 获赞数
-    17: i32 collect_count                     // 收藏数
-    18: double average_score                  // 平均得分
-    19: i32 follower_count                    // 粉丝数
-    20: i32 following_count                   // 关注数
-    21: bool is_verified                      // 是否认证
-    22: list<string> tags                     // 用户标签
-    23: list<AnonymousProfile> anonymous_profiles // 匿名马甲列表
+    2: string role
+    3: string username
+    4: string nickname
+    5: string avatar
+    6: string phone
+    7: string email
+    8: UserStatus status
+    9: i64 created_at
+    10: i64 updated_at
+    11: optional string bio                    // 个人简介
+    12: RelationshipStatus relationship_status // 感情状态
+    13: AgeGroup age_group                     // 年龄段
+    14: optional string location              // 所在地
+    15: i32 post_count                        // 发帖数
+    16: i32 comment_count                     // 评论数
+    17: i32 like_count                        // 获赞数
+    18: i32 collect_count                     // 收藏数
+    19: double average_score                  // 平均得分
+    20: i32 follower_count                    // 粉丝数
+    21: i32 following_count                   // 关注数
+    22: bool is_verified                      // 是否认证
+    23: list<string> tags                     // 用户标签
+    24: list<AnonymousProfile> anonymous_profiles // 匿名马甲列表
 }
 
 struct RegisterRequest {
@@ -82,8 +83,7 @@ struct LoginRequest {
 struct LoginResponse {
     1: i32 code
     2: string message
-    3: string token
-    4: User user
+    3: User user
 }
 
 struct GetUserRequest {

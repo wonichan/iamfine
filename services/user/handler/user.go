@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 
-	"hupu/kitex_gen/user"
+	service "hupu/kitex_gen/user"
 	"hupu/services/user/repository"
 	"hupu/shared/constants"
 	"hupu/shared/log"
@@ -17,19 +16,17 @@ import (
 )
 
 type UserHandler struct {
-	db  repository.UserRepository
-	rdb repository.UserRepository
+	db repository.UserRepository
 }
 
-func NewUserHandler(db *gorm.DB, rdb *redis.Client) *UserHandler {
+func NewUserHandler(db *gorm.DB) service.UserService {
 	return &UserHandler{
-		db:  repository.NewUserRepository(db),
-		rdb: repository.NewUserRedisRepo(rdb),
+		db: repository.NewUserRepository(db),
 	}
 }
 
 // 用户注册
-func (h *UserHandler) Register(ctx context.Context, req *user.RegisterRequest) (*user.RegisterResponse, error) {
+func (h *UserHandler) Register(ctx context.Context, req *service.RegisterRequest) (*service.RegisterResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Info("Register start")
 	userModel := &models.User{
@@ -40,77 +37,70 @@ func (h *UserHandler) Register(ctx context.Context, req *user.RegisterRequest) (
 		Status:   models.UserStatusActive,
 	}
 
-	savedUser, err := h.rdb.CreateUser(ctx, userModel)
+	savedUser, err := h.db.CreateUser(ctx, userModel)
 	if err != nil {
-		return &user.RegisterResponse{
-			Code:    500,
+		return &service.RegisterResponse{
+			Code:    constants.UserExistsErrCode,
 			Message: fmt.Sprintf("failed to create user, err:%s", err.Error()),
 		}, nil
 	}
 	logger.Infof("Register success, user:%+v", savedUser)
-	return &user.RegisterResponse{
-		Code:    200,
-		Message: "注册成功",
-		User:    h.convertToUserResponse(savedUser),
+	return &service.RegisterResponse{
+		Code: 0,
+		User: h.convertToUserResponse(savedUser),
 	}, nil
 }
 
 // 用户登录
-func (h *UserHandler) Login(ctx context.Context, req *user.LoginRequest) (*user.LoginResponse, error) {
+func (h *UserHandler) Login(ctx context.Context, req *service.LoginRequest) (*service.LoginResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Info("Login start")
-	getUser, err := h.rdb.GetUser(ctx, &models.User{
+	getUser, err := h.db.GetUser(ctx, &models.User{
 		Username: req.Username,
 		Password: req.Password,
 		Status:   models.UserStatusActive,
 	})
 	if err != nil {
-		return &user.LoginResponse{
-			Code:    500,
+		return &service.LoginResponse{
+			Code:    constants.UserLoginErrCode,
 			Message: fmt.Sprintf("failed to login, err:%s", err.Error()),
 		}, nil
 	}
-
-	// 生成JWT token
-	token, err := utils.GenerateToken(getUser.ID, getUser.Username)
-	if err != nil {
-		return &user.LoginResponse{
-			Code:    500,
-			Message: "生成token失败",
-		}, err
+	if !utils.CheckPassword(req.Password, getUser.Password) {
+		return &service.LoginResponse{
+			Code:    constants.UserPasswdErrCode,
+			Message: fmt.Sprintf("failed to login, err:%s", constants.MsgPasswordError),
+		}, nil
 	}
 
-	return &user.LoginResponse{
-		Code:    200,
-		Message: "登录成功",
-		Token:   token,
-		User:    h.convertToUserResponse(getUser),
+	return &service.LoginResponse{
+		Code: 0,
+		User: h.convertToUserResponse(getUser),
 	}, nil
 }
 
 // 获取用户信息
-func (h *UserHandler) GetUser(ctx context.Context, req *user.GetUserRequest) (*user.GetUserResponse, error) {
+func (h *UserHandler) GetUser(ctx context.Context, req *service.GetUserRequest) (*service.GetUserResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Infof("GetUser start, req:%+v", req)
-	getUser, err := h.rdb.GetUser(ctx, &models.User{
+	getUser, err := h.db.GetUser(ctx, &models.User{
 		ID: req.UserId,
 	})
 	if err != nil {
-		return &user.GetUserResponse{
-			Code:    500,
+		return &service.GetUserResponse{
+			Code:    constants.UserGerUserErrCode,
 			Message: fmt.Sprintf("failed to get user, err:%s", err.Error()),
-		}, err
+		}, nil
 	}
 
-	return &user.GetUserResponse{
-		Code:    0,
-		Message: "查询成功",
-		User:    h.convertToUserResponse(getUser),
+	return &service.GetUserResponse{
+		Code: 0,
+		User: h.convertToUserResponse(getUser),
 	}, nil
 }
 
 // 更新用户信息
-func (h *UserHandler) UpdateUser(ctx context.Context, req *user.UpdateUserRequest) (*user.UpdateUserResponse, error) {
+func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserRequest) (*service.UpdateUserResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Infof("UpdateUser start, req:%+v", req)
 
@@ -143,102 +133,104 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *user.UpdateUserReques
 		updateData.Tags = models.StringArray(req.Tags)
 	}
 
-	updatedUser, err := h.rdb.UpdateUser(ctx, updateData)
+	updatedUser, err := h.db.UpdateUser(ctx, updateData)
 	if err != nil {
-		return &user.UpdateUserResponse{
-			Code:    500,
+		return &service.UpdateUserResponse{
+			Code:    constants.UserUpdateUserErrCode,
 			Message: fmt.Sprintf("failed to update user, err:%s", err.Error()),
-		}, err
+		}, nil
 	}
 
-	return &user.UpdateUserResponse{
-		Code:    0,
-		Message: "更新成功",
-		User:    h.convertToUserResponse(updatedUser),
+	return &service.UpdateUserResponse{
+		Code: 0,
+		User: h.convertToUserResponse(updatedUser),
 	}, nil
 }
 
 // 关注功能相关方法
-func (h *UserHandler) FollowUser(ctx context.Context, req *user.FollowUserRequest) (*user.FollowUserResponse, error) {
-	err := h.rdb.FollowUser(ctx, req.UserId, req.TargetUserId)
+func (h *UserHandler) FollowUser(ctx context.Context, req *service.FollowUserRequest) (*service.FollowUserResponse, error) {
+	// 不能关注自己
+	if req.UserId == req.TargetUserId {
+		return &service.FollowUserResponse{
+			Code:    constants.UserFollowUserErrCode,
+			Message: constants.MsgCannotFollowSelf,
+		}, nil
+	}
+	err := h.db.FollowUser(ctx, req.UserId, req.TargetUserId)
 	if err != nil {
-		return &user.FollowUserResponse{
-			Code:    500,
-			Message: "关注失败",
-		}, err
+		return &service.FollowUserResponse{
+			Code:    constants.UserFollowUserErrCode,
+			Message: fmt.Sprintf("failed to follow user, err:%s", err.Error()),
+		}, nil
 	}
 
-	return &user.FollowUserResponse{
-		Code:    0,
-		Message: "关注成功",
+	return &service.FollowUserResponse{
+		Code: 0,
 	}, nil
 }
 
-func (h *UserHandler) UnfollowUser(ctx context.Context, req *user.UnfollowUserRequest) (*user.UnfollowUserResponse, error) {
-	err := h.rdb.UnfollowUser(ctx, req.UserId, req.TargetUserId)
+func (h *UserHandler) UnfollowUser(ctx context.Context, req *service.UnfollowUserRequest) (*service.UnfollowUserResponse, error) {
+	err := h.db.UnfollowUser(ctx, req.UserId, req.TargetUserId)
 	if err != nil {
-		return &user.UnfollowUserResponse{
-			Code:    500,
-			Message: "取消关注失败",
-		}, err
+		return &service.UnfollowUserResponse{
+			Code:    constants.UserUnfollowUserErrCode,
+			Message: fmt.Sprintf("failed to unfollow user, err:%s", err.Error()),
+		}, nil
 	}
 
-	return &user.UnfollowUserResponse{
-		Code:    0,
-		Message: "取消关注成功",
+	return &service.UnfollowUserResponse{
+		Code: 0,
 	}, nil
 }
 
 // 获取粉丝列表
-func (h *UserHandler) GetFollowers(ctx context.Context, req *user.GetFollowersRequest) (*user.GetFollowersResponse, error) {
+func (h *UserHandler) GetFollowers(ctx context.Context, req *service.GetFollowersRequest) (*service.GetFollowersResponse, error) {
 	followers, err := h.db.GetFollowerList(ctx, req.UserId, req.Page, req.PageSize)
 	if err != nil {
-		return &user.GetFollowersResponse{
-			Code:    500,
-			Message: "获取粉丝列表失败",
-		}, err
+		return &service.GetFollowersResponse{
+			Code:    constants.UserGetFollowersErrCode,
+			Message: fmt.Sprintf("failed to get followers, err:%s", err.Error()),
+		}, nil
 	}
 
 	// 转换为响应格式
-	userResponses := make([]*user.User, len(followers))
+	userResponses := make([]*service.User, len(followers))
 	for i, follower := range followers {
 		userResponses[i] = h.convertToUserResponse(follower)
 	}
 
-	return &user.GetFollowersResponse{
-		Code:    200,
-		Message: "获取成功",
-		Users:   userResponses,
-		Total:   int32(len(followers)),
+	return &service.GetFollowersResponse{
+		Code:  0,
+		Users: userResponses,
+		Total: int32(len(followers)),
 	}, nil
 }
 
 // 获取关注列表
-func (h *UserHandler) GetFollowing(ctx context.Context, req *user.GetFollowingRequest) (*user.GetFollowingResponse, error) {
+func (h *UserHandler) GetFollowing(ctx context.Context, req *service.GetFollowingRequest) (*service.GetFollowingResponse, error) {
 	following, err := h.db.GetFollowingList(ctx, req.UserId, req.Page, req.PageSize)
 	if err != nil {
-		return &user.GetFollowingResponse{
-			Code:    500,
-			Message: "获取关注列表失败",
-		}, err
+		return &service.GetFollowingResponse{
+			Code:    constants.UserGetFollowingErrCode,
+			Message: fmt.Sprintf("failed to get following list, err:%s", err.Error()),
+		}, nil
 	}
 
 	// 转换为响应格式
-	userResponses := make([]*user.User, len(following))
+	userResponses := make([]*service.User, len(following))
 	for i, follow := range following {
 		userResponses[i] = h.convertToUserResponse(follow)
 	}
 
-	return &user.GetFollowingResponse{
-		Code:    200,
-		Message: "获取成功",
-		Users:   userResponses,
-		Total:   int32(len(following)),
+	return &service.GetFollowingResponse{
+		Code:  0,
+		Users: userResponses,
+		Total: int32(len(following)),
 	}, nil
 }
 
 // 匿名马甲管理相关方法
-func (h *UserHandler) CreateAnonymousProfile(ctx context.Context, req *user.CreateAnonymousProfileRequest) (*user.CreateAnonymousProfileResponse, error) {
+func (h *UserHandler) CreateAnonymousProfile(ctx context.Context, req *service.CreateAnonymousProfileRequest) (*service.CreateAnonymousProfileResponse, error) {
 	avatar := &models.AnonymousAvatar{
 		UserID:   req.UserId,
 		Name:     req.AnonymousName,
@@ -248,16 +240,15 @@ func (h *UserHandler) CreateAnonymousProfile(ctx context.Context, req *user.Crea
 
 	err := h.db.CreateAnonymousAvatar(ctx, avatar)
 	if err != nil {
-		return &user.CreateAnonymousProfileResponse{
-			Code:    500,
-			Message: "创建匿名马甲失败",
-		}, err
+		return &service.CreateAnonymousProfileResponse{
+			Code:    constants.UserCreateAnonymousErrCode,
+			Message: fmt.Sprintf("failed to create anonymous avatar, err:%s", err.Error()),
+		}, nil
 	}
 
-	return &user.CreateAnonymousProfileResponse{
-		Code:    200,
-		Message: "创建成功",
-		Profile: &user.AnonymousProfile{
+	return &service.CreateAnonymousProfileResponse{
+		Code: 0,
+		Profile: &service.AnonymousProfile{
 			Id:            avatar.ID,
 			UserId:        avatar.UserID,
 			AnonymousName: avatar.Name,
@@ -268,19 +259,19 @@ func (h *UserHandler) CreateAnonymousProfile(ctx context.Context, req *user.Crea
 	}, nil
 }
 
-func (h *UserHandler) GetAnonymousProfiles(ctx context.Context, req *user.GetAnonymousProfilesRequest) (*user.GetAnonymousProfilesResponse, error) {
+func (h *UserHandler) GetAnonymousProfiles(ctx context.Context, req *service.GetAnonymousProfilesRequest) (*service.GetAnonymousProfilesResponse, error) {
 	avatars, err := h.db.GetAnonymousAvatarList(ctx, req.UserId)
 	if err != nil {
-		return &user.GetAnonymousProfilesResponse{
-			Code:    500,
-			Message: "获取匿名马甲列表失败",
-		}, err
+		return &service.GetAnonymousProfilesResponse{
+			Code:    constants.UserGetAnonymousErrCode,
+			Message: fmt.Sprintf("failed to get anonymous avatar list, err:%s", err.Error()),
+		}, nil
 	}
 
 	// 转换为响应格式
-	avatarResponses := make([]*user.AnonymousProfile, len(avatars))
+	avatarResponses := make([]*service.AnonymousProfile, len(avatars))
 	for i, avatar := range avatars {
-		avatarResponses[i] = &user.AnonymousProfile{
+		avatarResponses[i] = &service.AnonymousProfile{
 			Id:            avatar.ID,
 			UserId:        avatar.UserID,
 			AnonymousName: avatar.Name,
@@ -290,21 +281,20 @@ func (h *UserHandler) GetAnonymousProfiles(ctx context.Context, req *user.GetAno
 		}
 	}
 
-	return &user.GetAnonymousProfilesResponse{
-		Code:     200,
-		Message:  "获取成功",
+	return &service.GetAnonymousProfilesResponse{
+		Code:     0,
 		Profiles: avatarResponses,
 	}, nil
 }
 
-func (h *UserHandler) UpdateAnonymousProfile(ctx context.Context, req *user.UpdateAnonymousProfileRequest) (*user.UpdateAnonymousProfileResponse, error) {
+func (h *UserHandler) UpdateAnonymousProfile(ctx context.Context, req *service.UpdateAnonymousProfileRequest) (*service.UpdateAnonymousProfileResponse, error) {
 	// 先获取现有的匿名头像
 	avatar, err := h.db.GetAnonymousAvatar(ctx, req.ProfileId)
 	if err != nil {
-		return &user.UpdateAnonymousProfileResponse{
-			Code:    500,
-			Message: "获取匿名马甲失败",
-		}, err
+		return &service.UpdateAnonymousProfileResponse{
+			Code:    constants.UserGetAnonymousErrCode,
+			Message: fmt.Sprintf("failed to get anonymous avatar, err:%s", err.Error()),
+		}, nil
 	}
 
 	// 更新字段
@@ -320,31 +310,29 @@ func (h *UserHandler) UpdateAnonymousProfile(ctx context.Context, req *user.Upda
 
 	err = h.db.UpdateAnonymousAvatar(ctx, avatar)
 	if err != nil {
-		return &user.UpdateAnonymousProfileResponse{
-			Code:    500,
-			Message: "更新匿名马甲失败",
-		}, err
+		return &service.UpdateAnonymousProfileResponse{
+			Code:    constants.UserUpdateAnonymousErrCode,
+			Message: fmt.Sprintf("failed to update anonymous avatar, err:%s", err.Error()),
+		}, nil
 	}
 
-	return &user.UpdateAnonymousProfileResponse{
-		Code:    200,
-		Message: "更新成功",
+	return &service.UpdateAnonymousProfileResponse{
+		Code: 0,
 	}, nil
 }
 
 // 用户统计相关方法
-func (h *UserHandler) GetUserStats(ctx context.Context, req *user.GetUserStatsRequest) (*user.GetUserStatsResponse, error) {
+func (h *UserHandler) GetUserStats(ctx context.Context, req *service.GetUserStatsRequest) (*service.GetUserStatsResponse, error) {
 	stats, err := h.db.GetUserStats(ctx, req.UserId)
 	if err != nil {
-		return &user.GetUserStatsResponse{
-			Code:    500,
-			Message: "获取用户统计失败",
-		}, err
+		return &service.GetUserStatsResponse{
+			Code:    constants.UserGetUserStatusErrCode,
+			Message: fmt.Sprintf("failed to get user stats, err:%s", err.Error()),
+		}, nil
 	}
 
-	return &user.GetUserStatsResponse{
-		Code:           200,
-		Message:        "获取成功",
+	return &service.GetUserStatsResponse{
+		Code:           0,
 		PostCount:      stats.PostCount,
 		CommentCount:   stats.CommentCount,
 		LikeCount:      stats.LikeCount,
@@ -356,15 +344,15 @@ func (h *UserHandler) GetUserStats(ctx context.Context, req *user.GetUserStatsRe
 }
 
 // 辅助方法：转换模型为响应格式
-func (h *UserHandler) convertToUserResponse(u *models.User) *user.User {
-	response := &user.User{
+func (h *UserHandler) convertToUserResponse(u *models.User) *service.User {
+	response := &service.User{
 		Id:             u.ID,
 		Username:       u.Username,
 		Nickname:       u.Nickname,
 		Avatar:         u.Avatar,
 		Phone:          u.Phone,
 		Email:          u.Email,
-		Status:         user.UserStatus(u.Status),
+		Status:         service.UserStatus(u.Status),
 		PostCount:      u.PostCount,
 		CommentCount:   u.CommentCount,
 		LikeCount:      u.LikeCount,
@@ -381,11 +369,11 @@ func (h *UserHandler) convertToUserResponse(u *models.User) *user.User {
 		response.Bio = u.Bio
 	}
 	if u.RelationshipStatus != nil {
-		status := user.RelationshipStatus(*u.RelationshipStatus)
+		status := service.RelationshipStatus(*u.RelationshipStatus)
 		response.RelationshipStatus = status
 	}
 	if u.AgeGroup != nil {
-		age := user.AgeGroup(*u.AgeGroup)
+		age := service.AgeGroup(*u.AgeGroup)
 		response.AgeGroup = age
 	}
 	if u.Location != nil {

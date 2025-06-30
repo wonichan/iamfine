@@ -9,6 +9,7 @@ import (
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
 	"hupu/shared/constants"
+	"hupu/shared/utils"
 )
 
 // RegisterRequest 注册请求结构
@@ -69,7 +70,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		common.HandleServiceError(c, "Login", err, constants.MsgLoginFailed)
 		return
 	}
-
-	c.Header("Authorization", resp.Token)
+	token, err := utils.GenerateToken(resp.User.Id, resp.User.Username, resp.User.Role)
+	c.Header("Authorization", token)
 	common.SuccessResponseFunc(c, resp)
 }

@@ -22,6 +22,7 @@ const (
 	// 上下文键
 	UserIDKey        = "user_id"
 	ContextKeyUserID = "user_id"
+	UserRoleKey      = "role"
 )
 
 // 关注状态常量
@@ -67,6 +68,15 @@ func GetUserIDFromContext(c *app.RequestContext) (string, bool) {
 		return "", false
 	}
 	return userID.(string), true
+}
+
+// GetUserRoleFromContext 从上下文获取用户角色
+func GetUserRoleFromContext(c *app.RequestContext) (string, bool) {
+	role, exists := c.Get(UserRoleKey)
+	if !exists {
+		return "", false
+	}
+	return role.(string), true
 }
 
 // RequireAuth 需要认证的接口通用检查

@@ -55,6 +55,7 @@ func AuthMiddleware() app.HandlerFunc {
 		// 将用户信息存储到上下文中
 		c.Set("user_id", claims.UserID)
 		c.Set("username", claims.Username)
+		c.Set("role", claims.Role)
 		c.Next(ctx)
 	}
 }

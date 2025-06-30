@@ -633,28 +633,29 @@ func (p *AnonymousProfile) Field6DeepEqual(src int64) bool {
 
 type User struct {
 	Id                 string              `thrift:"id,1" frugal:"1,default,string" json:"id"`
-	Username           string              `thrift:"username,2" frugal:"2,default,string" json:"username"`
-	Nickname           string              `thrift:"nickname,3" frugal:"3,default,string" json:"nickname"`
-	Avatar             string              `thrift:"avatar,4" frugal:"4,default,string" json:"avatar"`
-	Phone              string              `thrift:"phone,5" frugal:"5,default,string" json:"phone"`
-	Email              string              `thrift:"email,6" frugal:"6,default,string" json:"email"`
-	Status             UserStatus          `thrift:"status,7" frugal:"7,default,UserStatus" json:"status"`
-	CreatedAt          int64               `thrift:"created_at,8" frugal:"8,default,i64" json:"created_at"`
-	UpdatedAt          int64               `thrift:"updated_at,9" frugal:"9,default,i64" json:"updated_at"`
-	Bio                *string             `thrift:"bio,10,optional" frugal:"10,optional,string" json:"bio,omitempty"`
-	RelationshipStatus RelationshipStatus  `thrift:"relationship_status,11" frugal:"11,default,RelationshipStatus" json:"relationship_status"`
-	AgeGroup           AgeGroup            `thrift:"age_group,12" frugal:"12,default,AgeGroup" json:"age_group"`
-	Location           *string             `thrift:"location,13,optional" frugal:"13,optional,string" json:"location,omitempty"`
-	PostCount          int32               `thrift:"post_count,14" frugal:"14,default,i32" json:"post_count"`
-	CommentCount       int32               `thrift:"comment_count,15" frugal:"15,default,i32" json:"comment_count"`
-	LikeCount          int32               `thrift:"like_count,16" frugal:"16,default,i32" json:"like_count"`
-	CollectCount       int32               `thrift:"collect_count,17" frugal:"17,default,i32" json:"collect_count"`
-	AverageScore       float64             `thrift:"average_score,18" frugal:"18,default,double" json:"average_score"`
-	FollowerCount      int32               `thrift:"follower_count,19" frugal:"19,default,i32" json:"follower_count"`
-	FollowingCount     int32               `thrift:"following_count,20" frugal:"20,default,i32" json:"following_count"`
-	IsVerified         bool                `thrift:"is_verified,21" frugal:"21,default,bool" json:"is_verified"`
-	Tags               []string            `thrift:"tags,22" frugal:"22,default,list<string>" json:"tags"`
-	AnonymousProfiles  []*AnonymousProfile `thrift:"anonymous_profiles,23" frugal:"23,default,list<AnonymousProfile>" json:"anonymous_profiles"`
+	Role               string              `thrift:"role,2" frugal:"2,default,string" json:"role"`
+	Username           string              `thrift:"username,3" frugal:"3,default,string" json:"username"`
+	Nickname           string              `thrift:"nickname,4" frugal:"4,default,string" json:"nickname"`
+	Avatar             string              `thrift:"avatar,5" frugal:"5,default,string" json:"avatar"`
+	Phone              string              `thrift:"phone,6" frugal:"6,default,string" json:"phone"`
+	Email              string              `thrift:"email,7" frugal:"7,default,string" json:"email"`
+	Status             UserStatus          `thrift:"status,8" frugal:"8,default,UserStatus" json:"status"`
+	CreatedAt          int64               `thrift:"created_at,9" frugal:"9,default,i64" json:"created_at"`
+	UpdatedAt          int64               `thrift:"updated_at,10" frugal:"10,default,i64" json:"updated_at"`
+	Bio                *string             `thrift:"bio,11,optional" frugal:"11,optional,string" json:"bio,omitempty"`
+	RelationshipStatus RelationshipStatus  `thrift:"relationship_status,12" frugal:"12,default,RelationshipStatus" json:"relationship_status"`
+	AgeGroup           AgeGroup            `thrift:"age_group,13" frugal:"13,default,AgeGroup" json:"age_group"`
+	Location           *string             `thrift:"location,14,optional" frugal:"14,optional,string" json:"location,omitempty"`
+	PostCount          int32               `thrift:"post_count,15" frugal:"15,default,i32" json:"post_count"`
+	CommentCount       int32               `thrift:"comment_count,16" frugal:"16,default,i32" json:"comment_count"`
+	LikeCount          int32               `thrift:"like_count,17" frugal:"17,default,i32" json:"like_count"`
+	CollectCount       int32               `thrift:"collect_count,18" frugal:"18,default,i32" json:"collect_count"`
+	AverageScore       float64             `thrift:"average_score,19" frugal:"19,default,double" json:"average_score"`
+	FollowerCount      int32               `thrift:"follower_count,20" frugal:"20,default,i32" json:"follower_count"`
+	FollowingCount     int32               `thrift:"following_count,21" frugal:"21,default,i32" json:"following_count"`
+	IsVerified         bool                `thrift:"is_verified,22" frugal:"22,default,bool" json:"is_verified"`
+	Tags               []string            `thrift:"tags,23" frugal:"23,default,list<string>" json:"tags"`
+	AnonymousProfiles  []*AnonymousProfile `thrift:"anonymous_profiles,24" frugal:"24,default,list<AnonymousProfile>" json:"anonymous_profiles"`
 }
 
 func NewUser() *User {
@@ -666,6 +667,10 @@ func (p *User) InitDefault() {
 
 func (p *User) GetId() (v string) {
 	return p.Id
+}
+
+func (p *User) GetRole() (v string) {
+	return p.Role
 }
 
 func (p *User) GetUsername() (v string) {
@@ -768,6 +773,9 @@ func (p *User) GetAnonymousProfiles() (v []*AnonymousProfile) {
 func (p *User) SetId(val string) {
 	p.Id = val
 }
+func (p *User) SetRole(val string) {
+	p.Role = val
+}
 func (p *User) SetUsername(val string) {
 	p.Username = val
 }
@@ -837,28 +845,29 @@ func (p *User) SetAnonymousProfiles(val []*AnonymousProfile) {
 
 var fieldIDToName_User = map[int16]string{
 	1:  "id",
-	2:  "username",
-	3:  "nickname",
-	4:  "avatar",
-	5:  "phone",
-	6:  "email",
-	7:  "status",
-	8:  "created_at",
-	9:  "updated_at",
-	10: "bio",
-	11: "relationship_status",
-	12: "age_group",
-	13: "location",
-	14: "post_count",
-	15: "comment_count",
-	16: "like_count",
-	17: "collect_count",
-	18: "average_score",
-	19: "follower_count",
-	20: "following_count",
-	21: "is_verified",
-	22: "tags",
-	23: "anonymous_profiles",
+	2:  "role",
+	3:  "username",
+	4:  "nickname",
+	5:  "avatar",
+	6:  "phone",
+	7:  "email",
+	8:  "status",
+	9:  "created_at",
+	10: "updated_at",
+	11: "bio",
+	12: "relationship_status",
+	13: "age_group",
+	14: "location",
+	15: "post_count",
+	16: "comment_count",
+	17: "like_count",
+	18: "collect_count",
+	19: "average_score",
+	20: "follower_count",
+	21: "following_count",
+	22: "is_verified",
+	23: "tags",
+	24: "anonymous_profiles",
 }
 
 func (p *User) IsSetBio() bool {
@@ -937,7 +946,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 7:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField7(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -945,7 +954,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 8:
-			if fieldTypeId == thrift.I64 {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField8(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -961,7 +970,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 10:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I64 {
 				if err = p.ReadField10(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -969,7 +978,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 11:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField11(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -985,7 +994,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 13:
-			if fieldTypeId == thrift.STRING {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField13(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -993,7 +1002,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 14:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField14(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1025,7 +1034,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 18:
-			if fieldTypeId == thrift.DOUBLE {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField18(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1033,7 +1042,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 19:
-			if fieldTypeId == thrift.I32 {
+			if fieldTypeId == thrift.DOUBLE {
 				if err = p.ReadField19(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1049,7 +1058,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 21:
-			if fieldTypeId == thrift.BOOL {
+			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField21(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1057,7 +1066,7 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 22:
-			if fieldTypeId == thrift.LIST {
+			if fieldTypeId == thrift.BOOL {
 				if err = p.ReadField22(iprot); err != nil {
 					goto ReadFieldError
 				}
@@ -1067,6 +1076,14 @@ func (p *User) Read(iprot thrift.TProtocol) (err error) {
 		case 23:
 			if fieldTypeId == thrift.LIST {
 				if err = p.ReadField23(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 24:
+			if fieldTypeId == thrift.LIST {
+				if err = p.ReadField24(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -1120,7 +1137,7 @@ func (p *User) ReadField2(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.Username = _field
+	p.Role = _field
 	return nil
 }
 func (p *User) ReadField3(iprot thrift.TProtocol) error {
@@ -1131,7 +1148,7 @@ func (p *User) ReadField3(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.Nickname = _field
+	p.Username = _field
 	return nil
 }
 func (p *User) ReadField4(iprot thrift.TProtocol) error {
@@ -1142,7 +1159,7 @@ func (p *User) ReadField4(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.Avatar = _field
+	p.Nickname = _field
 	return nil
 }
 func (p *User) ReadField5(iprot thrift.TProtocol) error {
@@ -1153,7 +1170,7 @@ func (p *User) ReadField5(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.Phone = _field
+	p.Avatar = _field
 	return nil
 }
 func (p *User) ReadField6(iprot thrift.TProtocol) error {
@@ -1164,10 +1181,21 @@ func (p *User) ReadField6(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.Email = _field
+	p.Phone = _field
 	return nil
 }
 func (p *User) ReadField7(iprot thrift.TProtocol) error {
+
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Email = _field
+	return nil
+}
+func (p *User) ReadField8(iprot thrift.TProtocol) error {
 
 	var _field UserStatus
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1178,7 +1206,7 @@ func (p *User) ReadField7(iprot thrift.TProtocol) error {
 	p.Status = _field
 	return nil
 }
-func (p *User) ReadField8(iprot thrift.TProtocol) error {
+func (p *User) ReadField9(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -1189,7 +1217,7 @@ func (p *User) ReadField8(iprot thrift.TProtocol) error {
 	p.CreatedAt = _field
 	return nil
 }
-func (p *User) ReadField9(iprot thrift.TProtocol) error {
+func (p *User) ReadField10(iprot thrift.TProtocol) error {
 
 	var _field int64
 	if v, err := iprot.ReadI64(); err != nil {
@@ -1200,7 +1228,7 @@ func (p *User) ReadField9(iprot thrift.TProtocol) error {
 	p.UpdatedAt = _field
 	return nil
 }
-func (p *User) ReadField10(iprot thrift.TProtocol) error {
+func (p *User) ReadField11(iprot thrift.TProtocol) error {
 
 	var _field *string
 	if v, err := iprot.ReadString(); err != nil {
@@ -1211,7 +1239,7 @@ func (p *User) ReadField10(iprot thrift.TProtocol) error {
 	p.Bio = _field
 	return nil
 }
-func (p *User) ReadField11(iprot thrift.TProtocol) error {
+func (p *User) ReadField12(iprot thrift.TProtocol) error {
 
 	var _field RelationshipStatus
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1222,7 +1250,7 @@ func (p *User) ReadField11(iprot thrift.TProtocol) error {
 	p.RelationshipStatus = _field
 	return nil
 }
-func (p *User) ReadField12(iprot thrift.TProtocol) error {
+func (p *User) ReadField13(iprot thrift.TProtocol) error {
 
 	var _field AgeGroup
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1233,7 +1261,7 @@ func (p *User) ReadField12(iprot thrift.TProtocol) error {
 	p.AgeGroup = _field
 	return nil
 }
-func (p *User) ReadField13(iprot thrift.TProtocol) error {
+func (p *User) ReadField14(iprot thrift.TProtocol) error {
 
 	var _field *string
 	if v, err := iprot.ReadString(); err != nil {
@@ -1244,7 +1272,7 @@ func (p *User) ReadField13(iprot thrift.TProtocol) error {
 	p.Location = _field
 	return nil
 }
-func (p *User) ReadField14(iprot thrift.TProtocol) error {
+func (p *User) ReadField15(iprot thrift.TProtocol) error {
 
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1255,7 +1283,7 @@ func (p *User) ReadField14(iprot thrift.TProtocol) error {
 	p.PostCount = _field
 	return nil
 }
-func (p *User) ReadField15(iprot thrift.TProtocol) error {
+func (p *User) ReadField16(iprot thrift.TProtocol) error {
 
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1266,7 +1294,7 @@ func (p *User) ReadField15(iprot thrift.TProtocol) error {
 	p.CommentCount = _field
 	return nil
 }
-func (p *User) ReadField16(iprot thrift.TProtocol) error {
+func (p *User) ReadField17(iprot thrift.TProtocol) error {
 
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1277,7 +1305,7 @@ func (p *User) ReadField16(iprot thrift.TProtocol) error {
 	p.LikeCount = _field
 	return nil
 }
-func (p *User) ReadField17(iprot thrift.TProtocol) error {
+func (p *User) ReadField18(iprot thrift.TProtocol) error {
 
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1288,7 +1316,7 @@ func (p *User) ReadField17(iprot thrift.TProtocol) error {
 	p.CollectCount = _field
 	return nil
 }
-func (p *User) ReadField18(iprot thrift.TProtocol) error {
+func (p *User) ReadField19(iprot thrift.TProtocol) error {
 
 	var _field float64
 	if v, err := iprot.ReadDouble(); err != nil {
@@ -1299,7 +1327,7 @@ func (p *User) ReadField18(iprot thrift.TProtocol) error {
 	p.AverageScore = _field
 	return nil
 }
-func (p *User) ReadField19(iprot thrift.TProtocol) error {
+func (p *User) ReadField20(iprot thrift.TProtocol) error {
 
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1310,7 +1338,7 @@ func (p *User) ReadField19(iprot thrift.TProtocol) error {
 	p.FollowerCount = _field
 	return nil
 }
-func (p *User) ReadField20(iprot thrift.TProtocol) error {
+func (p *User) ReadField21(iprot thrift.TProtocol) error {
 
 	var _field int32
 	if v, err := iprot.ReadI32(); err != nil {
@@ -1321,7 +1349,7 @@ func (p *User) ReadField20(iprot thrift.TProtocol) error {
 	p.FollowingCount = _field
 	return nil
 }
-func (p *User) ReadField21(iprot thrift.TProtocol) error {
+func (p *User) ReadField22(iprot thrift.TProtocol) error {
 
 	var _field bool
 	if v, err := iprot.ReadBool(); err != nil {
@@ -1332,7 +1360,7 @@ func (p *User) ReadField21(iprot thrift.TProtocol) error {
 	p.IsVerified = _field
 	return nil
 }
-func (p *User) ReadField22(iprot thrift.TProtocol) error {
+func (p *User) ReadField23(iprot thrift.TProtocol) error {
 	_, size, err := iprot.ReadListBegin()
 	if err != nil {
 		return err
@@ -1355,7 +1383,7 @@ func (p *User) ReadField22(iprot thrift.TProtocol) error {
 	p.Tags = _field
 	return nil
 }
-func (p *User) ReadField23(iprot thrift.TProtocol) error {
+func (p *User) ReadField24(iprot thrift.TProtocol) error {
 	_, size, err := iprot.ReadListBegin()
 	if err != nil {
 		return err
@@ -1478,6 +1506,10 @@ func (p *User) Write(oprot thrift.TProtocol) (err error) {
 			fieldId = 23
 			goto WriteFieldError
 		}
+		if err = p.writeField24(oprot); err != nil {
+			fieldId = 24
+			goto WriteFieldError
+		}
 	}
 	if err = oprot.WriteFieldStop(); err != nil {
 		goto WriteFieldStopError
@@ -1514,10 +1546,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField2(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("username", thrift.STRING, 2); err != nil {
+	if err = oprot.WriteFieldBegin("role", thrift.STRING, 2); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Username); err != nil {
+	if err := oprot.WriteString(p.Role); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1531,10 +1563,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("nickname", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("username", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Nickname); err != nil {
+	if err := oprot.WriteString(p.Username); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1548,10 +1580,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("avatar", thrift.STRING, 4); err != nil {
+	if err = oprot.WriteFieldBegin("nickname", thrift.STRING, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Avatar); err != nil {
+	if err := oprot.WriteString(p.Nickname); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1565,10 +1597,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField5(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("phone", thrift.STRING, 5); err != nil {
+	if err = oprot.WriteFieldBegin("avatar", thrift.STRING, 5); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Phone); err != nil {
+	if err := oprot.WriteString(p.Avatar); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1582,10 +1614,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField6(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("email", thrift.STRING, 6); err != nil {
+	if err = oprot.WriteFieldBegin("phone", thrift.STRING, 6); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Email); err != nil {
+	if err := oprot.WriteString(p.Phone); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1599,10 +1631,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField7(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("status", thrift.I32, 7); err != nil {
+	if err = oprot.WriteFieldBegin("email", thrift.STRING, 7); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(int32(p.Status)); err != nil {
+	if err := oprot.WriteString(p.Email); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1616,10 +1648,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField8(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("created_at", thrift.I64, 8); err != nil {
+	if err = oprot.WriteFieldBegin("status", thrift.I32, 8); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.CreatedAt); err != nil {
+	if err := oprot.WriteI32(int32(p.Status)); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1633,10 +1665,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField9(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("updated_at", thrift.I64, 9); err != nil {
+	if err = oprot.WriteFieldBegin("created_at", thrift.I64, 9); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI64(p.UpdatedAt); err != nil {
+	if err := oprot.WriteI64(p.CreatedAt); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1650,8 +1682,25 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField10(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("updated_at", thrift.I64, 10); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI64(p.UpdatedAt); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 10 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 10 end error: ", p), err)
+}
+
+func (p *User) writeField11(oprot thrift.TProtocol) (err error) {
 	if p.IsSetBio() {
-		if err = oprot.WriteFieldBegin("bio", thrift.STRING, 10); err != nil {
+		if err = oprot.WriteFieldBegin("bio", thrift.STRING, 11); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.Bio); err != nil {
@@ -1663,33 +1712,16 @@ func (p *User) writeField10(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 10 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 10 end error: ", p), err)
-}
-
-func (p *User) writeField11(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("relationship_status", thrift.I32, 11); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(int32(p.RelationshipStatus)); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 11 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 11 end error: ", p), err)
 }
 
 func (p *User) writeField12(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("age_group", thrift.I32, 12); err != nil {
+	if err = oprot.WriteFieldBegin("relationship_status", thrift.I32, 12); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(int32(p.AgeGroup)); err != nil {
+	if err := oprot.WriteI32(int32(p.RelationshipStatus)); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1703,8 +1735,25 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField13(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("age_group", thrift.I32, 13); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(int32(p.AgeGroup)); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 13 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 13 end error: ", p), err)
+}
+
+func (p *User) writeField14(oprot thrift.TProtocol) (err error) {
 	if p.IsSetLocation() {
-		if err = oprot.WriteFieldBegin("location", thrift.STRING, 13); err != nil {
+		if err = oprot.WriteFieldBegin("location", thrift.STRING, 14); err != nil {
 			goto WriteFieldBeginError
 		}
 		if err := oprot.WriteString(*p.Location); err != nil {
@@ -1716,33 +1765,16 @@ func (p *User) writeField13(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 13 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 13 end error: ", p), err)
-}
-
-func (p *User) writeField14(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("post_count", thrift.I32, 14); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteI32(p.PostCount); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 14 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 14 end error: ", p), err)
 }
 
 func (p *User) writeField15(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("comment_count", thrift.I32, 15); err != nil {
+	if err = oprot.WriteFieldBegin("post_count", thrift.I32, 15); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.CommentCount); err != nil {
+	if err := oprot.WriteI32(p.PostCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1756,10 +1788,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField16(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("like_count", thrift.I32, 16); err != nil {
+	if err = oprot.WriteFieldBegin("comment_count", thrift.I32, 16); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.LikeCount); err != nil {
+	if err := oprot.WriteI32(p.CommentCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1773,10 +1805,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField17(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("collect_count", thrift.I32, 17); err != nil {
+	if err = oprot.WriteFieldBegin("like_count", thrift.I32, 17); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.CollectCount); err != nil {
+	if err := oprot.WriteI32(p.LikeCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1790,10 +1822,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField18(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("average_score", thrift.DOUBLE, 18); err != nil {
+	if err = oprot.WriteFieldBegin("collect_count", thrift.I32, 18); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteDouble(p.AverageScore); err != nil {
+	if err := oprot.WriteI32(p.CollectCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1807,10 +1839,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField19(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("follower_count", thrift.I32, 19); err != nil {
+	if err = oprot.WriteFieldBegin("average_score", thrift.DOUBLE, 19); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.FollowerCount); err != nil {
+	if err := oprot.WriteDouble(p.AverageScore); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1824,10 +1856,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField20(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("following_count", thrift.I32, 20); err != nil {
+	if err = oprot.WriteFieldBegin("follower_count", thrift.I32, 20); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteI32(p.FollowingCount); err != nil {
+	if err := oprot.WriteI32(p.FollowerCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1841,10 +1873,10 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField21(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("is_verified", thrift.BOOL, 21); err != nil {
+	if err = oprot.WriteFieldBegin("following_count", thrift.I32, 21); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteBool(p.IsVerified); err != nil {
+	if err := oprot.WriteI32(p.FollowingCount); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -1858,7 +1890,24 @@ WriteFieldEndError:
 }
 
 func (p *User) writeField22(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("tags", thrift.LIST, 22); err != nil {
+	if err = oprot.WriteFieldBegin("is_verified", thrift.BOOL, 22); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteBool(p.IsVerified); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 22 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 22 end error: ", p), err)
+}
+
+func (p *User) writeField23(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("tags", thrift.LIST, 23); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteListBegin(thrift.STRING, len(p.Tags)); err != nil {
@@ -1877,13 +1926,13 @@ func (p *User) writeField22(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 22 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 23 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 22 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 23 end error: ", p), err)
 }
 
-func (p *User) writeField23(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("anonymous_profiles", thrift.LIST, 23); err != nil {
+func (p *User) writeField24(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("anonymous_profiles", thrift.LIST, 24); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := oprot.WriteListBegin(thrift.STRUCT, len(p.AnonymousProfiles)); err != nil {
@@ -1902,9 +1951,9 @@ func (p *User) writeField23(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 23 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 24 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 23 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 24 end error: ", p), err)
 }
 
 func (p *User) String() string {
@@ -1924,70 +1973,73 @@ func (p *User) DeepEqual(ano *User) bool {
 	if !p.Field1DeepEqual(ano.Id) {
 		return false
 	}
-	if !p.Field2DeepEqual(ano.Username) {
+	if !p.Field2DeepEqual(ano.Role) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Nickname) {
+	if !p.Field3DeepEqual(ano.Username) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.Avatar) {
+	if !p.Field4DeepEqual(ano.Nickname) {
 		return false
 	}
-	if !p.Field5DeepEqual(ano.Phone) {
+	if !p.Field5DeepEqual(ano.Avatar) {
 		return false
 	}
-	if !p.Field6DeepEqual(ano.Email) {
+	if !p.Field6DeepEqual(ano.Phone) {
 		return false
 	}
-	if !p.Field7DeepEqual(ano.Status) {
+	if !p.Field7DeepEqual(ano.Email) {
 		return false
 	}
-	if !p.Field8DeepEqual(ano.CreatedAt) {
+	if !p.Field8DeepEqual(ano.Status) {
 		return false
 	}
-	if !p.Field9DeepEqual(ano.UpdatedAt) {
+	if !p.Field9DeepEqual(ano.CreatedAt) {
 		return false
 	}
-	if !p.Field10DeepEqual(ano.Bio) {
+	if !p.Field10DeepEqual(ano.UpdatedAt) {
 		return false
 	}
-	if !p.Field11DeepEqual(ano.RelationshipStatus) {
+	if !p.Field11DeepEqual(ano.Bio) {
 		return false
 	}
-	if !p.Field12DeepEqual(ano.AgeGroup) {
+	if !p.Field12DeepEqual(ano.RelationshipStatus) {
 		return false
 	}
-	if !p.Field13DeepEqual(ano.Location) {
+	if !p.Field13DeepEqual(ano.AgeGroup) {
 		return false
 	}
-	if !p.Field14DeepEqual(ano.PostCount) {
+	if !p.Field14DeepEqual(ano.Location) {
 		return false
 	}
-	if !p.Field15DeepEqual(ano.CommentCount) {
+	if !p.Field15DeepEqual(ano.PostCount) {
 		return false
 	}
-	if !p.Field16DeepEqual(ano.LikeCount) {
+	if !p.Field16DeepEqual(ano.CommentCount) {
 		return false
 	}
-	if !p.Field17DeepEqual(ano.CollectCount) {
+	if !p.Field17DeepEqual(ano.LikeCount) {
 		return false
 	}
-	if !p.Field18DeepEqual(ano.AverageScore) {
+	if !p.Field18DeepEqual(ano.CollectCount) {
 		return false
 	}
-	if !p.Field19DeepEqual(ano.FollowerCount) {
+	if !p.Field19DeepEqual(ano.AverageScore) {
 		return false
 	}
-	if !p.Field20DeepEqual(ano.FollowingCount) {
+	if !p.Field20DeepEqual(ano.FollowerCount) {
 		return false
 	}
-	if !p.Field21DeepEqual(ano.IsVerified) {
+	if !p.Field21DeepEqual(ano.FollowingCount) {
 		return false
 	}
-	if !p.Field22DeepEqual(ano.Tags) {
+	if !p.Field22DeepEqual(ano.IsVerified) {
 		return false
 	}
-	if !p.Field23DeepEqual(ano.AnonymousProfiles) {
+	if !p.Field23DeepEqual(ano.Tags) {
+		return false
+	}
+	if !p.Field24DeepEqual(ano.AnonymousProfiles) {
 		return false
 	}
 	return true
@@ -2002,61 +2054,68 @@ func (p *User) Field1DeepEqual(src string) bool {
 }
 func (p *User) Field2DeepEqual(src string) bool {
 
-	if strings.Compare(p.Username, src) != 0 {
+	if strings.Compare(p.Role, src) != 0 {
 		return false
 	}
 	return true
 }
 func (p *User) Field3DeepEqual(src string) bool {
 
-	if strings.Compare(p.Nickname, src) != 0 {
+	if strings.Compare(p.Username, src) != 0 {
 		return false
 	}
 	return true
 }
 func (p *User) Field4DeepEqual(src string) bool {
 
-	if strings.Compare(p.Avatar, src) != 0 {
+	if strings.Compare(p.Nickname, src) != 0 {
 		return false
 	}
 	return true
 }
 func (p *User) Field5DeepEqual(src string) bool {
 
-	if strings.Compare(p.Phone, src) != 0 {
+	if strings.Compare(p.Avatar, src) != 0 {
 		return false
 	}
 	return true
 }
 func (p *User) Field6DeepEqual(src string) bool {
 
+	if strings.Compare(p.Phone, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *User) Field7DeepEqual(src string) bool {
+
 	if strings.Compare(p.Email, src) != 0 {
 		return false
 	}
 	return true
 }
-func (p *User) Field7DeepEqual(src UserStatus) bool {
+func (p *User) Field8DeepEqual(src UserStatus) bool {
 
 	if p.Status != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field8DeepEqual(src int64) bool {
+func (p *User) Field9DeepEqual(src int64) bool {
 
 	if p.CreatedAt != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field9DeepEqual(src int64) bool {
+func (p *User) Field10DeepEqual(src int64) bool {
 
 	if p.UpdatedAt != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field10DeepEqual(src *string) bool {
+func (p *User) Field11DeepEqual(src *string) bool {
 
 	if p.Bio == src {
 		return true
@@ -2068,21 +2127,21 @@ func (p *User) Field10DeepEqual(src *string) bool {
 	}
 	return true
 }
-func (p *User) Field11DeepEqual(src RelationshipStatus) bool {
+func (p *User) Field12DeepEqual(src RelationshipStatus) bool {
 
 	if p.RelationshipStatus != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field12DeepEqual(src AgeGroup) bool {
+func (p *User) Field13DeepEqual(src AgeGroup) bool {
 
 	if p.AgeGroup != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field13DeepEqual(src *string) bool {
+func (p *User) Field14DeepEqual(src *string) bool {
 
 	if p.Location == src {
 		return true
@@ -2094,63 +2153,63 @@ func (p *User) Field13DeepEqual(src *string) bool {
 	}
 	return true
 }
-func (p *User) Field14DeepEqual(src int32) bool {
+func (p *User) Field15DeepEqual(src int32) bool {
 
 	if p.PostCount != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field15DeepEqual(src int32) bool {
+func (p *User) Field16DeepEqual(src int32) bool {
 
 	if p.CommentCount != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field16DeepEqual(src int32) bool {
+func (p *User) Field17DeepEqual(src int32) bool {
 
 	if p.LikeCount != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field17DeepEqual(src int32) bool {
+func (p *User) Field18DeepEqual(src int32) bool {
 
 	if p.CollectCount != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field18DeepEqual(src float64) bool {
+func (p *User) Field19DeepEqual(src float64) bool {
 
 	if p.AverageScore != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field19DeepEqual(src int32) bool {
+func (p *User) Field20DeepEqual(src int32) bool {
 
 	if p.FollowerCount != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field20DeepEqual(src int32) bool {
+func (p *User) Field21DeepEqual(src int32) bool {
 
 	if p.FollowingCount != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field21DeepEqual(src bool) bool {
+func (p *User) Field22DeepEqual(src bool) bool {
 
 	if p.IsVerified != src {
 		return false
 	}
 	return true
 }
-func (p *User) Field22DeepEqual(src []string) bool {
+func (p *User) Field23DeepEqual(src []string) bool {
 
 	if len(p.Tags) != len(src) {
 		return false
@@ -2163,7 +2222,7 @@ func (p *User) Field22DeepEqual(src []string) bool {
 	}
 	return true
 }
-func (p *User) Field23DeepEqual(src []*AnonymousProfile) bool {
+func (p *User) Field24DeepEqual(src []*AnonymousProfile) bool {
 
 	if len(p.AnonymousProfiles) != len(src) {
 		return false
@@ -3032,8 +3091,7 @@ func (p *LoginRequest) Field2DeepEqual(src string) bool {
 type LoginResponse struct {
 	Code    int32  `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Message string `thrift:"message,2" frugal:"2,default,string" json:"message"`
-	Token   string `thrift:"token,3" frugal:"3,default,string" json:"token"`
-	User    *User  `thrift:"user,4" frugal:"4,default,User" json:"user"`
+	User    *User  `thrift:"user,3" frugal:"3,default,User" json:"user"`
 }
 
 func NewLoginResponse() *LoginResponse {
@@ -3051,10 +3109,6 @@ func (p *LoginResponse) GetMessage() (v string) {
 	return p.Message
 }
 
-func (p *LoginResponse) GetToken() (v string) {
-	return p.Token
-}
-
 var LoginResponse_User_DEFAULT *User
 
 func (p *LoginResponse) GetUser() (v *User) {
@@ -3069,9 +3123,6 @@ func (p *LoginResponse) SetCode(val int32) {
 func (p *LoginResponse) SetMessage(val string) {
 	p.Message = val
 }
-func (p *LoginResponse) SetToken(val string) {
-	p.Token = val
-}
 func (p *LoginResponse) SetUser(val *User) {
 	p.User = val
 }
@@ -3079,8 +3130,7 @@ func (p *LoginResponse) SetUser(val *User) {
 var fieldIDToName_LoginResponse = map[int16]string{
 	1: "code",
 	2: "message",
-	3: "token",
-	4: "user",
+	3: "user",
 }
 
 func (p *LoginResponse) IsSetUser() bool {
@@ -3123,16 +3173,8 @@ func (p *LoginResponse) Read(iprot thrift.TProtocol) (err error) {
 				goto SkipFieldError
 			}
 		case 3:
-			if fieldTypeId == thrift.STRING {
-				if err = p.ReadField3(iprot); err != nil {
-					goto ReadFieldError
-				}
-			} else if err = iprot.Skip(fieldTypeId); err != nil {
-				goto SkipFieldError
-			}
-		case 4:
 			if fieldTypeId == thrift.STRUCT {
-				if err = p.ReadField4(iprot); err != nil {
+				if err = p.ReadField3(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -3190,17 +3232,6 @@ func (p *LoginResponse) ReadField2(iprot thrift.TProtocol) error {
 	return nil
 }
 func (p *LoginResponse) ReadField3(iprot thrift.TProtocol) error {
-
-	var _field string
-	if v, err := iprot.ReadString(); err != nil {
-		return err
-	} else {
-		_field = v
-	}
-	p.Token = _field
-	return nil
-}
-func (p *LoginResponse) ReadField4(iprot thrift.TProtocol) error {
 	_field := NewUser()
 	if err := _field.Read(iprot); err != nil {
 		return err
@@ -3226,10 +3257,6 @@ func (p *LoginResponse) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField3(oprot); err != nil {
 			fieldId = 3
-			goto WriteFieldError
-		}
-		if err = p.writeField4(oprot); err != nil {
-			fieldId = 4
 			goto WriteFieldError
 		}
 	}
@@ -3285,24 +3312,7 @@ WriteFieldEndError:
 }
 
 func (p *LoginResponse) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("token", thrift.STRING, 3); err != nil {
-		goto WriteFieldBeginError
-	}
-	if err := oprot.WriteString(p.Token); err != nil {
-		return err
-	}
-	if err = oprot.WriteFieldEnd(); err != nil {
-		goto WriteFieldEndError
-	}
-	return nil
-WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
-WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
-}
-
-func (p *LoginResponse) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("user", thrift.STRUCT, 4); err != nil {
+	if err = oprot.WriteFieldBegin("user", thrift.STRUCT, 3); err != nil {
 		goto WriteFieldBeginError
 	}
 	if err := p.User.Write(oprot); err != nil {
@@ -3313,9 +3323,9 @@ func (p *LoginResponse) writeField4(oprot thrift.TProtocol) (err error) {
 	}
 	return nil
 WriteFieldBeginError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 begin error: ", p), err)
 WriteFieldEndError:
-	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
 func (p *LoginResponse) String() string {
@@ -3338,10 +3348,7 @@ func (p *LoginResponse) DeepEqual(ano *LoginResponse) bool {
 	if !p.Field2DeepEqual(ano.Message) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Token) {
-		return false
-	}
-	if !p.Field4DeepEqual(ano.User) {
+	if !p.Field3DeepEqual(ano.User) {
 		return false
 	}
 	return true
@@ -3361,14 +3368,7 @@ func (p *LoginResponse) Field2DeepEqual(src string) bool {
 	}
 	return true
 }
-func (p *LoginResponse) Field3DeepEqual(src string) bool {
-
-	if strings.Compare(p.Token, src) != 0 {
-		return false
-	}
-	return true
-}
-func (p *LoginResponse) Field4DeepEqual(src *User) bool {
+func (p *LoginResponse) Field3DeepEqual(src *User) bool {
 
 	if !p.User.DeepEqual(src) {
 		return false

@@ -59,3 +59,9 @@ const (
 	TopicSortTypeLatest      = "latest"
 	TopicSortTypeParticipant = "participant"
 )
+
+const (
+	InsertError = "数据插入失败"
+	UpdateError = "数据更新失败"
+	DeleteError = "数据删除失败"
+)

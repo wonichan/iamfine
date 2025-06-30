@@ -11,6 +11,12 @@ const (
 
 // 用户服务特有的错误消息常量
 const (
+	MsgPasswordError           = "密码错误"
+	MsgEncryptError            = "加密错误"
+	MsgDecryptError            = "解密错误"
+	MsgUserExists              = "用户已存在"
+	MsgUserNotExists           = "用户不存在"
+	MsgUserStatusError         = "用户状态异常"
 	MsgUserIDEmpty             = "用户ID不能为空"
 	MsgTargetUserIDEmpty       = "目标用户ID不能为空"
 	MsgProfileIDEmpty          = "profile_id不能为空"
@@ -29,5 +35,19 @@ const (
 	MsgGetFollowingFailed      = "获取关注列表失败"
 	MsgCreateAnonymousFailed   = "创建匿名马甲失败"
 	MsgGetAnonymousListFailed  = "获取匿名马甲列表失败"
+	MsgGetAnonymousFailed      = "获取匿名马甲失败"
 	MsgUpdateAnonymousFailed   = "更新匿名马甲失败"
 )
+
+var errMsgToCode = map[string]int32{
+	"":               InternalErrCode,
+	MsgPasswordError: UserPasswdErrCode,
+	MsgUserExists:    UserExistsErrCode,
+	MsgUserNotExists: UserNotExistsErrCode,
+	MsgParamError:    ParamErrCode,
+	InsertError:      InsertErrCode,
+	UpdateError:      UpdateErrCode,
+	DeleteError:      DeleteErrCode,
+	MsgDecryptError:  DecryptErrCode,
+	MsgEncryptError:  EncryptErrCode,
+}
