@@ -3,11 +3,11 @@ server:
   port: "9090"
 
 mysql:
-  host: "localhost"
+  host: "rm-bp113u5w514cub7a6yo.mysql.rds.aliyuncs.com"
   port: "3306"
   user: "root"
-  password: "123456"
-  database: "hupu"
+  password: "Imouto949"
+  database: "couple"
 
 redis:
   host: "localhost"

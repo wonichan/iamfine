@@ -103,9 +103,14 @@ func (h *UserHandler) GetUser(ctx context.Context, req *service.GetUserRequest) 
 func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserRequest) (*service.UpdateUserResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Infof("UpdateUser start, req:%+v", req)
-
-	updateData := &models.User{
+	updateData, err := h.db.GetUser(ctx, &models.User{
 		ID: req.Id,
+	})
+	if err != nil {
+		return &service.UpdateUserResponse{
+			Code:    constants.UserUpdateUserErrCode,
+			Message: fmt.Sprintf("failed to get user, err:%s", err.Error()),
+		}, nil
 	}
 
 	// 处理可选更新字段
@@ -119,7 +124,7 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserReq
 		updateData.Bio = req.Bio
 	}
 	if req.RelationshipStatus != nil {
-		status := models.RelationshipStatus(*req.RelationshipStatus)
+		status := service.RelationshipStatus(*req.RelationshipStatus)
 		updateData.RelationshipStatus = &status
 	}
 	if req.AgeGroup != nil {
@@ -132,7 +137,6 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserReq
 	if req.Tags != nil {
 		updateData.Tags = models.StringArray(req.Tags)
 	}
-
 	updatedUser, err := h.db.UpdateUser(ctx, updateData)
 	if err != nil {
 		return &service.UpdateUserResponse{

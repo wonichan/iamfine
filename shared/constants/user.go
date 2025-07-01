@@ -44,6 +44,8 @@ var errCodeToMsg = map[int32]string{
 	UserPasswdErrCode:    MsgPasswordError,
 	UserExistsErrCode:    MsgUserExists,
 	UserNotExistsErrCode: MsgUserNotExists,
+	UserLoginErrCode:     MsgLoginFailed,
+	UserGerUserErrCode:   MsgGetUserInfoFailed,
 	ParamErrCode:         MsgParamError,
 	InsertErrCode:        InsertError,
 	UpdateErrCode:        UpdateError,

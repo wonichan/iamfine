@@ -43,7 +43,8 @@ func (e *ValidationError) Error() string {
 func CallLikeService(c *app.RequestContext, serviceCall func() (interface{}, error), callName string, errorMsg string) {
 	resp, err := serviceCall()
 	if err != nil {
-		common.HandleServiceError(c, callName, err, errorMsg)
+		traceID := c.GetString(constants.TraceIdKey)
+		common.HandleServiceError(c, callName, traceID, constants.InternalErrCode, errorMsg)
 		return
 	}
 	common.RespondWithSuccess(c, resp)

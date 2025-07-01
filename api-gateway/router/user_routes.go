@@ -26,7 +26,6 @@ func RegisterUserRoutes(h *server.Hertz) {
 	{
 		// 用户相关（需要认证）
 		authGroup.GET("/user/info", user.GetUserInfoHandler)
-		authGroup.PUT("/user/info", user.UpdateUserInfoHandler)
 		authGroup.GET("/user/stats", user.GetUserStatsHandler)
 		authGroup.GET("/user/unread-count", user.GetUnreadCountHandler)
 		authGroup.POST("/user/:id/follow", user.FollowUserHandler)

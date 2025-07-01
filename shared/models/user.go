@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+
+	kitexuser "hupu/kitex_gen/user"
 )
 
 type UserStatus int32
@@ -13,17 +15,6 @@ const (
 	UserStatusInactive  UserStatus = 1
 	UserStatusBanned    UserStatus = 2
 	UserStatusSuspended UserStatus = 3
-)
-
-type RelationshipStatus int32
-
-const (
-	RelationshipStatusSingle      RelationshipStatus = 0
-	RelationshipStatusInLove      RelationshipStatus = 1
-	RelationshipStatusMarried     RelationshipStatus = 2
-	RelationshipStatusDivorced    RelationshipStatus = 3
-	RelationshipStatusComplicated RelationshipStatus = 4
-	RelationshipStatusSecret      RelationshipStatus = 5
 )
 
 type AgeGroup int32
@@ -50,31 +41,31 @@ func (AnonymousAvatar) TableName() string {
 }
 
 type User struct {
-	ID                 string              `gorm:"primaryKey;type:varchar(32)" json:"id"`
-	Role               string              `gorm:"type:varchar(20);default:'user'" json:"role"`
-	Username           string              `gorm:"uniqueIndex;type:varchar(50);not null" json:"username"`
-	Password           string              `gorm:"type:varchar(255);not null" json:"password"`
-	Nickname           string              `gorm:"type:varchar(50)" json:"nickname"`
-	Avatar             string              `gorm:"type:varchar(255)" json:"avatar"`
-	Phone              string              `gorm:"uniqueIndex;type:varchar(20)" json:"phone"`
-	Email              string              `gorm:"type:varchar(100)" json:"email"`
-	Status             UserStatus          `gorm:"type:int;default:0" json:"status"`
-	Bio                *string             `gorm:"type:text" json:"bio"`
-	RelationshipStatus *RelationshipStatus `gorm:"type:int" json:"relationship_status"`
-	AgeGroup           *AgeGroup           `gorm:"type:int" json:"age_group"`
-	Location           *string             `gorm:"type:varchar(255)" json:"location"`
-	PostCount          int32               `gorm:"default:0" json:"post_count"`
-	CommentCount       int32               `gorm:"default:0" json:"comment_count"`
-	LikeCount          int32               `gorm:"default:0" json:"like_count"`
-	FavoriteCount      int32               `gorm:"default:0" json:"favorite_count"`
-	AverageScore       float64             `gorm:"type:decimal(3,2);default:0" json:"average_score"`
-	FollowerCount      int32               `gorm:"default:0" json:"follower_count"`
-	FollowingCount     int32               `gorm:"default:0" json:"following_count"`
-	IsVerified         bool                `gorm:"default:false" json:"is_verified"`
-	Tags               StringArray         `gorm:"type:json" json:"tags"`
-	CreatedAt          time.Time           `json:"created_at"`
-	UpdatedAt          time.Time           `json:"updated_at"`
-	DeletedAt          gorm.DeletedAt      `gorm:"index" json:"-"`
+	ID                 string                        `gorm:"primaryKey;type:varchar(32)" json:"id"`
+	Role               string                        `gorm:"type:varchar(20);default:'user'" json:"role"`
+	Username           string                        `gorm:"uniqueIndex;type:varchar(50);not null" json:"username"`
+	Password           string                        `gorm:"type:varchar(255);not null" json:"password"`
+	Nickname           string                        `gorm:"type:varchar(50)" json:"nickname"`
+	Avatar             string                        `gorm:"type:varchar(255)" json:"avatar"`
+	Phone              string                        `gorm:"ype:varchar(20)" json:"phone"`
+	Email              string                        `gorm:"type:varchar(100)" json:"email"`
+	Status             UserStatus                    `gorm:"type:int;default:0" json:"status"`
+	Bio                *string                       `gorm:"type:text" json:"bio"`
+	RelationshipStatus *kitexuser.RelationshipStatus `gorm:"type:int" json:"relationship_status"`
+	AgeGroup           *AgeGroup                     `gorm:"type:int" json:"age_group"`
+	Location           *string                       `gorm:"type:varchar(255)" json:"location"`
+	PostCount          int32                         `gorm:"default:0" json:"post_count"`
+	CommentCount       int32                         `gorm:"default:0" json:"comment_count"`
+	LikeCount          int32                         `gorm:"default:0" json:"like_count"`
+	FavoriteCount      int32                         `gorm:"default:0" json:"favorite_count"`
+	AverageScore       float64                       `gorm:"type:decimal(3,2);default:0" json:"average_score"`
+	FollowerCount      int32                         `gorm:"default:0" json:"follower_count"`
+	FollowingCount     int32                         `gorm:"default:0" json:"following_count"`
+	IsVerified         bool                          `gorm:"default:false" json:"is_verified"`
+	Tags               StringArray                   `gorm:"type:json" json:"tags"`
+	CreatedAt          time.Time                     `json:"created_at"`
+	UpdatedAt          time.Time                     `json:"updated_at"`
+	DeletedAt          gorm.DeletedAt                `gorm:"index" json:"-"`
 }
 
 func (User) TableName() string {

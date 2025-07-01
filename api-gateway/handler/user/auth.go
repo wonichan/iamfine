@@ -9,6 +9,7 @@ import (
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
 	"hupu/shared/constants"
+	"hupu/shared/log"
 )
 
 // WxLoginRequest 微信登录请求结构
@@ -60,9 +61,11 @@ func WxLogin(ctx context.Context, c *app.RequestContext) {
 // GET /api/user/info
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	traceId, _ := c.Get(constants.TraceIdKey)
+	logger := log.GetLogger().WithField(constants.TraceIdKey, traceId)
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
+		logger.Errorf("GetUserInfo RequireAuth failed")
 		common.RespondUnauthorized(c)
 		return
 	}
@@ -82,25 +85,5 @@ func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 
-	// 转换响应格式以符合API文档
-	responseData := map[string]interface{}{
-		"code":    common.CodeSuccess,
-		"message": constants.MsgSuccess,
-		"data": map[string]interface{}{
-			"id":        resp.User.Id,
-			"openId":    "", // 需要根据实际情况填充
-			"unionId":   "", // 需要根据实际情况填充
-			"avatar":    resp.User.Avatar,
-			"nickname":  resp.User.Nickname,
-			"gender":    0,  // 需要根据实际情况填充
-			"city":      "", // 需要根据实际情况填充
-			"province":  "", // 需要根据实际情况填充
-			"country":   "", // 需要根据实际情况填充
-			"tags":      resp.User.Tags,
-			"createdAt": resp.User.CreatedAt,
-			"updatedAt": resp.User.UpdatedAt,
-		},
-	}
-
-	common.SuccessResponseFunc(c, responseData)
+	common.SuccessResponseFunc(c, resp.User)
 }

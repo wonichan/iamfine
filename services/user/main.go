@@ -27,6 +27,7 @@ func main() {
 	db, err := utils.InitDB()
 	if err != nil {
 		log.GetLogger().Errorf("Failed to init database: %v", err)
+		panic("Failed to init database")
 	}
 
 	// 初始化Redis

@@ -9,68 +9,9 @@ import (
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/user"
 	"hupu/shared/constants"
+	"hupu/shared/log"
+	"hupu/shared/models"
 )
-
-// UpdateUserInfoRequest 更新用户信息请求结构
-type UpdateUserInfoRequest struct {
-	Avatar   *string   `json:"avatar"`
-	Nickname *string   `json:"nickname"`
-	Gender   *int32    `json:"gender"`
-	City     *string   `json:"city"`
-	Province *string   `json:"province"`
-	Country  *string   `json:"country"`
-	Tags     *[]string `json:"tags"`
-}
-
-// UpdateUserInfo 更新用户信息
-// PUT /api/user/info
-func UpdateUserInfo(ctx context.Context, c *app.RequestContext) {
-	traceId, _ := c.Get(constants.TraceIdKey)
-	// 需要认证
-	currentUserID, ok := common.RequireAuth(c)
-	if !ok {
-		common.RespondUnauthorized(c)
-		return
-	}
-
-	// 解析请求体
-	var reqBody UpdateUserInfoRequest
-	if err := c.BindJSON(&reqBody); err != nil {
-		common.RespondBadRequest(c, constants.MsgRequestFormatError)
-		return
-	}
-
-	// 构建更新请求
-	req := &user.UpdateUserRequest{
-		Id: currentUserID,
-	}
-
-	if reqBody.Nickname != nil {
-		req.Nickname = reqBody.Nickname
-	}
-	if reqBody.Avatar != nil {
-		req.Avatar = reqBody.Avatar
-	}
-	// 注意：这里需要根据实际的thrift定义来映射字段
-	// 当前thrift定义中没有gender, city, province, country字段
-	// 如果需要支持这些字段，需要更新thrift定义
-
-	if reqBody.Tags != nil {
-		req.Tags = *reqBody.Tags
-	}
-
-	// 调用用户服务
-	resp, err := handler.GetUserClient().UpdateUser(ctx, req)
-	if err != nil {
-		common.HandleRpcError(c, "UpdateUserInfo", traceId.(string))
-		return
-	}
-	if resp.Code != constants.SuccessCode {
-		common.HandleServiceError(c, "UpdateUserInfo", traceId.(string), resp.Code, resp.Message)
-		return
-	}
-	common.RespondWithSuccess(c, resp)
-}
 
 // GetUserStats 获取用户统计
 // GET /api/user/stats
@@ -144,9 +85,12 @@ func GetUnreadCount(ctx context.Context, c *app.RequestContext) {
 // GET /api/user/{id}
 func GetUser(ctx context.Context, c *app.RequestContext) {
 	traceId, _ := c.Get(constants.TraceIdKey)
+	logger := log.GetLogger().WithField(constants.TraceIdKey, traceId)
 	// 获取用户ID参数
 	userID, ok := common.ValidateUserIDParam(c, "id")
 	if !ok {
+		logger.Errorf("GetUser ValidateUserIDParam failed")
+		common.RespondBadRequest(c, constants.MsgRequestFormatError)
 		return
 	}
 
@@ -170,35 +114,35 @@ func GetUser(ctx context.Context, c *app.RequestContext) {
 // PUT /api/user/{id}
 func UpdateUser(ctx context.Context, c *app.RequestContext) {
 	traceId, _ := c.Get(constants.TraceIdKey)
+	logger := log.GetLogger().WithField(constants.TraceIdKey, traceId)
 	// 从上下文获取用户ID
 	currentUserID, ok := common.RequireAuth(c)
 	if !ok {
+		logger.Errorf("UpdateUser RequireAuth failed")
+		common.RespondUnauthorized(c)
 		return
 	}
 
 	// 获取要更新的用户ID
 	userID, ok := common.ValidateUserIDParam(c, "id")
 	if !ok {
+		logger.Errorf("UpdateUser ValidateUserIDParam failed")
+		common.RespondBadRequest(c, constants.MsgRequestFormatError)
 		return
 	}
 
 	// 检查权限：只能更新自己的信息
 	if currentUserID != userID {
+		logger.Errorf("UpdateUser no permission")
 		common.ErrorResponseFunc(c, constants.HTTPStatusForbidden, common.CodeError, constants.MsgNoPermissionUpdateOther)
 		return
 	}
 
 	// 解析请求体
-	var reqBody struct {
-		Nickname  *string `json:"nickname"`
-		Avatar    *string `json:"avatar"`
-		Bio       *string `json:"bio"`
-		Gender    *int32  `json:"gender"`
-		Birthdate *string `json:"birthdate"`
-		Location  *string `json:"location"`
-	}
+	var reqBody models.User
 
 	if err := c.BindJSON(&reqBody); err != nil {
+		logger.Errorf("UpdateUser BindJSON failed, err:%s", err.Error())
 		common.RespondBadRequest(c, constants.MsgRequestFormatError)
 		return
 	}
@@ -208,17 +152,23 @@ func UpdateUser(ctx context.Context, c *app.RequestContext) {
 		Id: userID,
 	}
 
-	if reqBody.Nickname != nil {
-		req.Nickname = reqBody.Nickname
+	if reqBody.Nickname != "" {
+		req.Nickname = &reqBody.Nickname
 	}
-	if reqBody.Avatar != nil {
-		req.Avatar = reqBody.Avatar
+	if reqBody.Avatar != "" {
+		req.Avatar = &reqBody.Avatar
 	}
 	if reqBody.Bio != nil {
 		req.Bio = reqBody.Bio
 	}
 	if reqBody.Location != nil {
 		req.Location = reqBody.Location
+	}
+	if reqBody.RelationshipStatus != nil {
+		req.RelationshipStatus = reqBody.RelationshipStatus
+	}
+	if reqBody.Tags != nil {
+		req.Tags = reqBody.Tags
 	}
 
 	// 调用用户服务

@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/cloudwego/hertz/pkg/app"
 
@@ -25,9 +26,11 @@ type RegisterRequest struct {
 // POST /api/user/register
 func Register(ctx context.Context, c *app.RequestContext) {
 	traceId, _ := c.Get(constants.TraceIdKey)
+	logger := log.GetLogger().WithField(constants.TraceIdKey, traceId)
 	// 解析请求体
 	var reqBody RegisterRequest
 	if err := c.BindJSON(&reqBody); err != nil {
+		logger.Errorf("Register BindJSON failed: %v", err)
 		common.RespondBadRequest(c, constants.MsgRequestFormatError)
 		return
 	}
@@ -87,6 +90,11 @@ func Login(ctx context.Context, c *app.RequestContext) {
 		return
 	}
 	token, err := utils.GenerateToken(resp.User.Id, resp.User.Username, resp.User.Role)
-	c.Header("Authorization", token)
+	if err != nil {
+		logger.Errorf("Generate token failed: %v", err)
+		common.HandleServiceError(c, "Login", traceId.(string), constants.UserLoginErrCode, constants.MsgLoginFailed)
+	}
+	tokenHeader := fmt.Sprintf("Bearer %s", token)
+	c.Header("Authorization", tokenHeader)
 	common.SuccessResponseFunc(c, resp)
 }

@@ -285,3 +285,22 @@ func BindAndValidateRequest(c *app.RequestContext, req interface{}) bool {
 	}
 	return true
 }
+
+// ServiceCall 服务调用函数类型
+type ServiceCall func() (any, error)
+
+// CallService 统一服务调用处理
+func CallService(c *app.RequestContext, serviceCall ServiceCall, operation, errorMsg string) {
+	// 获取 trace ID
+	traceID := c.GetString(constants.TraceIdKey)
+	
+	// 执行服务调用
+	result, err := serviceCall()
+	if err != nil {
+		HandleServiceError(c, operation, traceID, constants.InternalErrCode, errorMsg)
+		return
+	}
+	
+	// 返回成功响应
+	SuccessResponseFunc(c, result)
+}

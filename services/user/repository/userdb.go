@@ -24,7 +24,7 @@ func NewUserRepository(db *gorm.DB) UserRepository {
 func (ur *userRepository) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
 	// 检查用户名是否已存在
 	var existUser models.User
-	err := ur.db.Where("username = ? OR phone = ?", user.Username, user.Phone).First(&existUser).Error
+	err := ur.db.Where("username = ? ", user.Username).First(&existUser).Error
 	if err == nil {
 		return nil, err
 	}
@@ -61,6 +61,11 @@ func (ur *userRepository) CreateUser(ctx context.Context, user *models.User) (*m
 func (ur *userRepository) GetUser(ctx context.Context, user *models.User) (*models.User, error) {
 	// 查找用户
 	var userModel models.User
+	if user.ID != "" {
+		if err := ur.db.Where("id = ? and status = ? ", user.ID, user.Status).First(&userModel).Error; err == nil {
+			return &userModel, nil
+		}
+	}
 
 	if err := ur.db.Where("username = ? and status = ? ", user.Username, user.Status).First(&userModel).Error; err != nil {
 		return nil, err
@@ -77,7 +82,6 @@ func (ur *userRepository) GetUserByUsername(ctx context.Context, user *models.Us
 }
 
 func (ur *userRepository) UpdateUser(ctx context.Context, user *models.User) (*models.User, error) {
-
 	if err := ur.db.Model(user).Where("id = ?", user.ID).Updates(user).Error; err != nil {
 		return nil, err
 	}

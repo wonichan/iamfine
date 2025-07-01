@@ -76,11 +76,6 @@ func GetUserInfoHandler(ctx context.Context, c *app.RequestContext) {
 	GetUserInfo(ctx, c)
 }
 
-// UpdateUserInfo 更新用户信息
-func UpdateUserInfoHandler(ctx context.Context, c *app.RequestContext) {
-	UpdateUserInfo(ctx, c)
-}
-
 // GetUnreadCount 获取未读消息数
 func GetUnreadCountHandler(ctx context.Context, c *app.RequestContext) {
 	GetUnreadCount(ctx, c)
