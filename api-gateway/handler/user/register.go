@@ -16,9 +16,10 @@ import (
 
 // RegisterRequest 注册请求结构
 type RegisterRequest struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-	Email    string `json:"email" binding:"required,email"`
+	Username string `json:"username"`
+	Password string `json:"password" vd:"len($)>0"`
+	Email    string `json:"email"`
+	Phone    string `json:"phone" vd:"phone($)"`
 	Nickname string `json:"nickname"`
 }
 
@@ -29,9 +30,8 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, traceId)
 	// 解析请求体
 	var reqBody RegisterRequest
-	if err := c.BindJSON(&reqBody); err != nil {
-		logger.Errorf("Register BindJSON failed: %v", err)
-		common.RespondBadRequest(c, constants.MsgRequestFormatError)
+	if !common.BindAndValidateRequest(c, &reqBody) {
+		logger.Errorf("Register BindJSON failed: %v", reqBody)
 		return
 	}
 
@@ -39,6 +39,9 @@ func Register(ctx context.Context, c *app.RequestContext) {
 	req := &user.RegisterRequest{
 		Username: reqBody.Username,
 		Password: reqBody.Password,
+		Phone:    reqBody.Phone,
+		Email:    reqBody.Email,
+		Nickname: reqBody.Nickname,
 	}
 
 	// 调用用户服务

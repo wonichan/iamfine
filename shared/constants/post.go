@@ -26,23 +26,6 @@ const (
 	MsgGetRankFailed      = "获取排行榜失败"
 )
 
-// 查询参数键常量
-const (
-	ParamPage        = "page"
-	ParamSize        = "size"
-	ParamPageSize    = "page_size"
-	ParamUserID      = "user_id"
-	ParamTopicID     = "topic_id"
-	ParamCategory    = "category"
-	ParamTag         = "tag"
-	ParamSortType    = "sort_type"
-	ParamIsAnonymous = "is_anonymous"
-	ParamRankType    = "rank_type"
-	ParamDate        = "date"
-	ParamKeyword     = "keyword"
-	ParamLimit       = "limit"
-)
-
 type PostTopic int32
 
 const (

@@ -72,7 +72,7 @@ func GetHotTopics(ctx context.Context, c *app.RequestContext) {
 
 	// 构建请求
 	req := &post.GetHotTopicsRequest{
-		Limit: limit,
+		Limit: &limit,
 	}
 
 	// 调用帖子服务
@@ -89,7 +89,7 @@ func GetTopicCategories(ctx context.Context, c *app.RequestContext) {
 
 	// 构建请求
 	req := &post.GetTopicCategoriesRequest{
-		Limit: limit,
+		Limit: &limit,
 	}
 
 	// 调用帖子服务

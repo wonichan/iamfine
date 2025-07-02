@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/rs/xid"
@@ -26,7 +27,7 @@ func (ur *userRepository) CreateUser(ctx context.Context, user *models.User) (*m
 	var existUser models.User
 	err := ur.db.Where("username = ? ", user.Username).First(&existUser).Error
 	if err == nil {
-		return nil, err
+		return nil, fmt.Errorf("username %s already exists", user.Username)
 	}
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err

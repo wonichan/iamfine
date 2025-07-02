@@ -6,19 +6,16 @@ import (
 	"hupu/services/comment/repository"
 	"hupu/shared/models"
 
-	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 )
 
 type CommentHandler struct {
-	db  repository.CommentRepository
-	rdb repository.CommentRepository
+	db repository.CommentRepository
 }
 
-func NewCommentHandler(db *gorm.DB, rdb *redis.Client) *CommentHandler {
+func NewCommentHandler(db *gorm.DB) *CommentHandler {
 	return &CommentHandler{
-		db:  repository.NewCommentRepository(db),
-		rdb: repository.NewCommentRedisRepo(rdb),
+		db: repository.NewCommentRepository(db),
 	}
 }
 
@@ -48,7 +45,7 @@ func (h *CommentHandler) CreateComment(ctx context.Context, req *comment.CreateC
 		commentModel.Images = models.StringArray(req.Images)
 	}
 
-	newComment, err := h.rdb.CreateComment(ctx, commentModel)
+	newComment, err := h.db.CreateComment(ctx, commentModel)
 	if err != nil {
 		return &comment.CreateCommentResponse{
 			Code:    500,
@@ -64,7 +61,7 @@ func (h *CommentHandler) CreateComment(ctx context.Context, req *comment.CreateC
 }
 
 func (h *CommentHandler) GetCommentList(ctx context.Context, req *comment.GetCommentListRequest) (*comment.GetCommentListResponse, error) {
-	comments, err := h.rdb.GetCommentList(ctx, req.PostId, req.ParentId, req.Page, req.PageSize)
+	comments, err := h.db.GetCommentList(ctx, req.PostId, req.ParentId, req.Page, req.PageSize)
 	if err != nil {
 		return &comment.GetCommentListResponse{
 			Code:    500,
@@ -89,7 +86,7 @@ func (h *CommentHandler) GetCommentList(ctx context.Context, req *comment.GetCom
 }
 
 func (h *CommentHandler) DeleteComment(ctx context.Context, req *comment.DeleteCommentRequest) (*comment.DeleteCommentResponse, error) {
-	err := h.rdb.DeleteComment(ctx, req.CommentId, req.UserId)
+	err := h.db.DeleteComment(ctx, req.CommentId, req.UserId)
 	if err != nil {
 		return &comment.DeleteCommentResponse{
 			Code:    500,
@@ -104,7 +101,7 @@ func (h *CommentHandler) DeleteComment(ctx context.Context, req *comment.DeleteC
 }
 
 func (h *CommentHandler) GetComment(ctx context.Context, req *comment.GetCommentRequest) (*comment.GetCommentResponse, error) {
-	commentModel, err := h.rdb.GetCommentDetail(ctx, req.CommentId)
+	commentModel, err := h.db.GetCommentDetail(ctx, req.CommentId)
 	if err != nil {
 		return &comment.GetCommentResponse{
 			Code:    500,
@@ -116,7 +113,7 @@ func (h *CommentHandler) GetComment(ctx context.Context, req *comment.GetComment
 
 	// 如果需要包含回复
 	if req.IncludeReplies {
-		replies, err := h.rdb.GetCommentList(ctx, commentModel.PostID, &commentModel.ID, 1, 100)
+		replies, err := h.db.GetCommentList(ctx, commentModel.PostID, &commentModel.ID, 1, 100)
 		if err == nil {
 			var replyList []*comment.Comment
 			for _, reply := range replies {
@@ -134,7 +131,7 @@ func (h *CommentHandler) GetComment(ctx context.Context, req *comment.GetComment
 }
 
 func (h *CommentHandler) GetUserComments(ctx context.Context, req *comment.GetUserCommentsRequest) (*comment.GetUserCommentsResponse, error) {
-	comments, err := h.rdb.GetUserCommentList(ctx, req.UserId, req.Page, req.PageSize)
+	comments, err := h.db.GetUserCommentList(ctx, req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &comment.GetUserCommentsResponse{
 			Code:    500,
@@ -188,4 +185,20 @@ func (h *CommentHandler) convertToCommentResponse(c *models.Comment) *comment.Co
 	}
 
 	return response
+}
+
+func (c *CommentHandler) RateComment(ctx context.Context, req *comment.RateCommentRequest) (r *comment.RateCommentResponse, err error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (c *CommentHandler) GetUserCommentRating(ctx context.Context, req *comment.GetUserCommentRatingRequest) (r *comment.GetUserCommentRatingResponse, err error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (c *CommentHandler) UpdateCommentRating(ctx context.Context, req *comment.UpdateCommentRatingRequest) (r *comment.UpdateCommentRatingResponse, err error) {
+	panic("not implemented") // TODO: Implement
+}
+
+func (c *CommentHandler) DeleteCommentRating(ctx context.Context, req *comment.DeleteCommentRatingRequest) (r *comment.DeleteCommentRatingResponse, err error) {
+	panic("not implemented") // TODO: Implement
 }

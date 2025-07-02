@@ -35,6 +35,23 @@ const (
 	MsgRequestFormatError = "请求格式错误"
 )
 
+// 查询参数键常量
+const (
+	ParamPage        = "page"
+	ParamSize        = "size"
+	ParamPageSize    = "page_size"
+	ParamUserID      = "user_id"
+	ParamTopicID     = "topic_id"
+	ParamCategory    = "category"
+	ParamTag         = "tag"
+	ParamSortType    = "sort_type"
+	ParamIsAnonymous = "is_anonymous"
+	ParamRankType    = "rank_type"
+	ParamDate        = "date"
+	ParamKeyword     = "keyword"
+	ParamLimit       = "limit"
+)
+
 // 排序类型常量
 const (
 	SortTypeLatest  = "latest"

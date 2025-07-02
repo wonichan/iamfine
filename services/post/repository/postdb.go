@@ -110,6 +110,49 @@ func (r *postRepository) GetPostListByCategory(ctx context.Context, category str
 	return posts, err
 }
 
+// GetPostListWithConditions 根据多个条件获取帖子列表
+func (r *postRepository) GetPostListWithConditions(ctx context.Context, conditions map[string]interface{}, page, pageSize int64, sortType string) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	query := r.db.WithContext(ctx)
+
+	// 添加查询条件
+	for key, value := range conditions {
+		if value != nil && value != "" {
+			switch key {
+			case "topic_id":
+				query = query.Where("topic_id = ?", value)
+			case "category":
+				query = query.Where("category = ?", value)
+			case "user_id":
+				query = query.Where("user_id = ?", value)
+			case "is_anonymous":
+				query = query.Where("is_anonymous = ?", value)
+			}
+		}
+	}
+
+	// 设置排序
+	switch sortType {
+	case "hot":
+		query = query.Order("like_count DESC, comment_count DESC, created_at DESC")
+	case "score":
+		query = query.Order("score DESC, created_at DESC")
+	case "latest":
+		fallthrough
+	default:
+		query = query.Order("created_at DESC")
+	}
+
+	err := query.
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
 // IncrementViewCount 增加浏览次数
 func (r *postRepository) IncrementViewCount(ctx context.Context, postID string) error {
 	return r.db.WithContext(ctx).

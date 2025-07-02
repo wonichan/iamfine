@@ -34,6 +34,7 @@ func (h *UserHandler) Register(ctx context.Context, req *service.RegisterRequest
 		Password: req.Password,
 		Nickname: req.Username,
 		Phone:    req.Phone,
+		Email:    req.Email,
 		Status:   models.UserStatusActive,
 	}
 
@@ -103,7 +104,7 @@ func (h *UserHandler) GetUser(ctx context.Context, req *service.GetUserRequest) 
 func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserRequest) (*service.UpdateUserResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Infof("UpdateUser start, req:%+v", req)
-	updateData, err := h.db.GetUser(ctx, &models.User{
+	_, err := h.db.GetUser(ctx, &models.User{
 		ID: req.Id,
 	})
 	if err != nil {
@@ -114,30 +115,9 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserReq
 	}
 
 	// 处理可选更新字段
-	if req.Nickname != nil {
-		updateData.Nickname = *req.Nickname
-	}
-	if req.Avatar != nil {
-		updateData.Avatar = *req.Avatar
-	}
-	if req.Bio != nil {
-		updateData.Bio = req.Bio
-	}
-	if req.RelationshipStatus != nil {
-		status := service.RelationshipStatus(*req.RelationshipStatus)
-		updateData.RelationshipStatus = &status
-	}
-	if req.AgeGroup != nil {
-		age := models.AgeGroup(*req.AgeGroup)
-		updateData.AgeGroup = &age
-	}
-	if req.Location != nil {
-		updateData.Location = req.Location
-	}
-	if req.Tags != nil {
-		updateData.Tags = models.StringArray(req.Tags)
-	}
-	updatedUser, err := h.db.UpdateUser(ctx, updateData)
+	newData := h.updateUserFields(req)
+
+	updatedUser, err := h.db.UpdateUser(ctx, newData)
 	if err != nil {
 		return &service.UpdateUserResponse{
 			Code:    constants.UserUpdateUserErrCode,
@@ -345,6 +325,41 @@ func (h *UserHandler) GetUserStats(ctx context.Context, req *service.GetUserStat
 		FollowerCount:  stats.FollowerCount,
 		FollowingCount: stats.FollowingCount,
 	}, nil
+}
+
+// 辅助方法：更新用户字段
+func (h *UserHandler) updateUserFields(req *service.UpdateUserRequest) *models.User {
+	updateData := &models.User{}
+	if req.Nickname != nil {
+		updateData.Nickname = *req.Nickname
+	}
+	if req.Avatar != nil {
+		updateData.Avatar = *req.Avatar
+	}
+	if req.Bio != nil {
+		updateData.Bio = req.Bio
+	}
+	if req.RelationshipStatus != nil {
+		status := service.RelationshipStatus(*req.RelationshipStatus)
+		updateData.RelationshipStatus = &status
+	}
+	if req.AgeGroup != nil {
+		age := models.AgeGroup(*req.AgeGroup)
+		updateData.AgeGroup = &age
+	}
+	if req.Location != nil {
+		updateData.Location = req.Location
+	}
+	if req.Tags != nil {
+		updateData.Tags = models.StringArray(req.Tags)
+	}
+	if req.Email != nil {
+		updateData.Email = *req.Email
+	}
+	if req.Phone != nil {
+		updateData.Phone = *req.Phone
+	}
+	return updateData
 }
 
 // 辅助方法：转换模型为响应格式

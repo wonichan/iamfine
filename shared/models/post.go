@@ -8,7 +8,7 @@ import (
 	kitex_gen_post "hupu/kitex_gen/post"
 )
 
-type PostCategory int32
+type PostCategory uint8
 
 const (
 	PostCategoryGeneral PostCategory = 0

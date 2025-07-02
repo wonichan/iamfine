@@ -2239,8 +2239,9 @@ func (p *User) Field24DeepEqual(src []*AnonymousProfile) bool {
 type RegisterRequest struct {
 	Username string `thrift:"username,1" frugal:"1,default,string" json:"username"`
 	Password string `thrift:"password,2" frugal:"2,default,string" json:"password"`
-	Phone    string `thrift:"phone,3" frugal:"3,default,string" json:"phone"`
-	Code     string `thrift:"code,4" frugal:"4,default,string" json:"code"`
+	Nickname string `thrift:"nickname,3" frugal:"3,default,string" json:"nickname"`
+	Phone    string `thrift:"phone,4" frugal:"4,default,string" json:"phone"`
+	Email    string `thrift:"email,5" frugal:"5,default,string" json:"email"`
 }
 
 func NewRegisterRequest() *RegisterRequest {
@@ -2258,12 +2259,16 @@ func (p *RegisterRequest) GetPassword() (v string) {
 	return p.Password
 }
 
+func (p *RegisterRequest) GetNickname() (v string) {
+	return p.Nickname
+}
+
 func (p *RegisterRequest) GetPhone() (v string) {
 	return p.Phone
 }
 
-func (p *RegisterRequest) GetCode() (v string) {
-	return p.Code
+func (p *RegisterRequest) GetEmail() (v string) {
+	return p.Email
 }
 func (p *RegisterRequest) SetUsername(val string) {
 	p.Username = val
@@ -2271,18 +2276,22 @@ func (p *RegisterRequest) SetUsername(val string) {
 func (p *RegisterRequest) SetPassword(val string) {
 	p.Password = val
 }
+func (p *RegisterRequest) SetNickname(val string) {
+	p.Nickname = val
+}
 func (p *RegisterRequest) SetPhone(val string) {
 	p.Phone = val
 }
-func (p *RegisterRequest) SetCode(val string) {
-	p.Code = val
+func (p *RegisterRequest) SetEmail(val string) {
+	p.Email = val
 }
 
 var fieldIDToName_RegisterRequest = map[int16]string{
 	1: "username",
 	2: "password",
-	3: "phone",
-	4: "code",
+	3: "nickname",
+	4: "phone",
+	5: "email",
 }
 
 func (p *RegisterRequest) Read(iprot thrift.TProtocol) (err error) {
@@ -2331,6 +2340,14 @@ func (p *RegisterRequest) Read(iprot thrift.TProtocol) (err error) {
 		case 4:
 			if fieldTypeId == thrift.STRING {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -2395,7 +2412,7 @@ func (p *RegisterRequest) ReadField3(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.Phone = _field
+	p.Nickname = _field
 	return nil
 }
 func (p *RegisterRequest) ReadField4(iprot thrift.TProtocol) error {
@@ -2406,7 +2423,18 @@ func (p *RegisterRequest) ReadField4(iprot thrift.TProtocol) error {
 	} else {
 		_field = v
 	}
-	p.Code = _field
+	p.Phone = _field
+	return nil
+}
+func (p *RegisterRequest) ReadField5(iprot thrift.TProtocol) error {
+
+	var _field string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Email = _field
 	return nil
 }
 
@@ -2431,6 +2459,10 @@ func (p *RegisterRequest) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 	}
@@ -2486,10 +2518,10 @@ WriteFieldEndError:
 }
 
 func (p *RegisterRequest) writeField3(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("phone", thrift.STRING, 3); err != nil {
+	if err = oprot.WriteFieldBegin("nickname", thrift.STRING, 3); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Phone); err != nil {
+	if err := oprot.WriteString(p.Nickname); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2503,10 +2535,10 @@ WriteFieldEndError:
 }
 
 func (p *RegisterRequest) writeField4(oprot thrift.TProtocol) (err error) {
-	if err = oprot.WriteFieldBegin("code", thrift.STRING, 4); err != nil {
+	if err = oprot.WriteFieldBegin("phone", thrift.STRING, 4); err != nil {
 		goto WriteFieldBeginError
 	}
-	if err := oprot.WriteString(p.Code); err != nil {
+	if err := oprot.WriteString(p.Phone); err != nil {
 		return err
 	}
 	if err = oprot.WriteFieldEnd(); err != nil {
@@ -2517,6 +2549,23 @@ WriteFieldBeginError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
 WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *RegisterRequest) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("email", thrift.STRING, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteString(p.Email); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
 }
 
 func (p *RegisterRequest) String() string {
@@ -2539,10 +2588,13 @@ func (p *RegisterRequest) DeepEqual(ano *RegisterRequest) bool {
 	if !p.Field2DeepEqual(ano.Password) {
 		return false
 	}
-	if !p.Field3DeepEqual(ano.Phone) {
+	if !p.Field3DeepEqual(ano.Nickname) {
 		return false
 	}
-	if !p.Field4DeepEqual(ano.Code) {
+	if !p.Field4DeepEqual(ano.Phone) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.Email) {
 		return false
 	}
 	return true
@@ -2564,14 +2616,21 @@ func (p *RegisterRequest) Field2DeepEqual(src string) bool {
 }
 func (p *RegisterRequest) Field3DeepEqual(src string) bool {
 
-	if strings.Compare(p.Phone, src) != 0 {
+	if strings.Compare(p.Nickname, src) != 0 {
 		return false
 	}
 	return true
 }
 func (p *RegisterRequest) Field4DeepEqual(src string) bool {
 
-	if strings.Compare(p.Code, src) != 0 {
+	if strings.Compare(p.Phone, src) != 0 {
+		return false
+	}
+	return true
+}
+func (p *RegisterRequest) Field5DeepEqual(src string) bool {
+
+	if strings.Compare(p.Email, src) != 0 {
 		return false
 	}
 	return true

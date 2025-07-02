@@ -201,6 +201,13 @@ func (r *postRedisRepo) GetPostListByCategory(ctx context.Context, category stri
 	return posts, nil
 }
 
+// GetPostListWithConditions 根据多个条件获取帖子列表 (Redis实现暂时回退到数据库查询)
+func (r *postRedisRepo) GetPostListWithConditions(ctx context.Context, conditions map[string]interface{}, page, pageSize int64, sortType string) ([]*models.Post, error) {
+	// Redis缓存的复合查询比较复杂，这里暂时返回空结果
+	// 在实际使用中，handler会回退到数据库查询
+	return []*models.Post{}, nil
+}
+
 // IncrementViewCount 增加浏览次数
 func (r *postRedisRepo) IncrementViewCount(ctx context.Context, postID string) error {
 	// 获取当前帖子数据

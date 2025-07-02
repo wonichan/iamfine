@@ -30,13 +30,13 @@ func main() {
 	}
 
 	// 初始化Redis
-	rdb, err := utils.InitRedis()
-	if err != nil {
-		log.GetLogger().Fatalf("Failed to init redis: %v", err)
-	}
+	// rdb, err := utils.InitRedis()
+	// if err != nil {
+	// 	log.GetLogger().Fatalf("Failed to init redis: %v", err)
+	// }
 
 	// 创建服务处理器
-	commentHandler := handler.NewCommentHandler(db, rdb)
+	commentHandler := handler.NewCommentHandler(db)
 
 	// 创建服务器
 	addr, _ := net.ResolveTCPAddr("tcp", config.GlobalConfig.Services.Comment.Host+":"+config.GlobalConfig.Services.Comment.Port)

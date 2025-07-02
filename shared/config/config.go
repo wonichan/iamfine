@@ -28,6 +28,7 @@ type MySQLConfig struct {
 	User     string `mapstructure:"user"`
 	Password string `mapstructure:"password"`
 	Database string `mapstructure:"database"`
+	LogLevel string `mapstructure:"log_level"` // GORM日志级别: silent, error, warn, info
 }
 
 type RedisConfig struct {

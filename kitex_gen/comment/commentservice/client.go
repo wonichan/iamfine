@@ -16,6 +16,10 @@ type Client interface {
 	GetComment(ctx context.Context, req *comment.GetCommentRequest, callOptions ...callopt.Option) (r *comment.GetCommentResponse, err error)
 	GetUserComments(ctx context.Context, req *comment.GetUserCommentsRequest, callOptions ...callopt.Option) (r *comment.GetUserCommentsResponse, err error)
 	DeleteComment(ctx context.Context, req *comment.DeleteCommentRequest, callOptions ...callopt.Option) (r *comment.DeleteCommentResponse, err error)
+	RateComment(ctx context.Context, req *comment.RateCommentRequest, callOptions ...callopt.Option) (r *comment.RateCommentResponse, err error)
+	GetUserCommentRating(ctx context.Context, req *comment.GetUserCommentRatingRequest, callOptions ...callopt.Option) (r *comment.GetUserCommentRatingResponse, err error)
+	UpdateCommentRating(ctx context.Context, req *comment.UpdateCommentRatingRequest, callOptions ...callopt.Option) (r *comment.UpdateCommentRatingResponse, err error)
+	DeleteCommentRating(ctx context.Context, req *comment.DeleteCommentRatingRequest, callOptions ...callopt.Option) (r *comment.DeleteCommentRatingResponse, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -70,4 +74,24 @@ func (p *kCommentServiceClient) GetUserComments(ctx context.Context, req *commen
 func (p *kCommentServiceClient) DeleteComment(ctx context.Context, req *comment.DeleteCommentRequest, callOptions ...callopt.Option) (r *comment.DeleteCommentResponse, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.DeleteComment(ctx, req)
+}
+
+func (p *kCommentServiceClient) RateComment(ctx context.Context, req *comment.RateCommentRequest, callOptions ...callopt.Option) (r *comment.RateCommentResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.RateComment(ctx, req)
+}
+
+func (p *kCommentServiceClient) GetUserCommentRating(ctx context.Context, req *comment.GetUserCommentRatingRequest, callOptions ...callopt.Option) (r *comment.GetUserCommentRatingResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetUserCommentRating(ctx, req)
+}
+
+func (p *kCommentServiceClient) UpdateCommentRating(ctx context.Context, req *comment.UpdateCommentRatingRequest, callOptions ...callopt.Option) (r *comment.UpdateCommentRatingResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.UpdateCommentRating(ctx, req)
+}
+
+func (p *kCommentServiceClient) DeleteCommentRating(ctx context.Context, req *comment.DeleteCommentRatingRequest, callOptions ...callopt.Option) (r *comment.DeleteCommentRatingResponse, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.DeleteCommentRating(ctx, req)
 }

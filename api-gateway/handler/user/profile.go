@@ -170,6 +170,12 @@ func UpdateUser(ctx context.Context, c *app.RequestContext) {
 	if reqBody.Tags != nil {
 		req.Tags = reqBody.Tags
 	}
+	if reqBody.Email != "" {
+		req.Email = &reqBody.Email
+	}
+	if reqBody.Phone != "" {
+		req.Phone = &reqBody.Phone
+	}
 
 	// 调用用户服务
 	resp, err := handler.GetUserClient().UpdateUser(ctx, req)

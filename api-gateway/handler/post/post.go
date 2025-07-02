@@ -9,21 +9,26 @@ import (
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/post"
 	"hupu/shared/constants"
+	"hupu/shared/log"
 )
 
 // 创建帖子
 func CreatePost(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
+	logger := log.GetLogger().WithField(constants.TraceIdKey, traceId)
 	postClient := handler.GetPostClient()
 	// 获取用户ID
 	userID, exists := common.GetUserIDFromContext(c)
 	if !exists {
 		common.RespondUnauthorized(c)
+		logger.Errorf("CreatePost GetUserIDFromContext failed")
 		return
 	}
 
 	// 解析请求参数
 	var req post.CreatePostRequest
 	if !common.BindAndValidateRequest(c, &req) {
+		logger.Errorf("CreatePost BindAndValidateRequest failed")
 		return
 	}
 
@@ -31,45 +36,67 @@ func CreatePost(ctx context.Context, c *app.RequestContext) {
 	req.UserId = userID
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.CreatePost(ctx, &req)
-	}), "CreatePost", constants.MsgCreatePostFailed)
+	resp, err := postClient.CreatePost(ctx, &req)
+	if err != nil {
+		common.HandleRpcError(c, "CreatePost", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "CreatePost", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 获取帖子详情
 func GetPost(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
+	logger := log.GetLogger().WithField(constants.TraceIdKey, traceId)
 	postClient := handler.GetPostClient()
 	// 获取帖子ID参数
 	postID, valid := common.ValidateRequiredPathParam(c, "id", constants.MsgPostIDEmpty)
 	if !valid {
+		logger.Errorf("GetPost ValidateRequiredPathParam failed")
 		return
 	}
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.GetPost(ctx, &post.GetPostRequest{PostId: postID})
-	}), "GetPost", constants.MsgGetPostFailed)
+	resp, err := postClient.GetPost(ctx, &post.GetPostRequest{PostId: postID})
+	if err != nil {
+		common.HandleRpcError(c, "GetPost", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetPost", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 更新帖子
 func UpdatePost(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
+	logger := log.GetLogger().WithField(constants.TraceIdKey, traceId)
 	postClient := handler.GetPostClient()
 	// 获取用户ID
 	userID, exists := common.GetUserIDFromContext(c)
 	if !exists {
 		common.RespondUnauthorized(c)
+		logger.Errorf("UpdatePost GetUserIDFromContext failed")
 		return
 	}
 
 	// 获取帖子ID参数
 	postID, valid := common.ValidateRequiredPathParam(c, "id", "帖子ID")
 	if !valid {
+		logger.Errorf("UpdatePost ValidateRequiredPathParam failed")
 		return
 	}
 
 	// 解析请求参数
 	var req post.UpdatePostRequest
 	if !common.BindAndValidateRequest(c, &req) {
+		logger.Errorf("UpdatePost BindAndValidateRequest failed")
 		return
 	}
 
@@ -78,24 +105,35 @@ func UpdatePost(ctx context.Context, c *app.RequestContext) {
 	req.PostId = postID
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.UpdatePost(ctx, &req)
-	}), "UpdatePost", constants.MsgUpdatePostFailed)
+	resp, err := postClient.UpdatePost(ctx, &req)
+	if err != nil {
+		common.HandleRpcError(c, "UpdatePost", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "UpdatePost", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 删除帖子
 func DeletePost(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
+	logger := log.GetLogger().WithField(constants.TraceIdKey, traceId)
 	postClient := handler.GetPostClient()
 	// 获取用户ID
 	userID, exists := common.GetUserIDFromContext(c)
 	if !exists {
 		common.RespondUnauthorized(c)
+		logger.Errorf("DeletePost GetUserIDFromContext failed")
 		return
 	}
 
 	// 获取帖子ID参数
 	postID, valid := common.ValidateRequiredPathParam(c, "id", constants.MsgPostIDEmpty)
 	if !valid {
+		logger.Errorf("DeletePost ValidateRequiredPathParam failed")
 		return
 	}
 
@@ -106,34 +144,54 @@ func DeletePost(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.DeletePost(ctx, req)
-	}), "DeletePost", constants.MsgDeletePostFailed)
+	resp, err := postClient.DeletePost(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "DeletePost", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "DeletePost", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 获取帖子列表
 func GetPostList(ctx context.Context, c *app.RequestContext) {
-	postClient := handler.GetPostClient()
+	traceId, _ := c.Get(constants.TraceIdKey)
 	// 解析分页参数
 	page, pageSize := common.ParsePaginationParams(c)
 
 	// 解析其他查询参数
-	// category := common.ParseOptionalStringParam(c, constants.ParamCategory)
+	category := int64(common.ParseOptionalIntParam(c, constants.ParamCategory))
+	topic := common.ParseOptionalStringParam(c, constants.ParamTopicID)
+	sortType := common.ParseOptionalStringParam(c, constants.ParamSortType)
 
 	// 构建请求
 	req := &post.GetPostListRequest{
 		Page:     int64(page),
 		PageSize: int64(pageSize),
+		Category: (*post.PostCategory)(&category),
+		TopicId:  topic,
+		SortType: sortType,
 	}
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.GetPostList(ctx, req)
-	}), "GetPostList", constants.MsgGetPostListFailed)
+	resp, err := handler.GetPostClient().GetPostList(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetPostList", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetPostList", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 获取推荐帖子
 func GetRecommendPosts(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	postClient := handler.GetPostClient()
 	// 解析分页参数
 	page, pageSize := common.ParsePaginationParams(c)
@@ -151,13 +209,21 @@ func GetRecommendPosts(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.GetRecommendPosts(ctx, req)
-	}), "GetRecommendPosts", constants.MsgGetPostListFailed)
+	resp, err := postClient.GetRecommendPosts(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetRecommendPosts", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetRecommendPosts", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 获取热门帖子
 func GetHotPosts(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	postClient := handler.GetPostClient()
 	// 解析分页参数
 	page, pageSize := common.ParsePaginationParams(c)
@@ -175,13 +241,21 @@ func GetHotPosts(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.GetHotPosts(ctx, req)
-	}), "GetHotPosts", constants.MsgGetPostListFailed)
+	resp, err := postClient.GetHotPosts(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetHotPosts", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetHotPosts", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 获取高分帖子
 func GetHighScorePosts(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	postClient := handler.GetPostClient()
 	// 解析分页参数
 	page, pageSize := common.ParsePaginationParams(c)
@@ -199,13 +273,21 @@ func GetHighScorePosts(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.GetHighScorePosts(ctx, req)
-	}), "GetHighScorePosts", constants.MsgGetPostListFailed)
+	resp, err := postClient.GetHighScorePosts(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetHighScorePosts", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetHighScorePosts", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 获取低分帖子
 func GetLowScorePosts(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	postClient := handler.GetPostClient()
 	// 解析分页参数
 	page, pageSize := common.ParsePaginationParams(c)
@@ -223,13 +305,21 @@ func GetLowScorePosts(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.GetLowScorePosts(ctx, req)
-	}), "GetLowScorePosts", constants.MsgGetPostListFailed)
+	resp, err := postClient.GetLowScorePosts(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetLowScorePosts", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetLowScorePosts", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 获取争议帖子
 func GetControversialPosts(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	postClient := handler.GetPostClient()
 	// 解析分页参数
 	page, pageSize := common.ParsePaginationParams(c)
@@ -247,13 +337,21 @@ func GetControversialPosts(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.GetControversialPosts(ctx, req)
-	}), "GetControversialPosts", constants.MsgGetPostListFailed)
+	resp, err := postClient.GetControversialPosts(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetControversialPosts", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetControversialPosts", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // 搜索帖子
 func SearchPosts(ctx context.Context, c *app.RequestContext) {
+	traceId, _ := c.Get(constants.TraceIdKey)
 	postClient := handler.GetPostClient()
 	// 获取搜索关键词
 	keyword := c.Query(constants.ParamKeyword)
@@ -273,7 +371,14 @@ func SearchPosts(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用帖子服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return postClient.SearchPosts(ctx, req)
-	}), "SearchPosts", constants.MsgSearchPostsFailed)
+	resp, err := postClient.SearchPosts(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "SearchPosts", traceId.(string))
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "SearchPosts", traceId.(string), resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }

@@ -25,6 +25,9 @@ struct Comment {
     16: list<Comment> replies             // 子评论列表（用于展示）
     17: bool is_liked                     // 当前用户是否已点赞
     18: optional Author author            // 作者信息
+    19: double score                      // 评论评分
+    20: i32 rating_count                  // 评分人数
+    21: bool is_rated                     // 当前用户是否已评分
 }
 
 struct CreateCommentRequest {
@@ -48,7 +51,7 @@ struct GetCommentListRequest {
     1: string post_id
     2: i32 page
     3: i32 page_size
-    4: optional string sort_type          // latest, hot, oldest
+    4: optional string sort_type          // latest, hot, oldest, score_high, score_low
     5: optional string parent_id          // 获取特定评论的回复
     6: bool include_replies               // 是否包含回复
 }
@@ -93,7 +96,7 @@ struct GetUserCommentsRequest {
     1: string user_id
     2: i32 page
     3: i32 page_size
-    4: optional string sort_type
+    4: optional string sort_type          // latest, hot, oldest, score_high, score_low
 }
 
 struct GetUserCommentsResponse {
@@ -101,6 +104,62 @@ struct GetUserCommentsResponse {
     2: string message
     3: list<Comment> comments
     4: i32 total
+}
+
+// 评论评分相关请求响应
+struct RateCommentRequest {
+    1: string user_id
+    2: string comment_id
+    3: double score              // 1-10分
+    4: optional string comment   // 评分评论
+}
+
+struct RateCommentResponse {
+    1: i32 code
+    2: string message
+    3: double average_score      // 平均分
+    4: i32 total_ratings        // 总评分数
+}
+
+// 获取用户对评论的评分
+struct GetUserCommentRatingRequest {
+    1: string user_id
+    2: string comment_id
+}
+
+struct GetUserCommentRatingResponse {
+    1: i32 code
+    2: string message
+    3: optional double score     // 用户评分，如果未评分则为空
+    4: optional string comment   // 评分评论
+}
+
+// 更新评论评分
+struct UpdateCommentRatingRequest {
+    1: string user_id
+    2: string comment_id
+    3: double score
+    4: optional string comment
+}
+
+struct UpdateCommentRatingResponse {
+    1: i32 code
+    2: string message
+    3: double average_score
+    4: i32 total_ratings
+}
+
+// 删除评论评分
+struct DeleteCommentRatingRequest {
+    1: string user_id
+    2: string comment_id
+}
+
+struct DeleteCommentRatingResponse {
+    1: i32 code
+    2: string message
+    3: double average_score
+    4: i32 total_ratings
 }
 
 service CommentService {
@@ -111,4 +170,10 @@ service CommentService {
     
     // 删除功能
     DeleteCommentResponse DeleteComment(1: DeleteCommentRequest req)
+    
+    // 评论评分功能
+    RateCommentResponse RateComment(1: RateCommentRequest req)
+    GetUserCommentRatingResponse GetUserCommentRating(1: GetUserCommentRatingRequest req)
+    UpdateCommentRatingResponse UpdateCommentRating(1: UpdateCommentRatingRequest req)
+    DeleteCommentRatingResponse DeleteCommentRating(1: DeleteCommentRatingRequest req)
 }

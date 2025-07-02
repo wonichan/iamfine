@@ -48,6 +48,34 @@ var serviceMethods = map[string]kitex.MethodInfo{
 		false,
 		kitex.WithStreamingMode(kitex.StreamingNone),
 	),
+	"RateComment": kitex.NewMethodInfo(
+		rateCommentHandler,
+		newCommentServiceRateCommentArgs,
+		newCommentServiceRateCommentResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"GetUserCommentRating": kitex.NewMethodInfo(
+		getUserCommentRatingHandler,
+		newCommentServiceGetUserCommentRatingArgs,
+		newCommentServiceGetUserCommentRatingResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"UpdateCommentRating": kitex.NewMethodInfo(
+		updateCommentRatingHandler,
+		newCommentServiceUpdateCommentRatingArgs,
+		newCommentServiceUpdateCommentRatingResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
+	"DeleteCommentRating": kitex.NewMethodInfo(
+		deleteCommentRatingHandler,
+		newCommentServiceDeleteCommentRatingArgs,
+		newCommentServiceDeleteCommentRatingResult,
+		false,
+		kitex.WithStreamingMode(kitex.StreamingNone),
+	),
 }
 
 var (
@@ -204,6 +232,78 @@ func newCommentServiceDeleteCommentResult() interface{} {
 	return comment.NewCommentServiceDeleteCommentResult()
 }
 
+func rateCommentHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceRateCommentArgs)
+	realResult := result.(*comment.CommentServiceRateCommentResult)
+	success, err := handler.(comment.CommentService).RateComment(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceRateCommentArgs() interface{} {
+	return comment.NewCommentServiceRateCommentArgs()
+}
+
+func newCommentServiceRateCommentResult() interface{} {
+	return comment.NewCommentServiceRateCommentResult()
+}
+
+func getUserCommentRatingHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceGetUserCommentRatingArgs)
+	realResult := result.(*comment.CommentServiceGetUserCommentRatingResult)
+	success, err := handler.(comment.CommentService).GetUserCommentRating(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceGetUserCommentRatingArgs() interface{} {
+	return comment.NewCommentServiceGetUserCommentRatingArgs()
+}
+
+func newCommentServiceGetUserCommentRatingResult() interface{} {
+	return comment.NewCommentServiceGetUserCommentRatingResult()
+}
+
+func updateCommentRatingHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceUpdateCommentRatingArgs)
+	realResult := result.(*comment.CommentServiceUpdateCommentRatingResult)
+	success, err := handler.(comment.CommentService).UpdateCommentRating(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceUpdateCommentRatingArgs() interface{} {
+	return comment.NewCommentServiceUpdateCommentRatingArgs()
+}
+
+func newCommentServiceUpdateCommentRatingResult() interface{} {
+	return comment.NewCommentServiceUpdateCommentRatingResult()
+}
+
+func deleteCommentRatingHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*comment.CommentServiceDeleteCommentRatingArgs)
+	realResult := result.(*comment.CommentServiceDeleteCommentRatingResult)
+	success, err := handler.(comment.CommentService).DeleteCommentRating(ctx, realArg.Req)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newCommentServiceDeleteCommentRatingArgs() interface{} {
+	return comment.NewCommentServiceDeleteCommentRatingArgs()
+}
+
+func newCommentServiceDeleteCommentRatingResult() interface{} {
+	return comment.NewCommentServiceDeleteCommentRatingResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -259,6 +359,46 @@ func (p *kClient) DeleteComment(ctx context.Context, req *comment.DeleteCommentR
 	_args.Req = req
 	var _result comment.CommentServiceDeleteCommentResult
 	if err = p.c.Call(ctx, "DeleteComment", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) RateComment(ctx context.Context, req *comment.RateCommentRequest) (r *comment.RateCommentResponse, err error) {
+	var _args comment.CommentServiceRateCommentArgs
+	_args.Req = req
+	var _result comment.CommentServiceRateCommentResult
+	if err = p.c.Call(ctx, "RateComment", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetUserCommentRating(ctx context.Context, req *comment.GetUserCommentRatingRequest) (r *comment.GetUserCommentRatingResponse, err error) {
+	var _args comment.CommentServiceGetUserCommentRatingArgs
+	_args.Req = req
+	var _result comment.CommentServiceGetUserCommentRatingResult
+	if err = p.c.Call(ctx, "GetUserCommentRating", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) UpdateCommentRating(ctx context.Context, req *comment.UpdateCommentRatingRequest) (r *comment.UpdateCommentRatingResponse, err error) {
+	var _args comment.CommentServiceUpdateCommentRatingArgs
+	_args.Req = req
+	var _result comment.CommentServiceUpdateCommentRatingResult
+	if err = p.c.Call(ctx, "UpdateCommentRating", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) DeleteCommentRating(ctx context.Context, req *comment.DeleteCommentRatingRequest) (r *comment.DeleteCommentRatingResponse, err error) {
+	var _args comment.CommentServiceDeleteCommentRatingArgs
+	_args.Req = req
+	var _result comment.CommentServiceDeleteCommentRatingResult
+	if err = p.c.Call(ctx, "DeleteCommentRating", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

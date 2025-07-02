@@ -22,6 +22,9 @@ type PostRepository interface {
 	// GetPostListByCategory 根据分类获取帖子列表
 	GetPostListByCategory(ctx context.Context, category string, page, pageSize int64) ([]*models.Post, error)
 
+	// GetPostListWithConditions 根据多个条件获取帖子列表
+	GetPostListWithConditions(ctx context.Context, conditions map[string]interface{}, page, pageSize int64, sortType string) ([]*models.Post, error)
+
 	// UpdatePost 更新帖子
 	UpdatePost(ctx context.Context, post *models.Post) error
 

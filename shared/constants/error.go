@@ -21,6 +21,24 @@ const (
 	UserUpdateAnonymousErrCode = 100113
 	UserGetUserStatusErrCode   = 100114
 
+	PostCreateErrCode       = 100201
+	PostGetErrCode          = 100202
+	PostUpdateErrCode       = 100203
+	PostDeleteErrCode       = 100204
+	PostNotFoundErrCode     = 100205
+	PostListErrCode         = 100206
+	PostCollectErrCode      = 100207
+	PostUncollectErrCode    = 100208
+	PostGetCollectedErrCode = 100209
+
+	TopicCreateErrCode = 100301
+	TopicGetErrCode    = 100302
+	TopicListErrCode   = 100303
+
+	RatePostErrCode          = 100401
+	RatePostNotFoundErrCode  = 100402
+	RateGetRatingRankErrCode = 100403
+
 	ParamErrCode   = 500101
 	InsertErrCode  = 500102
 	UpdateErrCode  = 500103

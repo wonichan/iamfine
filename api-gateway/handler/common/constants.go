@@ -91,8 +91,8 @@ func RequireAuth(c *app.RequestContext) (string, bool) {
 
 // ParsePaginationParams 解析分页参数
 func ParsePaginationParams(c *app.RequestContext) (int32, int32) {
-	pageStr := c.Query("page")
-	pageSizeStr := c.Query("page_size")
+	pageStr := c.Query(constants.ParamPage)
+	pageSizeStr := c.Query(constants.ParamPageSize)
 
 	page, err := strconv.ParseInt(pageStr, 10, 32)
 	if err != nil || page <= 0 {
@@ -133,16 +133,16 @@ func ParseOptionalBoolParam(c *app.RequestContext, key string) *bool {
 }
 
 // ParseOptionalIntParam 解析可选整数参数
-func ParseOptionalIntParam(c *app.RequestContext, key string) *int32 {
+func ParseOptionalIntParam(c *app.RequestContext, key string) int32 {
 	valueStr := c.Query(key)
 	if valueStr == "" {
-		return nil
+		return 0
 	}
 	if value, err := strconv.ParseInt(valueStr, 10, 32); err == nil {
 		intValue := int32(value)
-		return &intValue
+		return intValue
 	}
-	return nil
+	return 0
 }
 
 // LogError 记录错误日志
@@ -293,14 +293,14 @@ type ServiceCall func() (any, error)
 func CallService(c *app.RequestContext, serviceCall ServiceCall, operation, errorMsg string) {
 	// 获取 trace ID
 	traceID := c.GetString(constants.TraceIdKey)
-	
+
 	// 执行服务调用
 	result, err := serviceCall()
 	if err != nil {
 		HandleServiceError(c, operation, traceID, constants.InternalErrCode, errorMsg)
 		return
 	}
-	
+
 	// 返回成功响应
 	SuccessResponseFunc(c, result)
 }

@@ -8,6 +8,7 @@ mysql:
   user: "root"
   password: "Imouto949"
   database: "couple"
+  log_level: "info"  # GORM日志级别: silent, error, warn, info
 
 redis:
   host: "localhost"

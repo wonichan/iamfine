@@ -65,8 +65,9 @@ struct User {
 struct RegisterRequest {
     1: string username
     2: string password
-    3: string phone
-    4: string code
+    3: string nickname
+    4: string phone
+    5: string email
 }
 
 struct RegisterResponse {

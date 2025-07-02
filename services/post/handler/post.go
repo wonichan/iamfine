@@ -2,8 +2,11 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"hupu/kitex_gen/post"
 	"hupu/services/post/repository"
+	"hupu/shared/constants"
+	"hupu/shared/log"
 	"hupu/shared/models"
 
 	"github.com/go-redis/redis/v8"
@@ -23,6 +26,8 @@ func NewPostHandler(db *gorm.DB, rdb *redis.Client) *PostHandler {
 }
 
 func (h *PostHandler) CreatePost(ctx context.Context, req *post.CreatePostRequest) (*post.CreatePostResponse, error) {
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("CreatePost req: %v", req)
 	// 创建帖子
 	newPost := &models.Post{
 		UserID:      req.UserId,
@@ -36,60 +41,92 @@ func (h *PostHandler) CreatePost(ctx context.Context, req *post.CreatePostReques
 		Images:      models.StringArray(req.Images),
 	}
 
-	err := h.rdb.CreatePost(ctx, newPost)
+	err := h.db.CreatePost(ctx, newPost)
 	if err != nil {
+		logger.Errorf("CreatePost failed: %s", err)
 		return &post.CreatePostResponse{
-			Code:    500,
-			Message: "创建帖子失败",
-		}, err
+			Code:    constants.PostCreateErrCode,
+			Message: fmt.Sprintf("failed to create post: %s", err),
+		}, nil
 	}
 
 	return &post.CreatePostResponse{
-		Code:    0,
-		Message: "创建成功",
-		Post:    models.PostToKitexPost(newPost),
+		Code: constants.SuccessCode,
+		Post: models.PostToKitexPost(newPost),
 	}, nil
 }
 
 func (h *PostHandler) GetPost(ctx context.Context, req *post.GetPostRequest) (*post.GetPostResponse, error) {
-	postModel, err := h.rdb.GetPost(ctx, req.PostId)
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("GetPost req: %v", req)
+	postModel, err := h.db.GetPost(ctx, req.PostId)
 	if err != nil {
-		if err.Error() == "帖子不存在" {
-			return &post.GetPostResponse{
-				Code:    404,
-				Message: "帖子不存在",
-			}, nil
-		}
+		logger.Errorf("GetPost failed: %s", err)
 		return &post.GetPostResponse{
-			Code:    500,
-			Message: "查询帖子失败",
-		}, err
+			Code:    constants.PostGetErrCode,
+			Message: fmt.Sprintf("failed to get post: %s", err),
+		}, nil
 	}
 
 	return &post.GetPostResponse{
-		Code:    200,
-		Message: "查询成功",
-		Post:    models.PostToKitexPost(postModel),
+		Code: constants.SuccessCode,
+		Post: models.PostToKitexPost(postModel),
 	}, nil
 }
 
 func (h *PostHandler) GetPostList(ctx context.Context, req *post.GetPostListRequest) (*post.GetPostListResponse, error) {
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("GetPostList req: %v", req)
 	var posts []*models.Post
 	var err error
 
-	if req.UserId != nil {
-		// 根据用户ID获取帖子列表
-		posts, err = h.rdb.GetPostsByUserID(ctx, *req.UserId, req.Page, req.PageSize)
+	// 构建查询条件
+	conditions := make(map[string]interface{})
+	useConditions := false
+
+	// 添加用户ID条件
+	if req.UserId != nil && *req.UserId != "" {
+		conditions[constants.ParamUserID] = *req.UserId
+		useConditions = true
+	}
+
+	// 添加话题ID条件
+	if req.TopicId != nil && *req.TopicId != "" {
+		conditions[constants.ParamTopicID] = *req.TopicId
+		useConditions = true
+	}
+
+	// 添加分类条件
+	if req.Category != nil && int32(*req.Category) > 0 {
+		conditions[constants.ParamCategory] = int32(*req.Category)
+		useConditions = true
+	}
+
+	// 获取排序类型
+	sortType := constants.SortTypeLatest // 默认按最新排序
+	if req.SortType != nil && *req.SortType != "" {
+		sortType = *req.SortType
+		useConditions = true
+	}
+
+	// 根据是否有条件选择查询方法
+	if useConditions {
+		// 使用条件查询
+		posts, err = h.db.GetPostListWithConditions(ctx, conditions, req.Page, req.PageSize, sortType)
 	} else {
-		// 获取全部帖子列表
-		posts, err = h.rdb.GetPostList(ctx, req.Page, req.PageSize)
+		// 无条件查询，先尝试缓存
+		// posts, err = h.rdb.GetPostList(ctx, req.Page, req.PageSize)
+		// 缓存失败或无数据，回退到数据库
+		logger.Warnf("Cache failed, fallback to database: %s", err)
+		posts, err = h.db.GetPostList(ctx, req.Page, req.PageSize)
 	}
 
 	if err != nil {
+		logger.Errorf("GetPostList failed: %s", err)
 		return &post.GetPostListResponse{
-			Code:    500,
-			Message: "查询失败",
-		}, err
+			Code:    constants.PostListErrCode,
+			Message: fmt.Sprintf("failed to get post list: %s", err),
+		}, nil
 	}
 
 	// 转换数据格式
@@ -99,10 +136,9 @@ func (h *PostHandler) GetPostList(ctx context.Context, req *post.GetPostListRequ
 	}
 
 	return &post.GetPostListResponse{
-		Code:    200,
-		Message: "查询成功",
-		Posts:   postList,
-		Total:   int32(len(postList)),
+		Code:  constants.SuccessCode,
+		Posts: postList,
+		Total: int32(len(postList)),
 	}, nil
 }
 
@@ -113,12 +149,12 @@ func (h *PostHandler) CreateTopic(ctx context.Context, req *post.CreateTopicRequ
 		Description: &req.Description,
 	}
 
-	err := h.rdb.CreateTopic(ctx, topic)
+	err := h.db.CreateTopic(ctx, topic)
 	if err != nil {
 		return &post.CreateTopicResponse{
-			Code:    500,
-			Message: "创建话题失败",
-		}, err
+			Code:    constants.TopicCreateErrCode,
+			Message: fmt.Sprintf("failed to create topic: %s", err),
+		}, nil
 	}
 
 	description := ""
@@ -127,8 +163,7 @@ func (h *PostHandler) CreateTopic(ctx context.Context, req *post.CreateTopicRequ
 	}
 
 	return &post.CreateTopicResponse{
-		Code:    0,
-		Message: "创建成功",
+		Code: constants.SuccessCode,
 		Topic: &post.Topic{
 			Id:               topic.ID,
 			Name:             topic.Name,
@@ -143,12 +178,12 @@ func (h *PostHandler) CreateTopic(ctx context.Context, req *post.CreateTopicRequ
 }
 
 func (h *PostHandler) GetTopicList(ctx context.Context, req *post.GetTopicListRequest) (*post.GetTopicListResponse, error) {
-	topics, err := h.rdb.GetTopicList(ctx, req.Page, req.PageSize)
+	topics, err := h.db.GetTopicList(ctx, req.Page, req.PageSize)
 	if err != nil {
 		return &post.GetTopicListResponse{
-			Code:    500,
-			Message: "查询话题列表失败",
-		}, err
+			Code:    constants.TopicListErrCode,
+			Message: fmt.Sprintf("failed to get topic list: %s", err),
+		}, nil
 	}
 
 	// 转换数据格式
@@ -171,51 +206,49 @@ func (h *PostHandler) GetTopicList(ctx context.Context, req *post.GetTopicListRe
 	}
 
 	return &post.GetTopicListResponse{
-		Code:    0,
-		Message: "查询成功",
-		Topics:  topicList,
-		Total:   int32(len(topicList)),
+		Code:   constants.SuccessCode,
+		Topics: topicList,
+		Total:  int32(len(topicList)),
 	}, nil
 }
 
 // 收藏功能相关方法
 func (h *PostHandler) CollectPost(ctx context.Context, req *post.CollectPostRequest) (*post.CollectPostResponse, error) {
-	err := h.rdb.FavoritePost(ctx, req.UserId, req.PostId)
+	err := h.db.FavoritePost(ctx, req.UserId, req.PostId)
 	if err != nil {
 		return &post.CollectPostResponse{
-			Code:    500,
-			Message: "收藏失败",
-		}, err
+			Code:    constants.PostCollectErrCode,
+			Message: fmt.Sprintf("failed to collect post: %s", err),
+		}, nil
 	}
 
 	return &post.CollectPostResponse{
-		Code:    0,
+		Code:    constants.SuccessCode,
 		Message: "收藏成功",
 	}, nil
 }
 
 func (h *PostHandler) UncollectPost(ctx context.Context, req *post.UncollectPostRequest) (*post.UncollectPostResponse, error) {
-	err := h.rdb.UnfavoritePost(ctx, req.UserId, req.PostId)
+	err := h.db.UnfavoritePost(ctx, req.UserId, req.PostId)
 	if err != nil {
 		return &post.UncollectPostResponse{
-			Code:    500,
-			Message: "取消收藏失败",
-		}, err
+			Code:    constants.PostUncollectErrCode,
+			Message: fmt.Sprintf("failed to uncollect post: %s", err),
+		}, nil
 	}
 
 	return &post.UncollectPostResponse{
-		Code:    0,
-		Message: "取消收藏成功",
+		Code: constants.SuccessCode,
 	}, nil
 }
 
 func (h *PostHandler) GetCollectedPosts(ctx context.Context, req *post.GetCollectedPostsRequest) (*post.GetCollectedPostsResponse, error) {
-	posts, err := h.rdb.GetFavoriteList(ctx, req.UserId, req.Page, req.PageSize)
+	posts, err := h.db.GetFavoriteList(ctx, req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &post.GetCollectedPostsResponse{
-			Code:    500,
-			Message: "查询收藏列表失败",
-		}, err
+			Code:    constants.PostGetCollectedErrCode,
+			Message: fmt.Sprintf("failed to get collected posts: %s", err),
+		}, nil
 	}
 
 	// 转换数据格式
@@ -235,10 +268,9 @@ func (h *PostHandler) GetCollectedPosts(ctx context.Context, req *post.GetCollec
 	}
 
 	return &post.GetCollectedPostsResponse{
-		Code:    0,
-		Message: "查询成功",
-		Posts:   postList,
-		Total:   int32(len(postList)),
+		Code:  constants.SuccessCode,
+		Posts: postList,
+		Total: int32(len(postList)),
 	}, nil
 }
 
@@ -251,31 +283,30 @@ func (h *PostHandler) RatePost(ctx context.Context, req *post.RatePostRequest) (
 		Comment: req.Comment,      // req.Comment已经是*string类型
 	}
 
-	err := h.rdb.RatePost(ctx, rating)
+	err := h.db.RatePost(ctx, rating)
 	if err != nil {
 		return &post.RatePostResponse{
-			Code:    500,
-			Message: "评分失败",
-		}, err
+			Code:    constants.RatePostErrCode,
+			Message: fmt.Sprintf("failed to rate post: %s", err),
+		}, nil
 	}
 
 	// TODO: 计算平均分和总评分数
 	// 这里需要从数据库查询相关统计信息
 	return &post.RatePostResponse{
-		Code:         0,
-		Message:      "评分成功",
+		Code:         constants.SuccessCode,
 		AverageScore: req.Score, // 临时返回当前评分
 		TotalRatings: 1,         // 临时返回1
 	}, nil
 }
 
 func (h *PostHandler) GetRatingRank(ctx context.Context, req *post.GetRatingRankRequest) (*post.GetRatingRankResponse, error) {
-	posts, err := h.rdb.GetScoreRanking(ctx, req.Page, req.PageSize)
+	posts, err := h.db.GetScoreRanking(ctx, req.Page, req.PageSize)
 	if err != nil {
 		return &post.GetRatingRankResponse{
-			Code:    500,
-			Message: "查询评分排行榜失败",
-		}, err
+			Code:    constants.RateGetRatingRankErrCode,
+			Message: fmt.Sprintf("failed to get rating rank: %s", err),
+		}, nil
 	}
 
 	// 转换数据格式
@@ -297,10 +328,9 @@ func (h *PostHandler) GetRatingRank(ctx context.Context, req *post.GetRatingRank
 	}
 
 	return &post.GetRatingRankResponse{
-		Code:    0,
-		Message: "查询成功",
-		Posts:   postList,
-		Total:   int32(len(postList)),
+		Code:  constants.SuccessCode,
+		Posts: postList,
+		Total: int32(len(postList)),
 	}, nil
 }
 
@@ -315,10 +345,18 @@ func (h *PostHandler) UpdatePost(ctx context.Context, req *post.UpdatePostReques
 
 // DeletePost 删除帖子
 func (h *PostHandler) DeletePost(ctx context.Context, req *post.DeletePostRequest) (*post.DeletePostResponse, error) {
-	// TODO: 实现删除帖子逻辑
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("DeletePost req: %v", req)
+	err := h.db.DeletePost(ctx, req.PostId)
+	if err != nil {
+		logger.Errorf("DeletePost failed: %s", err)
+		return &post.DeletePostResponse{
+			Code:    constants.PostDeleteErrCode,
+			Message: fmt.Sprintf("failed to delete post: %s", err),
+		}, nil
+	}
 	return &post.DeletePostResponse{
-		Code:    0,
-		Message: "删除成功",
+		Code: constants.SuccessCode,
 	}, nil
 }
 
@@ -446,9 +484,9 @@ func (h *PostHandler) ShareTopic(ctx context.Context, req *post.ShareTopicReques
 func (h *PostHandler) GetUserRating(ctx context.Context, req *post.GetUserRatingRequest) (*post.GetUserRatingResponse, error) {
 	// TODO: 实现获取用户评分逻辑
 	return &post.GetUserRatingResponse{
-		Code:     0,
-		Message:  "获取成功",
-		IsRated:  false,
+		Code:    0,
+		Message: "获取成功",
+		IsRated: false,
 	}, nil
 }
 
@@ -456,10 +494,10 @@ func (h *PostHandler) GetUserRating(ctx context.Context, req *post.GetUserRating
 func (h *PostHandler) UpdateRating(ctx context.Context, req *post.UpdateRatingRequest) (*post.UpdateRatingResponse, error) {
 	// TODO: 实现更新评分逻辑
 	return &post.UpdateRatingResponse{
-		Code:          0,
-		Message:       "更新成功",
-		AverageScore:  0,
-		TotalRatings:  0,
+		Code:         0,
+		Message:      "更新成功",
+		AverageScore: 0,
+		TotalRatings: 0,
 	}, nil
 }
 
@@ -467,9 +505,9 @@ func (h *PostHandler) UpdateRating(ctx context.Context, req *post.UpdateRatingRe
 func (h *PostHandler) DeleteRating(ctx context.Context, req *post.DeleteRatingRequest) (*post.DeleteRatingResponse, error) {
 	// TODO: 实现删除评分逻辑
 	return &post.DeleteRatingResponse{
-		Code:          0,
-		Message:       "删除成功",
-		AverageScore:  0,
-		TotalRatings:  0,
+		Code:         0,
+		Message:      "删除成功",
+		AverageScore: 0,
+		TotalRatings: 0,
 	}, nil
 }
