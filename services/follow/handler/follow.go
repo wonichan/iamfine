@@ -5,7 +5,7 @@ import (
 	"hupu/kitex_gen/follow"
 	"hupu/services/follow/repository"
 
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 

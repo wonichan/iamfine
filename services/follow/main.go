@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net"
 	"time"
 
@@ -30,10 +31,11 @@ func main() {
 	}
 
 	// 初始化Redis
-	rdb, err := utils.InitRedis()
+	redisClient, err := utils.NewRedisClient(context.Background())
 	if err != nil {
 		log.GetLogger().Fatalf("Failed to init redis: %v", err)
 	}
+	rdb := redisClient.UnderlyingClient()
 
 	// 创建服务处理器
 	followHandler := handler.NewFollowHandler(db, rdb)

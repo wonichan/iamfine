@@ -5,24 +5,21 @@ import (
 	"hupu/kitex_gen/like"
 	"hupu/services/like/repository"
 
-	"github.com/go-redis/redis/v8"
 	"gorm.io/gorm"
 )
 
 type LikeHandler struct {
-	db  repository.LikeRepository
-	rdb repository.LikeRepository
+	db repository.LikeRepository
 }
 
-func NewLikeHandler(db *gorm.DB, rdb *redis.Client) *LikeHandler {
+func NewLikeHandler(db *gorm.DB) *LikeHandler {
 	return &LikeHandler{
-		db:  repository.NewLikeRepository(db),
-		rdb: repository.NewLikeRedisRepo(rdb),
+		db: repository.NewLikeRepository(db),
 	}
 }
 
 func (h *LikeHandler) Like(ctx context.Context, req *like.LikeRequest) (*like.LikeResponse, error) {
-	err := h.rdb.Like(ctx, req.UserId, req.TargetId, req.TargetType)
+	err := h.db.Like(ctx, req.UserId, req.TargetId, req.TargetType)
 	if err != nil {
 		return &like.LikeResponse{
 			Code:    400,
@@ -37,7 +34,7 @@ func (h *LikeHandler) Like(ctx context.Context, req *like.LikeRequest) (*like.Li
 }
 
 func (h *LikeHandler) Unlike(ctx context.Context, req *like.UnlikeRequest) (*like.UnlikeResponse, error) {
-	err := h.rdb.Unlike(ctx, req.UserId, req.TargetId, req.TargetType)
+	err := h.db.Unlike(ctx, req.UserId, req.TargetId, req.TargetType)
 	if err != nil {
 		return &like.UnlikeResponse{
 			Code:    500,
@@ -52,7 +49,7 @@ func (h *LikeHandler) Unlike(ctx context.Context, req *like.UnlikeRequest) (*lik
 }
 
 func (h *LikeHandler) IsLiked(ctx context.Context, req *like.LikeRequest) (*like.LikeResponse, error) {
-	isLiked, err := h.rdb.IsLiked(ctx, req.UserId, req.TargetId, req.TargetType)
+	isLiked, err := h.db.IsLiked(ctx, req.UserId, req.TargetId, req.TargetType)
 	if err != nil {
 		return &like.LikeResponse{
 			Code:    500,
@@ -74,7 +71,7 @@ func (h *LikeHandler) IsLiked(ctx context.Context, req *like.LikeRequest) (*like
 }
 
 func (h *LikeHandler) GetLikeList(ctx context.Context, req *like.GetLikeListRequest) (*like.GetLikeListResponse, error) {
-	likes, err := h.rdb.GetLikeList(ctx, req.UserId, req.Page, req.PageSize)
+	likes, err := h.db.GetLikeList(ctx, req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &like.GetLikeListResponse{
 			Code:    500,
@@ -102,7 +99,7 @@ func (h *LikeHandler) GetLikeList(ctx context.Context, req *like.GetLikeListRequ
 
 // GetLikeCount 获取点赞数量
 func (h *LikeHandler) GetLikeCount(ctx context.Context, req *like.GetLikeCountRequest) (*like.GetLikeCountResponse, error) {
-	count, err := h.rdb.GetLikeCount(ctx, req.TargetId, req.TargetType)
+	count, err := h.db.GetLikeCount(ctx, req.TargetId, req.TargetType)
 	if err != nil {
 		return &like.GetLikeCountResponse{
 			Code:    500,
@@ -119,7 +116,7 @@ func (h *LikeHandler) GetLikeCount(ctx context.Context, req *like.GetLikeCountRe
 
 // GetLikeUsers 获取点赞用户列表
 func (h *LikeHandler) GetLikeUsers(ctx context.Context, req *like.GetLikeUsersRequest) (*like.GetLikeUsersResponse, error) {
-	userIDs, err := h.rdb.GetLikeUsers(ctx, req.TargetId, req.TargetType, req.Page, req.PageSize)
+	userIDs, err := h.db.GetLikeUsers(ctx, req.TargetId, req.TargetType, req.Page, req.PageSize)
 	if err != nil {
 		return &like.GetLikeUsersResponse{
 			Code:    500,

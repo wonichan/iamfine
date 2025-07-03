@@ -5,20 +5,17 @@ import (
 	"hupu/kitex_gen/notification"
 	"hupu/shared/models"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/rs/xid"
 	"gorm.io/gorm"
 )
 
 type NotificationHandler struct {
-	db  *gorm.DB
-	rdb *redis.Client
+	db *gorm.DB
 }
 
-func NewNotificationHandler(db *gorm.DB, rdb *redis.Client) *NotificationHandler {
+func NewNotificationHandler(db *gorm.DB) *NotificationHandler {
 	return &NotificationHandler{
-		db:  db,
-		rdb: rdb,
+		db: db,
 	}
 }
 
@@ -112,12 +109,12 @@ func (h *NotificationHandler) MarkNotificationRead(ctx context.Context, req *not
 // MarkAllNotificationsRead 标记所有通知为已读
 func (h *NotificationHandler) MarkAllNotificationsRead(ctx context.Context, req *notification.MarkAllNotificationsReadRequest) (*notification.MarkAllNotificationsReadResponse, error) {
 	query := h.db.Model(&models.Notification{}).Where("user_id = ?", req.UserId)
-	
+
 	// 如果指定了类型，只标记特定类型的通知
 	if req.Type != nil {
 		query = query.Where("type = ?", *req.Type)
 	}
-	
+
 	// 执行更新并获取影响的行数
 	result := query.Update("is_read", true)
 	if result.Error != nil {
@@ -128,8 +125,8 @@ func (h *NotificationHandler) MarkAllNotificationsRead(ctx context.Context, req 
 	}
 
 	return &notification.MarkAllNotificationsReadResponse{
-		Code:         200,
-		Message:      "标记成功",
+		Code:          200,
+		Message:       "标记成功",
 		AffectedCount: int32(result.RowsAffected),
 	}, nil
 }
@@ -138,12 +135,12 @@ func (h *NotificationHandler) MarkAllNotificationsRead(ctx context.Context, req 
 func (h *NotificationHandler) GetUnreadCount(ctx context.Context, req *notification.GetUnreadCountRequest) (*notification.GetUnreadCountResponse, error) {
 	var count int64
 	query := h.db.Model(&models.Notification{}).Where("user_id = ? AND is_read = ?", req.UserId, false)
-	
+
 	// 如果指定了类型，只统计特定类型的通知
 	if req.Type != nil {
 		query = query.Where("type = ?", *req.Type)
 	}
-	
+
 	err := query.Count(&count).Error
 	if err != nil {
 		return &notification.GetUnreadCountResponse{
