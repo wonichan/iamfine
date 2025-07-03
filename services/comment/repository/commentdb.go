@@ -1,26 +1,26 @@
 package repository
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/rs/xid"
 	"gorm.io/gorm"
 
 	"hupu/shared/models"
+	"hupu/shared/utils"
 )
 
-type commentRepository struct {
+type CommentRepository struct {
 	db *gorm.DB
 }
 
-func NewCommentRepository(db *gorm.DB) CommentRepository {
-	return &commentRepository{
-		db: db,
+func NewCommentRepository() *CommentRepository {
+	return &CommentRepository{
+		db: utils.GetDB(),
 	}
 }
 
-func (cr *commentRepository) CreateComment(ctx context.Context, comment *models.Comment) (*models.Comment, error) {
+func (cr *CommentRepository) CreateComment(comment *models.Comment) (*models.Comment, error) {
 	// 生成评论ID
 	commentID := xid.New().String()
 
@@ -41,7 +41,7 @@ func (cr *commentRepository) CreateComment(ctx context.Context, comment *models.
 	return newComment, nil
 }
 
-func (cr *commentRepository) GetCommentList(ctx context.Context, postID string, parentID *string, page, pageSize int32) ([]*models.Comment, error) {
+func (cr *CommentRepository) GetCommentList(postID string, parentID *string, page, pageSize int32) ([]*models.Comment, error) {
 	var comments []models.Comment
 	query := cr.db.Where("post_id = ?", postID)
 
@@ -69,7 +69,7 @@ func (cr *commentRepository) GetCommentList(ctx context.Context, postID string, 
 	return commentList, nil
 }
 
-func (cr *commentRepository) GetComment(ctx context.Context, commentID string) (*models.Comment, error) {
+func (cr *CommentRepository) GetComment(commentID string) (*models.Comment, error) {
 	var comment models.Comment
 	err := cr.db.Where("id = ?", commentID).First(&comment).Error
 	if err != nil {
@@ -81,7 +81,7 @@ func (cr *commentRepository) GetComment(ctx context.Context, commentID string) (
 	return &comment, nil
 }
 
-func (cr *commentRepository) UpdateComment(ctx context.Context, comment *models.Comment) (*models.Comment, error) {
+func (cr *CommentRepository) UpdateComment(comment *models.Comment) (*models.Comment, error) {
 	err := cr.db.Model(comment).Where("id = ?", comment.ID).Updates(comment).Error
 	if err != nil {
 		return nil, err
@@ -89,11 +89,11 @@ func (cr *commentRepository) UpdateComment(ctx context.Context, comment *models.
 	return comment, nil
 }
 
-func (cr *commentRepository) DeleteComment(ctx context.Context, commentID, userID string) error {
+func (cr *CommentRepository) DeleteComment(commentID, userID string) error {
 	return cr.db.Where("id = ? AND user_id = ?", commentID, userID).Delete(&models.Comment{}).Error
 }
 
-func (cr *commentRepository) GetCommentDetail(ctx context.Context, commentID string) (*models.Comment, error) {
+func (cr *CommentRepository) GetCommentDetail(commentID string) (*models.Comment, error) {
 	var comment models.Comment
 	err := cr.db.Where("id = ?", commentID).First(&comment).Error
 	if err != nil {
@@ -105,7 +105,7 @@ func (cr *commentRepository) GetCommentDetail(ctx context.Context, commentID str
 	return &comment, nil
 }
 
-func (cr *commentRepository) GetUserCommentList(ctx context.Context, userID string, page, pageSize int32) ([]*models.Comment, error) {
+func (cr *CommentRepository) GetUserCommentList(userID string, page, pageSize int32) ([]*models.Comment, error) {
 	var comments []models.Comment
 	offset := (page - 1) * pageSize
 	err := cr.db.Where("user_id = ?", userID).Offset(int(offset)).Limit(int(pageSize)).Order("created_at DESC").Find(&comments).Error
@@ -122,17 +122,17 @@ func (cr *commentRepository) GetUserCommentList(ctx context.Context, userID stri
 	return commentList, nil
 }
 
-func (cr *commentRepository) LikeComment(ctx context.Context, commentID, userID string) error {
+func (cr *CommentRepository) LikeComment(commentID, userID string) error {
 	// 增加评论点赞数
 	return cr.db.Model(&models.Comment{}).Where("id = ?", commentID).UpdateColumn("like_count", gorm.Expr("like_count + ?", 1)).Error
 }
 
-func (cr *commentRepository) UnlikeComment(ctx context.Context, commentID, userID string) error {
+func (cr *CommentRepository) UnlikeComment(commentID, userID string) error {
 	// 减少评论点赞数
 	return cr.db.Model(&models.Comment{}).Where("id = ?", commentID).UpdateColumn("like_count", gorm.Expr("like_count - ?", 1)).Error
 }
 
-func (cr *commentRepository) GetAnonymousAvatar(ctx context.Context, avatarID string) (*models.AnonymousAvatar, error) {
+func (cr *CommentRepository) GetAnonymousAvatar(avatarID string) (*models.AnonymousAvatar, error) {
 	var avatar models.AnonymousAvatar
 	err := cr.db.Where("id = ?", avatarID).First(&avatar).Error
 	if err != nil {

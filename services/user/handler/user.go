@@ -31,7 +31,7 @@ func (h *UserHandler) Register(ctx context.Context, req *service.RegisterRequest
 	logger.Info("Register start")
 
 	// 参数验证
-	validationErrors := middleware.ValidateUserRegistration(ctx, req.Username, req.Password, req.Email, req.Phone)
+	validationErrors := middleware.ValidateUserRegistration(req.Username, req.Password, req.Email, req.Phone)
 	if len(validationErrors) > 0 {
 		errorMsg := "参数验证失败: "
 		for _, ve := range validationErrors {
@@ -52,7 +52,7 @@ func (h *UserHandler) Register(ctx context.Context, req *service.RegisterRequest
 		Status:   models.UserStatusActive,
 	}
 
-	savedUser, err := h.db.CreateUser(ctx, userModel)
+	savedUser, err := h.db.CreateUser(userModel)
 	if err != nil {
 		// 根据错误类型返回不同的错误码
 		if strings.Contains(err.Error(), "already exists") {
@@ -86,7 +86,7 @@ func (h *UserHandler) Login(ctx context.Context, req *service.LoginRequest) (*se
 		}, nil
 	}
 
-	getUser, err := h.db.GetUser(ctx, &models.User{
+	getUser, err := h.db.GetUser(&models.User{
 		Username: req.Username,
 		Status:   models.UserStatusActive,
 	})
@@ -122,7 +122,7 @@ func (h *UserHandler) GetUser(ctx context.Context, req *service.GetUserRequest) 
 		}, nil
 	}
 
-	getUser, err := h.db.GetUser(ctx, &models.User{
+	getUser, err := h.db.GetUser(&models.User{
 		ID: req.UserId,
 	})
 	if err != nil {
@@ -151,7 +151,7 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserReq
 		}, nil
 	}
 
-	_, err := h.db.GetUser(ctx, &models.User{
+	_, err := h.db.GetUser(&models.User{
 		ID: req.Id,
 	})
 	if err != nil {
@@ -165,7 +165,7 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserReq
 	newData := h.updateUserFields(req)
 	newData.ID = req.Id
 
-	updatedUser, err := h.db.UpdateUser(ctx, newData)
+	updatedUser, err := h.db.UpdateUser(newData)
 	if err != nil {
 		return &service.UpdateUserResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -182,7 +182,7 @@ func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserReq
 // 关注功能相关方法
 func (h *UserHandler) FollowUser(ctx context.Context, req *service.FollowUserRequest) (*service.FollowUserResponse, error) {
 	// 参数验证
-	validationErrors := middleware.ValidateFollowOperation(ctx, req.UserId, req.TargetUserId)
+	validationErrors := middleware.ValidateFollowOperation(req.UserId, req.TargetUserId)
 	if len(validationErrors) > 0 {
 		errorMsg := "参数验证失败: "
 		for _, ve := range validationErrors {
@@ -194,7 +194,7 @@ func (h *UserHandler) FollowUser(ctx context.Context, req *service.FollowUserReq
 		}, nil
 	}
 
-	err := h.db.FollowUser(ctx, req.UserId, req.TargetUserId)
+	err := h.db.FollowUser(req.UserId, req.TargetUserId)
 	if err != nil {
 		// 根据错误类型返回不同的错误码
 		if strings.Contains(err.Error(), "target user not found") {
@@ -222,7 +222,7 @@ func (h *UserHandler) FollowUser(ctx context.Context, req *service.FollowUserReq
 
 func (h *UserHandler) UnfollowUser(ctx context.Context, req *service.UnfollowUserRequest) (*service.UnfollowUserResponse, error) {
 	// 参数验证
-	validationErrors := middleware.ValidateFollowOperation(ctx, req.UserId, req.TargetUserId)
+	validationErrors := middleware.ValidateFollowOperation(req.UserId, req.TargetUserId)
 	if len(validationErrors) > 0 {
 		errorMsg := "参数验证失败: "
 		for _, ve := range validationErrors {
@@ -234,7 +234,7 @@ func (h *UserHandler) UnfollowUser(ctx context.Context, req *service.UnfollowUse
 		}, nil
 	}
 
-	err := h.db.UnfollowUser(ctx, req.UserId, req.TargetUserId)
+	err := h.db.UnfollowUser(req.UserId, req.TargetUserId)
 	if err != nil {
 		return &service.UnfollowUserResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -257,7 +257,7 @@ func (h *UserHandler) GetFollowers(ctx context.Context, req *service.GetFollower
 		}, nil
 	}
 
-	followers, err := h.db.GetFollowerList(ctx, req.UserId, req.Page, req.PageSize)
+	followers, err := h.db.GetFollowerList(req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &service.GetFollowersResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -288,7 +288,7 @@ func (h *UserHandler) GetFollowing(ctx context.Context, req *service.GetFollowin
 		}, nil
 	}
 
-	following, err := h.db.GetFollowingList(ctx, req.UserId, req.Page, req.PageSize)
+	following, err := h.db.GetFollowingList(req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &service.GetFollowingResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -326,7 +326,7 @@ func (h *UserHandler) CreateAnonymousProfile(ctx context.Context, req *service.C
 		IsActive: true,
 	}
 
-	err := h.db.CreateAnonymousAvatar(ctx, avatar)
+	err := h.db.CreateAnonymousAvatar(avatar)
 	if err != nil {
 		return &service.CreateAnonymousProfileResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -356,7 +356,7 @@ func (h *UserHandler) GetAnonymousProfiles(ctx context.Context, req *service.Get
 		}, nil
 	}
 
-	avatars, err := h.db.GetAnonymousAvatarList(ctx, req.UserId)
+	avatars, err := h.db.GetAnonymousAvatarList(req.UserId)
 	if err != nil {
 		return &service.GetAnonymousProfilesResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -393,7 +393,7 @@ func (h *UserHandler) UpdateAnonymousProfile(ctx context.Context, req *service.U
 	}
 
 	// 先获取现有的匿名头像
-	avatar, err := h.db.GetAnonymousAvatar(ctx, req.ProfileId)
+	avatar, err := h.db.GetAnonymousAvatar(req.ProfileId)
 	if err != nil {
 		return &service.UpdateAnonymousProfileResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -412,7 +412,7 @@ func (h *UserHandler) UpdateAnonymousProfile(ctx context.Context, req *service.U
 		avatar.IsActive = *req.IsActive
 	}
 
-	err = h.db.UpdateAnonymousAvatar(ctx, avatar)
+	err = h.db.UpdateAnonymousAvatar(avatar)
 	if err != nil {
 		return &service.UpdateAnonymousProfileResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -435,7 +435,7 @@ func (h *UserHandler) GetUserStats(ctx context.Context, req *service.GetUserStat
 		}, nil
 	}
 
-	stats, err := h.db.GetUserStats(ctx, req.UserId)
+	stats, err := h.db.GetUserStats(req.UserId)
 	if err != nil {
 		return &service.GetUserStatsResponse{
 			Code:    constants.DatabaseErrorCode,

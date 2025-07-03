@@ -7,19 +7,20 @@ import (
 	"gorm.io/gorm"
 
 	"hupu/shared/models"
+	"hupu/shared/utils"
 )
 
-type followRepository struct {
+type FollowRepository struct {
 	db *gorm.DB
 }
 
-func NewFollowRepository(db *gorm.DB) FollowRepository {
-	return &followRepository{
-		db: db,
+func NewFollowRepository() *FollowRepository {
+	return &FollowRepository{
+		db: utils.GetDB(),
 	}
 }
 
-func (fr *followRepository) Follow(ctx context.Context, followerID, followingID string) error {
+func (fr *FollowRepository) Follow(ctx context.Context, followerID, followingID string) error {
 	// 检查是否已经关注
 	var existFollow models.Follow
 	err := fr.db.Where("follower_id = ? AND following_id = ?", followerID, followingID).First(&existFollow).Error
@@ -41,11 +42,11 @@ func (fr *followRepository) Follow(ctx context.Context, followerID, followingID 
 	return fr.db.Create(&newFollow).Error
 }
 
-func (fr *followRepository) Unfollow(ctx context.Context, followerID, followingID string) error {
+func (fr *FollowRepository) Unfollow(ctx context.Context, followerID, followingID string) error {
 	return fr.db.Where("follower_id = ? AND following_id = ?", followerID, followingID).Delete(&models.Follow{}).Error
 }
 
-func (fr *followRepository) IsFollowing(ctx context.Context, followerID, followingID string) (bool, error) {
+func (fr *FollowRepository) IsFollowing(ctx context.Context, followerID, followingID string) (bool, error) {
 	var existFollow models.Follow
 	err := fr.db.Where("follower_id = ? AND following_id = ?", followerID, followingID).First(&existFollow).Error
 	if err != nil {
@@ -57,7 +58,7 @@ func (fr *followRepository) IsFollowing(ctx context.Context, followerID, followi
 	return true, nil
 }
 
-func (fr *followRepository) GetFollowList(ctx context.Context, userID string, page, pageSize int32) ([]string, error) {
+func (fr *FollowRepository) GetFollowList(ctx context.Context, userID string, page, pageSize int32) ([]string, error) {
 	var follows []models.Follow
 	offset := (page - 1) * pageSize
 	err := fr.db.Where("follower_id = ?", userID).Offset(int(offset)).Limit(int(pageSize)).Find(&follows).Error
@@ -74,7 +75,7 @@ func (fr *followRepository) GetFollowList(ctx context.Context, userID string, pa
 	return followList, nil
 }
 
-func (fr *followRepository) GetFollowerList(ctx context.Context, userID string, page, pageSize int32) ([]*models.Follow, error) {
+func (fr *FollowRepository) GetFollowerList(ctx context.Context, userID string, page, pageSize int32) ([]*models.Follow, error) {
 	var follows []models.Follow
 	offset := (page - 1) * pageSize
 	err := fr.db.Where("following_id = ?", userID).Offset(int(offset)).Limit(int(pageSize)).Find(&follows).Error
@@ -91,19 +92,19 @@ func (fr *followRepository) GetFollowerList(ctx context.Context, userID string, 
 	return followerList, nil
 }
 
-func (fr *followRepository) GetFollowCount(ctx context.Context, userID string) (int64, error) {
+func (fr *FollowRepository) GetFollowCount(ctx context.Context, userID string) (int64, error) {
 	var count int64
 	err := fr.db.Model(&models.Follow{}).Where("follower_id = ?", userID).Count(&count).Error
 	return count, err
 }
 
-func (fr *followRepository) GetFollowerCount(ctx context.Context, userID string) (int64, error) {
+func (fr *FollowRepository) GetFollowerCount(ctx context.Context, userID string) (int64, error) {
 	var count int64
 	err := fr.db.Model(&models.Follow{}).Where("following_id = ?", userID).Count(&count).Error
 	return count, err
 }
 
-func (fr *followRepository) GetMutualFollows(ctx context.Context, userID1, userID2 string, page, pageSize int32) ([]string, error) {
+func (fr *FollowRepository) GetMutualFollows(ctx context.Context, userID1, userID2 string, page, pageSize int32) ([]string, error) {
 	// 查找用户1关注的人中，也关注用户2的人
 	var mutualFollows []string
 	offset := (page - 1) * pageSize

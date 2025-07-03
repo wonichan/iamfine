@@ -8,17 +8,17 @@ import (
 	"hupu/shared/constants"
 	"hupu/shared/middleware"
 	"hupu/shared/models"
-
-	"gorm.io/gorm"
+	"hupu/shared/utils"
+	"strings"
 )
 
 type CommentHandler struct {
-	db repository.CommentRepository
+	db *repository.CommentRepository
 }
 
-func NewCommentHandler(db *gorm.DB) *CommentHandler {
+func NewCommentHandler() *CommentHandler {
 	return &CommentHandler{
-		db: repository.NewCommentRepository(db),
+		db: repository.NewCommentRepository(),
 	}
 }
 
@@ -27,10 +27,10 @@ func (h *CommentHandler) CreateComment(ctx context.Context, req *comment.CreateC
 	if err := middleware.ValidateCommentCreation(req.PostId, req.UserId, req.Content); err != nil {
 		return &comment.CreateCommentResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("参数验证失败: %s", err),
 		}, nil
 	}
-	
+
 	// 创建评论
 	commentModel := &models.Comment{
 		PostID:      req.PostId,
@@ -44,7 +44,7 @@ func (h *CommentHandler) CreateComment(ctx context.Context, req *comment.CreateC
 	// 处理匿名评论
 	if req.IsAnonymous && req.AnonymousProfileId != nil {
 		// 根据匿名马甲ID获取匿名信息
-		avatar, err := h.db.GetAnonymousAvatar(ctx, *req.AnonymousProfileId)
+		avatar, err := h.db.GetAnonymousAvatar(*req.AnonymousProfileId)
 		if err == nil {
 			commentModel.AnonymousName = &avatar.Name
 			commentModel.AnonymousColor = &avatar.Color
@@ -56,10 +56,10 @@ func (h *CommentHandler) CreateComment(ctx context.Context, req *comment.CreateC
 		commentModel.Images = models.StringArray(req.Images)
 	}
 
-	newComment, err := h.db.CreateComment(ctx, commentModel)
+	newComment, err := h.db.CreateComment(commentModel)
 	if err != nil {
 		return &comment.CreateCommentResponse{
-			Code:    constants.CommentCreateFailedCode,
+			Code:    constants.CommentCreateFailCode,
 			Message: fmt.Sprintf("创建评论失败: %s", err),
 		}, nil
 	}
@@ -73,14 +73,14 @@ func (h *CommentHandler) CreateComment(ctx context.Context, req *comment.CreateC
 
 func (h *CommentHandler) GetCommentList(ctx context.Context, req *comment.GetCommentListRequest) (*comment.GetCommentListResponse, error) {
 	// 参数验证
-	if req.PostId <= 0 {
+	if req.PostId == "" {
 		return &comment.GetCommentListResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to get comment list, post id is empty"),
 		}, nil
 	}
-	
-	comments, err := h.db.GetCommentList(ctx, req.PostId, req.ParentId, req.Page, req.PageSize)
+
+	comments, err := h.db.GetCommentList(req.PostId, req.ParentId, req.Page, req.PageSize)
 	if err != nil {
 		return &comment.GetCommentListResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -106,24 +106,24 @@ func (h *CommentHandler) GetCommentList(ctx context.Context, req *comment.GetCom
 
 func (h *CommentHandler) DeleteComment(ctx context.Context, req *comment.DeleteCommentRequest) (*comment.DeleteCommentResponse, error) {
 	// 参数验证
-	if req.CommentId <= 0 || req.UserId <= 0 {
+	if req.CommentId == "" || req.UserId == "" {
 		return &comment.DeleteCommentResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to delete comment, comment id or user id is empty"),
 		}, nil
 	}
-	
-	err := h.db.DeleteComment(ctx, req.CommentId, req.UserId)
+
+	err := h.db.DeleteComment(req.CommentId, req.UserId)
 	if err != nil {
-		if fmt.Sprintf("%s", err).Contains("not found") {
+		if strings.Contains(err.Error(), "not found") {
 			return &comment.DeleteCommentResponse{
 				Code:    constants.CommentNotFoundCode,
-				Message: constants.GetErrorMessage(constants.CommentNotFoundCode),
+				Message: fmt.Sprintf("failed to delete comment, err:%s", constants.GetErrorMessage(constants.CommentNotFoundCode)),
 			}, nil
 		}
 		return &comment.DeleteCommentResponse{
-			Code:    constants.CommentDeleteFailedCode,
-			Message: fmt.Sprintf("删除失败: %s", err),
+			Code:    constants.CommentDeleteFailCode,
+			Message: fmt.Sprintf("failed to delete comment, err:%s", err),
 		}, nil
 	}
 
@@ -135,24 +135,24 @@ func (h *CommentHandler) DeleteComment(ctx context.Context, req *comment.DeleteC
 
 func (h *CommentHandler) GetComment(ctx context.Context, req *comment.GetCommentRequest) (*comment.GetCommentResponse, error) {
 	// 参数验证
-	if req.CommentId <= 0 {
+	if req.CommentId == "" {
 		return &comment.GetCommentResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to get comment, comment id is empty"),
 		}, nil
 	}
-	
-	commentModel, err := h.db.GetCommentDetail(ctx, req.CommentId)
+
+	commentModel, err := h.db.GetCommentDetail(req.CommentId)
 	if err != nil {
-		if fmt.Sprintf("%s", err).Contains("not found") {
+		if strings.Contains(fmt.Sprintf("%s", err), "not found") {
 			return &comment.GetCommentResponse{
 				Code:    constants.CommentNotFoundCode,
-				Message: constants.GetErrorMessage(constants.CommentNotFoundCode),
+				Message: fmt.Sprintf("failed to get comment, err:%s", constants.GetErrorMessage(constants.CommentNotFoundCode)),
 			}, nil
 		}
 		return &comment.GetCommentResponse{
 			Code:    constants.DatabaseErrorCode,
-			Message: fmt.Sprintf("获取评论失败: %s", err),
+			Message: fmt.Sprintf("failed to get comment, err:%s", err),
 		}, nil
 	}
 
@@ -160,7 +160,7 @@ func (h *CommentHandler) GetComment(ctx context.Context, req *comment.GetComment
 
 	// 如果需要包含回复
 	if req.IncludeReplies {
-		replies, err := h.db.GetCommentList(ctx, commentModel.PostID, &commentModel.ID, 1, 100)
+		replies, err := h.db.GetCommentList(commentModel.PostID, &commentModel.ID, 1, 100)
 		if err == nil {
 			var replyList []*comment.Comment
 			for _, reply := range replies {
@@ -179,14 +179,14 @@ func (h *CommentHandler) GetComment(ctx context.Context, req *comment.GetComment
 
 func (h *CommentHandler) GetUserComments(ctx context.Context, req *comment.GetUserCommentsRequest) (*comment.GetUserCommentsResponse, error) {
 	// 参数验证
-	if req.UserId <= 0 {
+	if req.UserId == "" {
 		return &comment.GetUserCommentsResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to get user comments, user id is empty"),
 		}, nil
 	}
-	
-	comments, err := h.db.GetUserCommentList(ctx, req.UserId, req.Page, req.PageSize)
+
+	comments, err := h.db.GetUserCommentList(req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &comment.GetUserCommentsResponse{
 			Code:    constants.DatabaseErrorCode,
@@ -244,13 +244,13 @@ func (h *CommentHandler) convertToCommentResponse(c *models.Comment) *comment.Co
 
 func (c *CommentHandler) RateComment(ctx context.Context, req *comment.RateCommentRequest) (r *comment.RateCommentResponse, err error) {
 	// 参数验证
-	if req.UserId <= 0 || req.CommentId <= 0 || req.Score < 1 || req.Score > 5 {
+	if req.UserId == "" || req.CommentId == "" || req.Score < 1 || req.Score > 5 {
 		return &comment.RateCommentResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to rate comment, user id or comment id is empty, score is %d", req.Score),
 		}, nil
 	}
-	
+
 	// TODO: Implement
 	return &comment.RateCommentResponse{
 		Code:    constants.SuccessCode,
@@ -260,37 +260,36 @@ func (c *CommentHandler) RateComment(ctx context.Context, req *comment.RateComme
 
 func (c *CommentHandler) GetUserCommentRating(ctx context.Context, req *comment.GetUserCommentRatingRequest) (r *comment.GetUserCommentRatingResponse, err error) {
 	// 参数验证
-	if req.UserId <= 0 || req.CommentId <= 0 {
+	if req.UserId == "" || req.CommentId == "" {
 		return &comment.GetUserCommentRatingResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to get user comment rating, user id or comment id is empty"),
 		}, nil
 	}
-	
 	// TODO: Implement
 	return &comment.GetUserCommentRatingResponse{
 		Code:    constants.SuccessCode,
 		Message: "获取成功",
-		IsRated: false,
-		Score:   0,
+		Score:   utils.Float64Ptr(0),
+		Comment: utils.StringPtr(""),
 	}, nil
 }
 
 func (c *CommentHandler) UpdateCommentRating(ctx context.Context, req *comment.UpdateCommentRatingRequest) (r *comment.UpdateCommentRatingResponse, err error) {
 	// 参数验证
-	if req.UserId <= 0 || req.CommentId <= 0 || req.Score < 1 || req.Score > 5 {
+	if req.UserId == "" || req.CommentId == "" || req.Score < 1 || req.Score > 5 {
 		return &comment.UpdateCommentRatingResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to update comment rating, user id or comment id is empty, score is %d", req.Score),
 		}, nil
 	}
-	
+
 	// TODO: Implement
 	return &comment.UpdateCommentRatingResponse{
 		Code:         constants.SuccessCode,
 		Message:      "更新成功",
 		AverageScore: 0,
-		RatingCount:  0,
+		TotalRatings: 0,
 	}, nil
 }
 

@@ -4,17 +4,15 @@ import (
 	"context"
 	"hupu/kitex_gen/like"
 	"hupu/services/like/repository"
-
-	"gorm.io/gorm"
 )
 
 type LikeHandler struct {
-	db repository.LikeRepository
+	db *repository.LikeRepository
 }
 
-func NewLikeHandler(db *gorm.DB) *LikeHandler {
+func NewLikeHandler() *LikeHandler {
 	return &LikeHandler{
-		db: repository.NewLikeRepository(db),
+		db: repository.NewLikeRepository(),
 	}
 }
 

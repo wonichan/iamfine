@@ -7,19 +7,20 @@ import (
 	"gorm.io/gorm"
 
 	"hupu/shared/models"
+	"hupu/shared/utils"
 )
 
-type likeRepository struct {
+type LikeRepository struct {
 	db *gorm.DB
 }
 
-func NewLikeRepository(db *gorm.DB) LikeRepository {
-	return &likeRepository{
-		db: db,
+func NewLikeRepository() *LikeRepository {
+	return &LikeRepository{
+		db: utils.GetDB(),
 	}
 }
 
-func (lr *likeRepository) Like(ctx context.Context, userID, targetID, targetType string) error {
+func (lr *LikeRepository) Like(ctx context.Context, userID, targetID, targetType string) error {
 	// 检查是否已经点赞
 	var existLike models.Like
 	err := lr.db.Where("user_id = ? AND target_id = ? AND target_type = ?", userID, targetID, targetType).First(&existLike).Error
@@ -59,7 +60,7 @@ func (lr *likeRepository) Like(ctx context.Context, userID, targetID, targetType
 	return nil
 }
 
-func (lr *likeRepository) Unlike(ctx context.Context, userID, targetID, targetType string) error {
+func (lr *LikeRepository) Unlike(ctx context.Context, userID, targetID, targetType string) error {
 	// 开始事务
 	tx := lr.db.Begin()
 
@@ -86,7 +87,7 @@ func (lr *likeRepository) Unlike(ctx context.Context, userID, targetID, targetTy
 	return nil
 }
 
-func (lr *likeRepository) IsLiked(ctx context.Context, userID, targetID, targetType string) (bool, error) {
+func (lr *LikeRepository) IsLiked(ctx context.Context, userID, targetID, targetType string) (bool, error) {
 	var existLike models.Like
 	err := lr.db.Where("user_id = ? AND target_id = ? AND target_type = ?", userID, targetID, targetType).First(&existLike).Error
 	if err != nil {
@@ -98,7 +99,7 @@ func (lr *likeRepository) IsLiked(ctx context.Context, userID, targetID, targetT
 	return true, nil
 }
 
-func (lr *likeRepository) GetLikeList(ctx context.Context, userID string, page, pageSize int32) ([]*models.Like, error) {
+func (lr *LikeRepository) GetLikeList(ctx context.Context, userID string, page, pageSize int32) ([]*models.Like, error) {
 	var likes []models.Like
 	offset := (page - 1) * pageSize
 	err := lr.db.Where("user_id = ?", userID).Offset(int(offset)).Limit(int(pageSize)).Order("created_at DESC").Find(&likes).Error
@@ -115,13 +116,13 @@ func (lr *likeRepository) GetLikeList(ctx context.Context, userID string, page, 
 	return likeList, nil
 }
 
-func (lr *likeRepository) GetLikeCount(ctx context.Context, targetID, targetType string) (int64, error) {
+func (lr *LikeRepository) GetLikeCount(ctx context.Context, targetID, targetType string) (int64, error) {
 	var count int64
 	err := lr.db.Model(&models.Like{}).Where("target_id = ? AND target_type = ?", targetID, targetType).Count(&count).Error
 	return count, err
 }
 
-func (lr *likeRepository) GetLikeUsers(ctx context.Context, targetID, targetType string, page, pageSize int32) ([]string, error) {
+func (lr *LikeRepository) GetLikeUsers(ctx context.Context, targetID, targetType string, page, pageSize int32) ([]string, error) {
 	var userIDs []string
 	offset := (page - 1) * pageSize
 	err := lr.db.Model(&models.Like{}).

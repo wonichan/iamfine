@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -22,7 +21,7 @@ func NewUserRepository() *UserRepository {
 		db: utils.GetDB(),
 	}
 }
-func (ur *UserRepository) CreateUser(ctx context.Context, user *models.User) (*models.User, error) {
+func (ur *UserRepository) CreateUser(user *models.User) (*models.User, error) {
 	// 检查用户名是否已存在
 	var existUser models.User
 	err := ur.db.Where("username = ? ", user.Username).First(&existUser).Error
@@ -59,7 +58,7 @@ func (ur *UserRepository) CreateUser(ctx context.Context, user *models.User) (*m
 	return newUser, nil
 }
 
-func (ur *UserRepository) GetUser(ctx context.Context, user *models.User) (*models.User, error) {
+func (ur *UserRepository) GetUser(user *models.User) (*models.User, error) {
 	// 查找用户
 	var userModel models.User
 	if user.ID != "" {
@@ -74,7 +73,7 @@ func (ur *UserRepository) GetUser(ctx context.Context, user *models.User) (*mode
 	return &userModel, nil
 }
 
-func (ur *UserRepository) GetUserByUsername(ctx context.Context, user *models.User) (*models.User, error) {
+func (ur *UserRepository) GetUserByUsername(user *models.User) (*models.User, error) {
 	var userModel models.User
 	if err := ur.db.Where("id = ? ", user.ID).First(&userModel).Error; err != nil {
 		return nil, err
@@ -82,14 +81,14 @@ func (ur *UserRepository) GetUserByUsername(ctx context.Context, user *models.Us
 	return &userModel, nil
 }
 
-func (ur *UserRepository) UpdateUser(ctx context.Context, user *models.User) (*models.User, error) {
+func (ur *UserRepository) UpdateUser(user *models.User) (*models.User, error) {
 	if err := ur.db.Model(user).Where("id = ?", user.ID).Updates(user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (ur *UserRepository) DeleteUser(ctx context.Context, user *models.User) (*models.User, error) {
+func (ur *UserRepository) DeleteUser(user *models.User) (*models.User, error) {
 	if err := ur.db.Where("id = ?", user.ID).Delete(&models.User{}).Error; err != nil {
 		return nil, err
 	}
@@ -97,7 +96,7 @@ func (ur *UserRepository) DeleteUser(ctx context.Context, user *models.User) (*m
 }
 
 // 关注功能相关方法
-func (ur *UserRepository) FollowUser(ctx context.Context, userID, targetUserID string) error {
+func (ur *UserRepository) FollowUser(userID, targetUserID string) error {
 	// 防止自己关注自己
 	if userID == targetUserID {
 		return fmt.Errorf("cannot follow yourself")
@@ -147,7 +146,7 @@ func (ur *UserRepository) FollowUser(ctx context.Context, userID, targetUserID s
 	return tx.Commit().Error
 }
 
-func (ur *UserRepository) UnfollowUser(ctx context.Context, userID, targetUserID string) error {
+func (ur *UserRepository) UnfollowUser(userID, targetUserID string) error {
 	err := ur.db.Where("follower_id = ? AND following_id = ?", userID, targetUserID).Delete(&models.Follow{}).Error
 	if !errors.Is(err, gorm.ErrRecordNotFound) {
 		return err
@@ -155,7 +154,7 @@ func (ur *UserRepository) UnfollowUser(ctx context.Context, userID, targetUserID
 	return nil
 }
 
-func (ur *UserRepository) GetFollowerList(ctx context.Context, userID string, page, pageSize int32) ([]*models.User, error) {
+func (ur *UserRepository) GetFollowerList(userID string, page, pageSize int32) ([]*models.User, error) {
 	var users []*models.User
 	offset := (page - 1) * pageSize
 
@@ -175,7 +174,7 @@ func (ur *UserRepository) GetFollowerList(ctx context.Context, userID string, pa
 	return users, nil
 }
 
-func (ur *UserRepository) GetFollowingList(ctx context.Context, userID string, page, pageSize int32) ([]*models.User, error) {
+func (ur *UserRepository) GetFollowingList(userID string, page, pageSize int32) ([]*models.User, error) {
 	var users []*models.User
 	offset := (page - 1) * pageSize
 
@@ -196,7 +195,7 @@ func (ur *UserRepository) GetFollowingList(ctx context.Context, userID string, p
 }
 
 // 匿名马甲管理相关方法
-func (ur *UserRepository) CreateAnonymousAvatar(ctx context.Context, avatar *models.AnonymousAvatar) error {
+func (ur *UserRepository) CreateAnonymousAvatar(avatar *models.AnonymousAvatar) error {
 	// 生成头像ID
 	if avatar.ID == "" {
 		avatar.ID = xid.New().String()
@@ -204,7 +203,7 @@ func (ur *UserRepository) CreateAnonymousAvatar(ctx context.Context, avatar *mod
 	return ur.db.Create(avatar).Error
 }
 
-func (ur *UserRepository) GetAnonymousAvatarList(ctx context.Context, userID string) ([]*models.AnonymousAvatar, error) {
+func (ur *UserRepository) GetAnonymousAvatarList(userID string) ([]*models.AnonymousAvatar, error) {
 	var avatars []models.AnonymousAvatar
 	err := ur.db.Where("user_id = ?", userID).Find(&avatars).Error
 	if err != nil {
@@ -220,11 +219,11 @@ func (ur *UserRepository) GetAnonymousAvatarList(ctx context.Context, userID str
 	return avatarList, nil
 }
 
-func (ur *UserRepository) UpdateAnonymousAvatar(ctx context.Context, avatar *models.AnonymousAvatar) error {
+func (ur *UserRepository) UpdateAnonymousAvatar(avatar *models.AnonymousAvatar) error {
 	return ur.db.Model(avatar).Where("id = ?", avatar.ID).Updates(avatar).Error
 }
 
-func (ur *UserRepository) GetAnonymousAvatar(ctx context.Context, avatarID string) (*models.AnonymousAvatar, error) {
+func (ur *UserRepository) GetAnonymousAvatar(avatarID string) (*models.AnonymousAvatar, error) {
 	var avatar models.AnonymousAvatar
 	err := ur.db.Where("id = ?", avatarID).First(&avatar).Error
 	if err != nil {
@@ -234,7 +233,7 @@ func (ur *UserRepository) GetAnonymousAvatar(ctx context.Context, avatarID strin
 }
 
 // 用户统计相关方法
-func (ur *UserRepository) GetUserStats(ctx context.Context, userID string) (*models.UserStats, error) {
+func (ur *UserRepository) GetUserStats(userID string) (*models.UserStats, error) {
 	var stats models.UserStats
 	err := ur.db.Where("user_id = ?", userID).First(&stats).Error
 	if err != nil {

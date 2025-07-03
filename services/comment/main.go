@@ -25,19 +25,17 @@ func main() {
 	log.InitLogger("comment", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
 
 	// 初始化数据库
-	db, err := utils.InitDB()
-	if err != nil {
+	if err := utils.InitDB(); err != nil {
 		log.GetLogger().Fatalf("Failed to init database: %v", err)
 	}
 
 	// 初始化Redis
-	_, err = utils.NewRedisClient(context.Background())
-	if err != nil {
+	if err := utils.NewRedisClient(context.Background()); err != nil {
 		log.GetLogger().Fatalf("Failed to init redis: %v", err)
 	}
 
 	// 创建服务处理器
-	commentHandler := handler.NewCommentHandler(db)
+	commentHandler := handler.NewCommentHandler()
 
 	// 创建服务器
 	addr, _ := net.ResolveTCPAddr("tcp", config.GlobalConfig.Services.Comment.Host+":"+config.GlobalConfig.Services.Comment.Port)
@@ -50,7 +48,7 @@ func main() {
 	)
 
 	log.GetLogger().Info("Comment service starting...")
-	err = svr.Run()
+	err := svr.Run()
 	if err != nil {
 		log.GetLogger().Fatalf("Failed to start server: %v", err)
 	}

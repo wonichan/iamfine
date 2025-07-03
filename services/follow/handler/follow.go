@@ -7,17 +7,16 @@ import (
 	"hupu/services/follow/repository"
 	"hupu/shared/constants"
 	"hupu/shared/middleware"
-
-	"gorm.io/gorm"
+	"strings"
 )
 
 type FollowHandler struct {
-	db repository.FollowRepository
+	db *repository.FollowRepository
 }
 
-func NewFollowHandler(db *gorm.DB) *FollowHandler {
+func NewFollowHandler() *FollowHandler {
 	return &FollowHandler{
-		db: repository.NewFollowRepository(db),
+		db: repository.NewFollowRepository(),
 	}
 }
 
@@ -29,17 +28,17 @@ func (h *FollowHandler) Follow(ctx context.Context, req *follow.FollowRequest) (
 			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
 		}, nil
 	}
-	
+
 	err := h.db.Follow(ctx, req.FollowerId, req.FollowingId)
 	if err != nil {
-		if fmt.Sprintf("%s", err).Contains("already following") {
+		if strings.Contains(err.Error(), "already following") {
 			return &follow.FollowResponse{
 				Code:    constants.UserAlreadyFollowedCode,
 				Message: constants.GetErrorMessage(constants.UserAlreadyFollowedCode),
 			}, nil
 		}
 		return &follow.FollowResponse{
-			Code:    constants.FollowOperationFailedCode,
+			Code:    constants.UserFollowFailCode,
 			Message: fmt.Sprintf("关注失败: %s", err),
 		}, nil
 	}
@@ -58,17 +57,17 @@ func (h *FollowHandler) Unfollow(ctx context.Context, req *follow.UnfollowReques
 			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
 		}, nil
 	}
-	
+
 	err := h.db.Unfollow(ctx, req.FollowerId, req.FollowingId)
 	if err != nil {
-		if fmt.Sprintf("%s", err).Contains("not following") {
+		if strings.Contains(err.Error(), "not following") {
 			return &follow.UnfollowResponse{
 				Code:    constants.UserNotFollowedCode,
 				Message: constants.GetErrorMessage(constants.UserNotFollowedCode),
 			}, nil
 		}
 		return &follow.UnfollowResponse{
-			Code:    constants.UnfollowOperationFailedCode,
+			Code:    constants.UserFollowFailCode,
 			Message: fmt.Sprintf("取消关注失败: %s", err),
 		}, nil
 	}
@@ -84,10 +83,10 @@ func (h *FollowHandler) IsFollowing(ctx context.Context, req *follow.FollowReque
 	if err := middleware.ValidateFollowOperation(req.FollowerId, req.FollowingId); err != nil {
 		return &follow.FollowResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to validate follow operation: %s", err),
 		}, nil
 	}
-	
+
 	isFollowing, err := h.db.IsFollowing(ctx, req.FollowerId, req.FollowingId)
 	if err != nil {
 		return &follow.FollowResponse{
@@ -112,13 +111,13 @@ func (h *FollowHandler) IsFollowing(ctx context.Context, req *follow.FollowReque
 
 func (h *FollowHandler) GetFollowList(ctx context.Context, req *follow.GetFollowListRequest) (*follow.GetFollowListResponse, error) {
 	// 参数验证
-	if req.UserId <= 0 {
+	if req.UserId == "" {
 		return &follow.GetFollowListResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to validate user id: %s", req.UserId),
 		}, nil
 	}
-	
+
 	followList, err := h.db.GetFollowList(ctx, req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &follow.GetFollowListResponse{
@@ -147,13 +146,13 @@ func (h *FollowHandler) GetFollowList(ctx context.Context, req *follow.GetFollow
 
 func (h *FollowHandler) GetFollowerList(ctx context.Context, req *follow.GetFollowerListRequest) (*follow.GetFollowerListResponse, error) {
 	// 参数验证
-	if req.UserId <= 0 {
+	if req.UserId == "" {
 		return &follow.GetFollowerListResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to validate user id: %s", req.UserId),
 		}, nil
 	}
-	
+
 	follows, err := h.db.GetFollowerList(ctx, req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &follow.GetFollowerListResponse{
@@ -182,13 +181,13 @@ func (h *FollowHandler) GetFollowerList(ctx context.Context, req *follow.GetFoll
 // GetFollowCount 获取关注数量
 func (h *FollowHandler) GetFollowCount(ctx context.Context, req *follow.GetFollowCountRequest) (*follow.GetFollowCountResponse, error) {
 	// 参数验证
-	if req.UserId <= 0 {
+	if req.UserId == "" {
 		return &follow.GetFollowCountResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to validate user id: %s", req.UserId),
 		}, nil
 	}
-	
+
 	count, err := h.db.GetFollowCount(ctx, req.UserId)
 	if err != nil {
 		return &follow.GetFollowCountResponse{
@@ -207,13 +206,13 @@ func (h *FollowHandler) GetFollowCount(ctx context.Context, req *follow.GetFollo
 // GetFollowerCount 获取粉丝数量
 func (h *FollowHandler) GetFollowerCount(ctx context.Context, req *follow.GetFollowerCountRequest) (*follow.GetFollowerCountResponse, error) {
 	// 参数验证
-	if req.UserId <= 0 {
+	if req.UserId == "" {
 		return &follow.GetFollowerCountResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to validate user id: %s", req.UserId),
 		}, nil
 	}
-	
+
 	count, err := h.db.GetFollowerCount(ctx, req.UserId)
 	if err != nil {
 		return &follow.GetFollowerCountResponse{
@@ -232,13 +231,13 @@ func (h *FollowHandler) GetFollowerCount(ctx context.Context, req *follow.GetFol
 // GetMutualFollows 获取共同关注
 func (h *FollowHandler) GetMutualFollows(ctx context.Context, req *follow.GetMutualFollowsRequest) (*follow.GetMutualFollowsResponse, error) {
 	// 参数验证
-	if req.UserId <= 0 || req.TargetUserId <= 0 {
+	if req.UserId == "" || req.TargetUserId == "" {
 		return &follow.GetMutualFollowsResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+			Message: fmt.Sprintf("failed to validate user id: %s", req.UserId),
 		}, nil
 	}
-	
+
 	userIds, err := h.db.GetMutualFollows(ctx, req.UserId, req.TargetUserId, req.Page, req.PageSize)
 	if err != nil {
 		return &follow.GetMutualFollowsResponse{
@@ -275,7 +274,7 @@ func (h *FollowHandler) CheckFollowStatus(ctx context.Context, req *follow.Check
 			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
 		}, nil
 	}
-	
+
 	// 检查是否关注
 	isFollowing, err := h.db.IsFollowing(ctx, req.FollowerId, req.FollowingId)
 	if err != nil {

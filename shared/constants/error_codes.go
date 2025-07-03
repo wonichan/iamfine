@@ -32,8 +32,9 @@ const (
 	UserTokenInvalidCode       = 2008
 	UserFollowSelfCode         = 2009
 	UserAlreadyFollowedCode    = 2010
-	UserNotFollowedCode        = 2011
-	UserProfileUpdateFailCode  = 2012
+	UserFollowFailCode         = 2011
+	UserNotFollowedCode        = 2012
+	UserProfileUpdateFailCode  = 2013
 )
 
 // 帖子相关错误码 (3000-3999)
@@ -148,6 +149,7 @@ var ErrorCodeMessage = map[int32]string{
 	UserTokenExpiredCode:       "登录已过期",
 	UserTokenInvalidCode:       "登录凭证无效",
 	UserFollowSelfCode:         "不能关注自己",
+	UserFollowFailCode:         "关注失败",
 	UserAlreadyFollowedCode:    "已经关注过该用户",
 	UserNotFollowedCode:        "未关注该用户",
 	UserProfileUpdateFailCode:  "用户信息更新失败",

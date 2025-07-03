@@ -25,19 +25,17 @@ func main() {
 	log.InitLogger("like", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
 
 	// 初始化数据库
-	db, err := utils.InitDB()
-	if err != nil {
+	if err := utils.InitDB(); err != nil {
 		log.GetLogger().Fatalf("Failed to init database: %v", err)
 	}
 
 	// 初始化Redis
-	_, err = utils.NewRedisClient(context.Background())
-	if err != nil {
+	if err := utils.NewRedisClient(context.Background()); err != nil {
 		log.GetLogger().Fatalf("Failed to init redis: %v", err)
 	}
 
 	// 创建服务处理器
-	likeHandler := handler.NewLikeHandler(db)
+	likeHandler := handler.NewLikeHandler()
 
 	// 创建服务器
 	addr, _ := net.ResolveTCPAddr("tcp", config.GlobalConfig.Services.Like.Host+":"+config.GlobalConfig.Services.Like.Port)
@@ -50,7 +48,7 @@ func main() {
 	)
 
 	log.GetLogger().Info("Like service starting...")
-	err = svr.Run()
+	err := svr.Run()
 	if err != nil {
 		log.GetLogger().Fatalf("Failed to start server: %v", err)
 	}

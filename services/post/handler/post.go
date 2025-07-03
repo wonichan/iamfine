@@ -27,7 +27,7 @@ func (h *PostHandler) CreatePost(ctx context.Context, req *post.CreatePostReques
 	logger.Infof("CreatePost req: %v", req)
 
 	// 参数验证
-	validationErrors := middleware.ValidatePostCreation(ctx, req.UserId, req.Title, req.Content)
+	validationErrors := middleware.ValidatePostCreation(req.UserId, req.Title, req.Content)
 	if len(validationErrors) > 0 {
 		errorMsg := "参数验证失败: "
 		for _, ve := range validationErrors {

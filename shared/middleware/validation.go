@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"fmt"
 	"regexp"
 	"strings"
@@ -19,7 +18,7 @@ func (e ValidationError) Error() string {
 
 // Validator 验证器接口
 type Validator interface {
-	Validate(ctx context.Context, value interface{}) error
+	Validate(value interface{}) error
 }
 
 // StringValidator 字符串验证器
@@ -30,7 +29,7 @@ type StringValidator struct {
 	Required  bool
 }
 
-func (v *StringValidator) Validate(ctx context.Context, value interface{}) error {
+func (v *StringValidator) Validate(value interface{}) error {
 	str, ok := value.(string)
 	if !ok {
 		return ValidationError{Message: "value must be a string"}
@@ -67,7 +66,7 @@ type EmailValidator struct {
 	Required bool
 }
 
-func (v *EmailValidator) Validate(ctx context.Context, value interface{}) error {
+func (v *EmailValidator) Validate(value interface{}) error {
 	str, ok := value.(string)
 	if !ok {
 		return ValidationError{Message: "value must be a string"}
@@ -94,7 +93,7 @@ type PhoneValidator struct {
 	Required bool
 }
 
-func (v *PhoneValidator) Validate(ctx context.Context, value interface{}) error {
+func (v *PhoneValidator) Validate(value interface{}) error {
 	str, ok := value.(string)
 	if !ok {
 		return ValidationError{Message: "value must be a string"}
@@ -122,7 +121,7 @@ type UserIDValidator struct {
 	Required bool
 }
 
-func (v *UserIDValidator) Validate(ctx context.Context, value interface{}) error {
+func (v *UserIDValidator) Validate(value interface{}) error {
 	str, ok := value.(string)
 	if !ok {
 		return ValidationError{Message: "value must be a string"}
@@ -145,7 +144,7 @@ func (v *UserIDValidator) Validate(ctx context.Context, value interface{}) error
 }
 
 // ValidateUserRegistration 验证用户注册参数
-func ValidateUserRegistration(ctx context.Context, username, password, email, phone string) []ValidationError {
+func ValidateUserRegistration(username, password, email, phone string) []ValidationError {
 	var errors []ValidationError
 
 	// 验证用户名
@@ -155,7 +154,7 @@ func ValidateUserRegistration(ctx context.Context, username, password, email, ph
 		Pattern:   regexp.MustCompile(`^[a-zA-Z0-9_]+$`),
 		Required:  true,
 	}
-	if err := usernameValidator.Validate(ctx, username); err != nil {
+	if err := usernameValidator.Validate(username); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "username"
 			errors = append(errors, ve)
@@ -168,7 +167,7 @@ func ValidateUserRegistration(ctx context.Context, username, password, email, ph
 		MaxLength: 50,
 		Required:  true,
 	}
-	if err := passwordValidator.Validate(ctx, password); err != nil {
+	if err := passwordValidator.Validate(password); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "password"
 			errors = append(errors, ve)
@@ -177,7 +176,7 @@ func ValidateUserRegistration(ctx context.Context, username, password, email, ph
 
 	// 验证邮箱
 	emailValidator := &EmailValidator{Required: false}
-	if err := emailValidator.Validate(ctx, email); err != nil {
+	if err := emailValidator.Validate(email); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "email"
 			errors = append(errors, ve)
@@ -186,7 +185,7 @@ func ValidateUserRegistration(ctx context.Context, username, password, email, ph
 
 	// 验证手机号
 	phoneValidator := &PhoneValidator{Required: false}
-	if err := phoneValidator.Validate(ctx, phone); err != nil {
+	if err := phoneValidator.Validate(phone); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "phone"
 			errors = append(errors, ve)
@@ -197,12 +196,12 @@ func ValidateUserRegistration(ctx context.Context, username, password, email, ph
 }
 
 // ValidatePostCreation 验证帖子创建参数
-func ValidatePostCreation(ctx context.Context, userID, title, content string) []ValidationError {
+func ValidatePostCreation(userID, title, content string) []ValidationError {
 	var errors []ValidationError
 
 	// 验证用户ID
 	userIDValidator := &UserIDValidator{Required: true}
-	if err := userIDValidator.Validate(ctx, userID); err != nil {
+	if err := userIDValidator.Validate(userID); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "user_id"
 			errors = append(errors, ve)
@@ -215,7 +214,7 @@ func ValidatePostCreation(ctx context.Context, userID, title, content string) []
 		MaxLength: 100,
 		Required:  true,
 	}
-	if err := titleValidator.Validate(ctx, title); err != nil {
+	if err := titleValidator.Validate(title); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "title"
 			errors = append(errors, ve)
@@ -228,7 +227,7 @@ func ValidatePostCreation(ctx context.Context, userID, title, content string) []
 		MaxLength: 10000,
 		Required:  true,
 	}
-	if err := contentValidator.Validate(ctx, content); err != nil {
+	if err := contentValidator.Validate(content); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "content"
 			errors = append(errors, ve)
@@ -239,12 +238,12 @@ func ValidatePostCreation(ctx context.Context, userID, title, content string) []
 }
 
 // ValidateFollowOperation 验证关注操作参数
-func ValidateFollowOperation(ctx context.Context, userID, targetUserID string) []ValidationError {
+func ValidateFollowOperation(userID, targetUserID string) []ValidationError {
 	var errors []ValidationError
 
 	// 验证用户ID
 	userIDValidator := &UserIDValidator{Required: true}
-	if err := userIDValidator.Validate(ctx, userID); err != nil {
+	if err := userIDValidator.Validate(userID); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "user_id"
 			errors = append(errors, ve)
@@ -253,7 +252,7 @@ func ValidateFollowOperation(ctx context.Context, userID, targetUserID string) [
 
 	// 验证目标用户ID
 	targetUserIDValidator := &UserIDValidator{Required: true}
-	if err := targetUserIDValidator.Validate(ctx, targetUserID); err != nil {
+	if err := targetUserIDValidator.Validate(targetUserID); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "target_user_id"
 			errors = append(errors, ve)
@@ -269,4 +268,39 @@ func ValidateFollowOperation(ctx context.Context, userID, targetUserID string) [
 	}
 
 	return errors
+}
+
+// ValidateCommentCreation 验证评论创建参数
+func ValidateCommentCreation(postID, userID, content string) error {
+	// 验证帖子ID
+	if strings.TrimSpace(postID) == "" {
+		return ValidationError{
+			Field:   "post_id",
+			Message: "post ID is required",
+		}
+	}
+
+	// 验证用户ID
+	userIDValidator := &UserIDValidator{Required: true}
+	if err := userIDValidator.Validate(userID); err != nil {
+		if ve, ok := err.(ValidationError); ok {
+			ve.Field = "user_id"
+			return ve
+		}
+	}
+
+	// 验证评论内容
+	contentValidator := &StringValidator{
+		MinLength: 1,
+		MaxLength: 2000,
+		Required:  true,
+	}
+	if err := contentValidator.Validate(content); err != nil {
+		if ve, ok := err.(ValidationError); ok {
+			ve.Field = "content"
+			return ve
+		}
+	}
+
+	return nil
 }
