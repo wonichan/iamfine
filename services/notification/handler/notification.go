@@ -4,6 +4,7 @@ import (
 	"context"
 	"hupu/kitex_gen/notification"
 	"hupu/shared/models"
+	"hupu/shared/utils"
 
 	"github.com/rs/xid"
 	"gorm.io/gorm"
@@ -13,9 +14,9 @@ type NotificationHandler struct {
 	db *gorm.DB
 }
 
-func NewNotificationHandler(db *gorm.DB) *NotificationHandler {
+func NewNotificationHandler() *NotificationHandler {
 	return &NotificationHandler{
-		db: db,
+		db: utils.GetDB(),
 	}
 }
 
