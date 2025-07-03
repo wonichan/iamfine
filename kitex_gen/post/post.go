@@ -16063,6 +16063,8 @@ type GetTopicCategoriesResponse struct {
 	Code    int32    `thrift:"code,1" frugal:"1,default,i32" json:"code"`
 	Message string   `thrift:"message,2" frugal:"2,default,string" json:"message"`
 	Topics  []*Topic `thrift:"topics,3" frugal:"3,default,list<Topic>" json:"topics"`
+	Total   int32    `thrift:"total,4" frugal:"4,default,i32" json:"total"`
+	HasMore bool     `thrift:"has_more,5" frugal:"5,default,bool" json:"has_more"`
 }
 
 func NewGetTopicCategoriesResponse() *GetTopicCategoriesResponse {
@@ -16083,6 +16085,14 @@ func (p *GetTopicCategoriesResponse) GetMessage() (v string) {
 func (p *GetTopicCategoriesResponse) GetTopics() (v []*Topic) {
 	return p.Topics
 }
+
+func (p *GetTopicCategoriesResponse) GetTotal() (v int32) {
+	return p.Total
+}
+
+func (p *GetTopicCategoriesResponse) GetHasMore() (v bool) {
+	return p.HasMore
+}
 func (p *GetTopicCategoriesResponse) SetCode(val int32) {
 	p.Code = val
 }
@@ -16092,11 +16102,19 @@ func (p *GetTopicCategoriesResponse) SetMessage(val string) {
 func (p *GetTopicCategoriesResponse) SetTopics(val []*Topic) {
 	p.Topics = val
 }
+func (p *GetTopicCategoriesResponse) SetTotal(val int32) {
+	p.Total = val
+}
+func (p *GetTopicCategoriesResponse) SetHasMore(val bool) {
+	p.HasMore = val
+}
 
 var fieldIDToName_GetTopicCategoriesResponse = map[int16]string{
 	1: "code",
 	2: "message",
 	3: "topics",
+	4: "total",
+	5: "has_more",
 }
 
 func (p *GetTopicCategoriesResponse) Read(iprot thrift.TProtocol) (err error) {
@@ -16137,6 +16155,22 @@ func (p *GetTopicCategoriesResponse) Read(iprot thrift.TProtocol) (err error) {
 		case 3:
 			if fieldTypeId == thrift.LIST {
 				if err = p.ReadField3(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 4:
+			if fieldTypeId == thrift.I32 {
+				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 5:
+			if fieldTypeId == thrift.BOOL {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -16216,6 +16250,28 @@ func (p *GetTopicCategoriesResponse) ReadField3(iprot thrift.TProtocol) error {
 	p.Topics = _field
 	return nil
 }
+func (p *GetTopicCategoriesResponse) ReadField4(iprot thrift.TProtocol) error {
+
+	var _field int32
+	if v, err := iprot.ReadI32(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.Total = _field
+	return nil
+}
+func (p *GetTopicCategoriesResponse) ReadField5(iprot thrift.TProtocol) error {
+
+	var _field bool
+	if v, err := iprot.ReadBool(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.HasMore = _field
+	return nil
+}
 
 func (p *GetTopicCategoriesResponse) Write(oprot thrift.TProtocol) (err error) {
 
@@ -16234,6 +16290,14 @@ func (p *GetTopicCategoriesResponse) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField3(oprot); err != nil {
 			fieldId = 3
+			goto WriteFieldError
+		}
+		if err = p.writeField4(oprot); err != nil {
+			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 	}
@@ -16313,6 +16377,40 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 3 end error: ", p), err)
 }
 
+func (p *GetTopicCategoriesResponse) writeField4(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("total", thrift.I32, 4); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteI32(p.Total); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
+}
+
+func (p *GetTopicCategoriesResponse) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("has_more", thrift.BOOL, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteBool(p.HasMore); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
 func (p *GetTopicCategoriesResponse) String() string {
 	if p == nil {
 		return "<nil>"
@@ -16334,6 +16432,12 @@ func (p *GetTopicCategoriesResponse) DeepEqual(ano *GetTopicCategoriesResponse) 
 		return false
 	}
 	if !p.Field3DeepEqual(ano.Topics) {
+		return false
+	}
+	if !p.Field4DeepEqual(ano.Total) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.HasMore) {
 		return false
 	}
 	return true
@@ -16363,6 +16467,20 @@ func (p *GetTopicCategoriesResponse) Field3DeepEqual(src []*Topic) bool {
 		if !v.DeepEqual(_src) {
 			return false
 		}
+	}
+	return true
+}
+func (p *GetTopicCategoriesResponse) Field4DeepEqual(src int32) bool {
+
+	if p.Total != src {
+		return false
+	}
+	return true
+}
+func (p *GetTopicCategoriesResponse) Field5DeepEqual(src bool) bool {
+
+	if p.HasMore != src {
+		return false
 	}
 	return true
 }
@@ -16654,6 +16772,7 @@ type SearchTopicsResponse struct {
 	Message string   `thrift:"message,2" frugal:"2,default,string" json:"message"`
 	Topics  []*Topic `thrift:"topics,3" frugal:"3,default,list<Topic>" json:"topics"`
 	Total   int32    `thrift:"total,4" frugal:"4,default,i32" json:"total"`
+	HasMore bool     `thrift:"has_more,5" frugal:"5,default,bool" json:"has_more"`
 }
 
 func NewSearchTopicsResponse() *SearchTopicsResponse {
@@ -16678,6 +16797,10 @@ func (p *SearchTopicsResponse) GetTopics() (v []*Topic) {
 func (p *SearchTopicsResponse) GetTotal() (v int32) {
 	return p.Total
 }
+
+func (p *SearchTopicsResponse) GetHasMore() (v bool) {
+	return p.HasMore
+}
 func (p *SearchTopicsResponse) SetCode(val int32) {
 	p.Code = val
 }
@@ -16690,12 +16813,16 @@ func (p *SearchTopicsResponse) SetTopics(val []*Topic) {
 func (p *SearchTopicsResponse) SetTotal(val int32) {
 	p.Total = val
 }
+func (p *SearchTopicsResponse) SetHasMore(val bool) {
+	p.HasMore = val
+}
 
 var fieldIDToName_SearchTopicsResponse = map[int16]string{
 	1: "code",
 	2: "message",
 	3: "topics",
 	4: "total",
+	5: "has_more",
 }
 
 func (p *SearchTopicsResponse) Read(iprot thrift.TProtocol) (err error) {
@@ -16744,6 +16871,14 @@ func (p *SearchTopicsResponse) Read(iprot thrift.TProtocol) (err error) {
 		case 4:
 			if fieldTypeId == thrift.I32 {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 5:
+			if fieldTypeId == thrift.BOOL {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -16834,6 +16969,17 @@ func (p *SearchTopicsResponse) ReadField4(iprot thrift.TProtocol) error {
 	p.Total = _field
 	return nil
 }
+func (p *SearchTopicsResponse) ReadField5(iprot thrift.TProtocol) error {
+
+	var _field bool
+	if v, err := iprot.ReadBool(); err != nil {
+		return err
+	} else {
+		_field = v
+	}
+	p.HasMore = _field
+	return nil
+}
 
 func (p *SearchTopicsResponse) Write(oprot thrift.TProtocol) (err error) {
 
@@ -16856,6 +17002,10 @@ func (p *SearchTopicsResponse) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 	}
@@ -16952,6 +17102,23 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
+func (p *SearchTopicsResponse) writeField5(oprot thrift.TProtocol) (err error) {
+	if err = oprot.WriteFieldBegin("has_more", thrift.BOOL, 5); err != nil {
+		goto WriteFieldBeginError
+	}
+	if err := oprot.WriteBool(p.HasMore); err != nil {
+		return err
+	}
+	if err = oprot.WriteFieldEnd(); err != nil {
+		goto WriteFieldEndError
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
 func (p *SearchTopicsResponse) String() string {
 	if p == nil {
 		return "<nil>"
@@ -16976,6 +17143,9 @@ func (p *SearchTopicsResponse) DeepEqual(ano *SearchTopicsResponse) bool {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.Total) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.HasMore) {
 		return false
 	}
 	return true
@@ -17011,6 +17181,13 @@ func (p *SearchTopicsResponse) Field3DeepEqual(src []*Topic) bool {
 func (p *SearchTopicsResponse) Field4DeepEqual(src int32) bool {
 
 	if p.Total != src {
+		return false
+	}
+	return true
+}
+func (p *SearchTopicsResponse) Field5DeepEqual(src bool) bool {
+
+	if p.HasMore != src {
 		return false
 	}
 	return true

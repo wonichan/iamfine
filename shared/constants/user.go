@@ -38,18 +38,3 @@ const (
 	MsgGetAnonymousFailed      = "获取匿名马甲失败"
 	MsgUpdateAnonymousFailed   = "更新匿名马甲失败"
 )
-
-var errCodeToMsg = map[int32]string{
-	InternalErrCode:      MsgServerError,
-	UserPasswdErrCode:    MsgPasswordError,
-	UserExistsErrCode:    MsgUserExists,
-	UserNotExistsErrCode: MsgUserNotExists,
-	UserLoginErrCode:     MsgLoginFailed,
-	UserGerUserErrCode:   MsgGetUserInfoFailed,
-	ParamErrCode:         MsgParamError,
-	InsertErrCode:        InsertError,
-	UpdateErrCode:        UpdateError,
-	DeleteErrCode:        DeleteError,
-	DecryptErrCode:       MsgDecryptError,
-	EncryptErrCode:       MsgEncryptError,
-}

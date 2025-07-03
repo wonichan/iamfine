@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"net"
 	"time"
 
@@ -24,19 +25,21 @@ func main() {
 	log.InitLogger("post", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
 
 	// 初始化数据库
-	db, err := utils.InitDB()
+	err := utils.InitDB()
 	if err != nil {
 		log.GetLogger().Fatalf("Failed to init database: %v", err)
+		panic(err)
 	}
 
 	// 初始化Redis
-	// rdb, err := utils.InitRedis()
-	// if err != nil {
-	// 	log.GetLogger().Fatalf("Failed to init redis: %v", err)
-	// }
+	err = utils.NewRedisClient(context.Background())
+	if err != nil {
+		log.GetLogger().Fatalf("Failed to init redis: %v", err)
+		panic(err)
+	}
 
 	// 创建服务处理器
-	postHandler := handler.NewPostHandler(db, nil)
+	postHandler := handler.NewPostHandler()
 
 	// 创建服务器
 	addr, _ := net.ResolveTCPAddr("tcp", config.GlobalConfig.Services.Post.Host+":"+config.GlobalConfig.Services.Post.Port)

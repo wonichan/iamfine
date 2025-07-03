@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"hupu/shared/config"
 	"hupu/shared/models"
+	"sync"
 	"time"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-func InitDB() (*gorm.DB, error) {
+func InitDB() error {
 	// 设置默认时区为北京时间
 	loc, _ := time.LoadLocation("Asia/Shanghai")
 	time.Local = loc
@@ -31,18 +32,18 @@ func InitDB() (*gorm.DB, error) {
 		SetParameterizedQueries(false).
 		LogMode(ParseLogLevel(logLevel))
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	instance, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		NowFunc: func() time.Time {
 			return time.Now().In(loc)
 		},
 		Logger: gormLogger,
 	})
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	// 自动迁移数据库表
-	err = db.AutoMigrate(
+	err = instance.AutoMigrate(
 		&models.User{},
 		&models.Post{},
 		&models.Comment{},
@@ -51,8 +52,21 @@ func InitDB() (*gorm.DB, error) {
 		&models.Notification{},
 	)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return db, nil
+	return nil
+}
+
+var instance *gorm.DB
+
+var onceDB sync.Once
+
+func GetDB() *gorm.DB {
+	onceDB.Do(func() {
+		if err := InitDB(); err != nil {
+			panic(err)
+		}
+	})
+	return instance
 }

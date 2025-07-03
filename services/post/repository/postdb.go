@@ -2,36 +2,61 @@ package repository
 
 import (
 	"context"
-	"hupu/shared/models"
+	"fmt"
 	"time"
 
 	"github.com/rs/xid"
 	"gorm.io/gorm"
+
+	"hupu/shared/models"
+	"hupu/shared/utils"
 )
 
-type postRepository struct {
+type PostRepository struct {
 	db *gorm.DB
 }
 
 // NewPostRepository 创建新的帖子数据库仓库
-func NewPostRepository(db *gorm.DB) PostRepository {
-	return &postRepository{
-		db: db,
+func NewPostRepository() *PostRepository {
+	return &PostRepository{
+		db: utils.GetDB(),
 	}
 }
 
 // CreatePost 创建帖子
-func (r *postRepository) CreatePost(ctx context.Context, post *models.Post) error {
+func (r *PostRepository) CreatePost(ctx context.Context, post *models.Post) error {
 	// 生成帖子ID
 	post.ID = xid.New().String()
 	post.CreatedAt = time.Now()
 	post.UpdatedAt = time.Now()
 
-	return r.db.WithContext(ctx).Create(post).Error
+	// 使用事务确保数据一致性
+	tx := r.db.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
+
+	// 创建帖子
+	if err := tx.Create(post).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// 如果有话题ID，更新话题的帖子数量
+	if post.TopicID != nil {
+		if err := tx.Model(&models.Topic{}).Where("id = ?", post.TopicID).Update("post_count", gorm.Expr("post_count + ?", 1)).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+	}
+
+	return tx.Commit().Error
 }
 
 // GetPost 根据ID获取帖子
-func (r *postRepository) GetPost(ctx context.Context, id string) (*models.Post, error) {
+func (r *PostRepository) GetPost(ctx context.Context, id string) (*models.Post, error) {
 	var post models.Post
 	err := r.db.WithContext(ctx).Where("id = ?", id).First(&post).Error
 	if err != nil {
@@ -41,7 +66,7 @@ func (r *postRepository) GetPost(ctx context.Context, id string) (*models.Post, 
 }
 
 // GetPostList 获取帖子列表
-func (r *postRepository) GetPostList(ctx context.Context, page, pageSize int64) ([]*models.Post, error) {
+func (r *PostRepository) GetPostList(ctx context.Context, page, pageSize int64) ([]*models.Post, error) {
 	var posts []*models.Post
 	offset := (page - 1) * pageSize
 
@@ -55,18 +80,18 @@ func (r *postRepository) GetPostList(ctx context.Context, page, pageSize int64) 
 }
 
 // UpdatePost 更新帖子
-func (r *postRepository) UpdatePost(ctx context.Context, post *models.Post) error {
+func (r *PostRepository) UpdatePost(ctx context.Context, post *models.Post) error {
 	post.UpdatedAt = time.Now()
 	return r.db.WithContext(ctx).Save(post).Error
 }
 
 // DeletePost 删除帖子
-func (r *postRepository) DeletePost(ctx context.Context, id string) error {
+func (r *PostRepository) DeletePost(ctx context.Context, id string) error {
 	return r.db.WithContext(ctx).Where("id = ?", id).Delete(&models.Post{}).Error
 }
 
 // GetPostsByUserID 根据用户ID获取帖子列表
-func (r *postRepository) GetPostsByUserID(ctx context.Context, userID string, page, pageSize int64) ([]*models.Post, error) {
+func (r *PostRepository) GetPostsByUserID(ctx context.Context, userID string, page, pageSize int64) ([]*models.Post, error) {
 	var posts []*models.Post
 	offset := (page - 1) * pageSize
 
@@ -81,7 +106,7 @@ func (r *postRepository) GetPostsByUserID(ctx context.Context, userID string, pa
 }
 
 // GetPostListByTopic 根据话题ID获取帖子列表
-func (r *postRepository) GetPostListByTopic(ctx context.Context, topicID string, page, pageSize int64) ([]*models.Post, error) {
+func (r *PostRepository) GetPostListByTopic(ctx context.Context, topicID string, page, pageSize int64) ([]*models.Post, error) {
 	var posts []*models.Post
 	offset := (page - 1) * pageSize
 
@@ -96,7 +121,7 @@ func (r *postRepository) GetPostListByTopic(ctx context.Context, topicID string,
 }
 
 // GetPostListByCategory 根据分类获取帖子列表
-func (r *postRepository) GetPostListByCategory(ctx context.Context, category string, page, pageSize int64) ([]*models.Post, error) {
+func (r *PostRepository) GetPostListByCategory(ctx context.Context, category string, page, pageSize int64) ([]*models.Post, error) {
 	var posts []*models.Post
 	offset := (page - 1) * pageSize
 
@@ -111,7 +136,7 @@ func (r *postRepository) GetPostListByCategory(ctx context.Context, category str
 }
 
 // GetPostListWithConditions 根据多个条件获取帖子列表
-func (r *postRepository) GetPostListWithConditions(ctx context.Context, conditions map[string]interface{}, page, pageSize int64, sortType string) ([]*models.Post, error) {
+func (r *PostRepository) GetPostListWithConditions(ctx context.Context, conditions map[string]interface{}, page, pageSize int64, sortType string) ([]*models.Post, error) {
 	var posts []*models.Post
 	offset := (page - 1) * pageSize
 
@@ -154,7 +179,7 @@ func (r *postRepository) GetPostListWithConditions(ctx context.Context, conditio
 }
 
 // IncrementViewCount 增加浏览次数
-func (r *postRepository) IncrementViewCount(ctx context.Context, postID string) error {
+func (r *PostRepository) IncrementViewCount(ctx context.Context, postID string) error {
 	return r.db.WithContext(ctx).
 		Model(&models.Post{}).
 		Where("id = ?", postID).
@@ -162,14 +187,14 @@ func (r *postRepository) IncrementViewCount(ctx context.Context, postID string) 
 }
 
 // 话题管理相关方法
-func (r *postRepository) CreateTopic(ctx context.Context, topic *models.Topic) error {
+func (r *PostRepository) CreateTopic(ctx context.Context, topic *models.Topic) error {
 	topic.ID = xid.New().String()
 	topic.CreatedAt = time.Now()
 	topic.UpdatedAt = time.Now()
 	return r.db.WithContext(ctx).Create(topic).Error
 }
 
-func (r *postRepository) GetTopicList(ctx context.Context, page, pageSize int32) ([]*models.Topic, error) {
+func (r *PostRepository) GetTopicList(ctx context.Context, page, pageSize int32) ([]*models.Topic, error) {
 	var topics []*models.Topic
 	offset := (page - 1) * pageSize
 
@@ -182,7 +207,7 @@ func (r *postRepository) GetTopicList(ctx context.Context, page, pageSize int32)
 	return topics, err
 }
 
-func (r *postRepository) GetTopic(ctx context.Context, topicID string) (*models.Topic, error) {
+func (r *PostRepository) GetTopic(ctx context.Context, topicID string) (*models.Topic, error) {
 	var topic models.Topic
 	err := r.db.WithContext(ctx).Where("id = ?", topicID).First(&topic).Error
 	if err != nil {
@@ -192,19 +217,37 @@ func (r *postRepository) GetTopic(ctx context.Context, topicID string) (*models.
 }
 
 // 收藏功能相关方法
-func (r *postRepository) FavoritePost(ctx context.Context, userID string, postID string) error {
+func (r *PostRepository) FavoritePost(ctx context.Context, userID string, postID string) error {
+	// 检查帖子是否存在
+	var post models.Post
+	err := r.db.WithContext(ctx).Where("id = ?", postID).First(&post).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("post not found")
+		}
+		return fmt.Errorf("failed to check post existence: %w", err)
+	}
+
 	// 检查是否已经收藏
 	var count int64
-	err := r.db.WithContext(ctx).
+	err = r.db.WithContext(ctx).
 		Model(&models.PostFavorite{}).
 		Where("user_id = ? AND post_id = ?", userID, postID).
 		Count(&count).Error
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to check favorite existence: %w", err)
 	}
 	if count > 0 {
-		return nil // 已经收藏过了
+		return fmt.Errorf("post already favorited")
 	}
+
+	// 使用事务创建收藏记录
+	tx := r.db.WithContext(ctx).Begin()
+	defer func() {
+		if r := recover(); r != nil {
+			tx.Rollback()
+		}
+	}()
 
 	// 创建收藏记录
 	favorite := &models.PostFavorite{
@@ -214,16 +257,21 @@ func (r *postRepository) FavoritePost(ctx context.Context, userID string, postID
 		CreatedAt: time.Now(),
 	}
 
-	return r.db.WithContext(ctx).Create(favorite).Error
+	if err := tx.Create(favorite).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to create favorite: %w", err)
+	}
+
+	return tx.Commit().Error
 }
 
-func (r *postRepository) UnfavoritePost(ctx context.Context, userID string, postID string) error {
+func (r *PostRepository) UnfavoritePost(ctx context.Context, userID string, postID string) error {
 	return r.db.WithContext(ctx).
 		Where("user_id = ? AND post_id = ?", userID, postID).
 		Delete(&models.PostFavorite{}).Error
 }
 
-func (r *postRepository) GetFavoriteList(ctx context.Context, userID string, page, pageSize int32) ([]*models.Post, error) {
+func (r *PostRepository) GetFavoriteList(ctx context.Context, userID string, page, pageSize int32) ([]*models.Post, error) {
 	var posts []*models.Post
 	offset := (page - 1) * pageSize
 
@@ -240,7 +288,7 @@ func (r *postRepository) GetFavoriteList(ctx context.Context, userID string, pag
 }
 
 // 评分功能相关方法
-func (r *postRepository) RatePost(ctx context.Context, rating *models.PostRating) error {
+func (r *PostRepository) RatePost(ctx context.Context, rating *models.PostRating) error {
 	// 检查是否已经评分过
 	var existingRating models.PostRating
 	err := r.db.WithContext(ctx).
@@ -262,7 +310,7 @@ func (r *postRepository) RatePost(ctx context.Context, rating *models.PostRating
 	}
 }
 
-func (r *postRepository) GetScoreRanking(ctx context.Context, page, pageSize int32) ([]*models.Post, error) {
+func (r *PostRepository) GetScoreRanking(ctx context.Context, page, pageSize int32) ([]*models.Post, error) {
 	var posts []*models.Post
 	offset := (page - 1) * pageSize
 
@@ -280,7 +328,7 @@ func (r *postRepository) GetScoreRanking(ctx context.Context, page, pageSize int
 }
 
 // 获取匿名头像信息
-func (r *postRepository) GetAnonymousAvatar(ctx context.Context, avatarID string) (*models.AnonymousAvatar, error) {
+func (r *PostRepository) GetAnonymousAvatar(ctx context.Context, avatarID string) (*models.AnonymousAvatar, error) {
 	var avatar models.AnonymousAvatar
 	err := r.db.WithContext(ctx).Where("id = ?", avatarID).First(&avatar).Error
 	if err != nil {

@@ -4,10 +4,14 @@ import (
 	"context"
 	"fmt"
 	"hupu/shared/config"
+	"sync"
 	"time"
 
 	"github.com/redis/go-redis/v9"
 )
+
+var redisClient *RedisClient
+var onceRedis sync.Once
 
 // RedisClient 封装了 Redis 客户端
 type RedisClient struct {
@@ -16,7 +20,7 @@ type RedisClient struct {
 }
 
 // NewRedisClient 创建一个新的 RedisClient 实例
-func NewRedisClient(ctx context.Context) (*RedisClient, error) {
+func NewRedisClient(ctx context.Context) error {
 	cfg := config.GlobalConfig.Redis
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
@@ -27,13 +31,22 @@ func NewRedisClient(ctx context.Context) (*RedisClient, error) {
 	// 测试连接
 	_, err := rdb.Ping(ctx).Result()
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	return &RedisClient{
+	redisClient = &RedisClient{
 		client: rdb,
 		ctx:    ctx,
-	}, nil
+	}
+	return nil
+}
+
+func GetRedisClient() *RedisClient {
+	onceRedis.Do(func() {
+		if err := NewRedisClient(context.Background()); err != nil {
+			panic(err)
+		}
+	})
+	return redisClient
 }
 
 // --- String Commands ---
@@ -403,9 +416,4 @@ func (rc *RedisClient) ScriptFlush() error {
 // Ping 测试服务器是否连接正常
 func (rc *RedisClient) Ping() (string, error) {
 	return rc.client.Ping(rc.ctx).Result()
-}
-
-// UnderlyingClient 返回底层的 go-redis 客户端，以便进行更高级的操作
-func (rc *RedisClient) UnderlyingClient() *redis.Client {
-	return rc.client
 }

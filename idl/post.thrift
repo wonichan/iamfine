@@ -339,6 +339,8 @@ struct GetTopicCategoriesResponse {
     1: i32 code
     2: string message
     3: list<Topic> topics
+    4: i32 total
+    5: bool has_more
 }
 
 // 搜索话题请求响应
@@ -353,6 +355,7 @@ struct SearchTopicsResponse {
     2: string message
     3: list<Topic> topics
     4: i32 total
+    5: bool has_more
 }
 
 // 分享话题请求响应

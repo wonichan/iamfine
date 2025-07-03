@@ -3,25 +3,25 @@ package handler
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
-
-	"gorm.io/gorm"
 
 	service "hupu/kitex_gen/user"
 	"hupu/services/user/repository"
 	"hupu/shared/constants"
 	"hupu/shared/log"
+	"hupu/shared/middleware"
 	"hupu/shared/models"
 	"hupu/shared/utils"
 )
 
 type UserHandler struct {
-	db repository.UserRepository
+	db *repository.UserRepository
 }
 
-func NewUserHandler(db *gorm.DB) service.UserService {
+func NewUserHandler() service.UserService {
 	return &UserHandler{
-		db: repository.NewUserRepository(db),
+		db: repository.NewUserRepository(),
 	}
 }
 
@@ -29,6 +29,20 @@ func NewUserHandler(db *gorm.DB) service.UserService {
 func (h *UserHandler) Register(ctx context.Context, req *service.RegisterRequest) (*service.RegisterResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Info("Register start")
+
+	// 参数验证
+	validationErrors := middleware.ValidateUserRegistration(ctx, req.Username, req.Password, req.Email, req.Phone)
+	if len(validationErrors) > 0 {
+		errorMsg := "参数验证失败: "
+		for _, ve := range validationErrors {
+			errorMsg += fmt.Sprintf("%s: %s; ", ve.Field, ve.Message)
+		}
+		return &service.RegisterResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: errorMsg,
+		}, nil
+	}
+
 	userModel := &models.User{
 		Username: req.Username,
 		Password: req.Password,
@@ -40,14 +54,21 @@ func (h *UserHandler) Register(ctx context.Context, req *service.RegisterRequest
 
 	savedUser, err := h.db.CreateUser(ctx, userModel)
 	if err != nil {
+		// 根据错误类型返回不同的错误码
+		if strings.Contains(err.Error(), "already exists") {
+			return &service.RegisterResponse{
+				Code:    constants.UserAlreadyExistsCode,
+				Message: constants.GetErrorMessage(constants.UserAlreadyExistsCode),
+			}, nil
+		}
 		return &service.RegisterResponse{
-			Code:    constants.UserExistsErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to create user, err:%s", err.Error()),
 		}, nil
 	}
 	logger.Infof("Register success, user:%+v", savedUser)
 	return &service.RegisterResponse{
-		Code: 0,
+		Code: constants.SuccessCode,
 		User: h.convertToUserResponse(savedUser),
 	}, nil
 }
@@ -56,26 +77,34 @@ func (h *UserHandler) Register(ctx context.Context, req *service.RegisterRequest
 func (h *UserHandler) Login(ctx context.Context, req *service.LoginRequest) (*service.LoginResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Info("Login start")
+
+	// 参数验证
+	if req.Username == "" || req.Password == "" {
+		return &service.LoginResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+		}, nil
+	}
+
 	getUser, err := h.db.GetUser(ctx, &models.User{
 		Username: req.Username,
-		Password: req.Password,
 		Status:   models.UserStatusActive,
 	})
 	if err != nil {
 		return &service.LoginResponse{
-			Code:    constants.UserLoginErrCode,
-			Message: fmt.Sprintf("failed to login, err:%s", err.Error()),
+			Code:    constants.UserNotFoundCode,
+			Message: constants.GetErrorMessage(constants.UserNotFoundCode),
 		}, nil
 	}
 	if !utils.CheckPassword(req.Password, getUser.Password) {
 		return &service.LoginResponse{
-			Code:    constants.UserPasswdErrCode,
-			Message: fmt.Sprintf("failed to login, err:%s", constants.MsgPasswordError),
+			Code:    constants.UserInvalidCredentialsCode,
+			Message: constants.GetErrorMessage(constants.UserInvalidCredentialsCode),
 		}, nil
 	}
 
 	return &service.LoginResponse{
-		Code: 0,
+		Code: constants.SuccessCode,
 		User: h.convertToUserResponse(getUser),
 	}, nil
 }
@@ -84,18 +113,27 @@ func (h *UserHandler) Login(ctx context.Context, req *service.LoginRequest) (*se
 func (h *UserHandler) GetUser(ctx context.Context, req *service.GetUserRequest) (*service.GetUserResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Infof("GetUser start, req:%+v", req)
+
+	// 参数验证
+	if req.UserId == "" {
+		return &service.GetUserResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+		}, nil
+	}
+
 	getUser, err := h.db.GetUser(ctx, &models.User{
 		ID: req.UserId,
 	})
 	if err != nil {
 		return &service.GetUserResponse{
-			Code:    constants.UserGerUserErrCode,
-			Message: fmt.Sprintf("failed to get user, err:%s", err.Error()),
+			Code:    constants.UserNotFoundCode,
+			Message: constants.GetErrorMessage(constants.UserNotFoundCode),
 		}, nil
 	}
 
 	return &service.GetUserResponse{
-		Code: 0,
+		Code: constants.SuccessCode,
 		User: h.convertToUserResponse(getUser),
 	}, nil
 }
@@ -104,75 +142,125 @@ func (h *UserHandler) GetUser(ctx context.Context, req *service.GetUserRequest) 
 func (h *UserHandler) UpdateUser(ctx context.Context, req *service.UpdateUserRequest) (*service.UpdateUserResponse, error) {
 	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
 	logger.Infof("UpdateUser start, req:%+v", req)
+
+	// 参数验证
+	if len(req.Id) <= 0 {
+		return &service.UpdateUserResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+		}, nil
+	}
+
 	_, err := h.db.GetUser(ctx, &models.User{
 		ID: req.Id,
 	})
 	if err != nil {
 		return &service.UpdateUserResponse{
-			Code:    constants.UserUpdateUserErrCode,
-			Message: fmt.Sprintf("failed to get user, err:%s", err.Error()),
+			Code:    constants.UserNotFoundCode,
+			Message: constants.GetErrorMessage(constants.UserNotFoundCode),
 		}, nil
 	}
 
 	// 处理可选更新字段
 	newData := h.updateUserFields(req)
+	newData.ID = req.Id
 
 	updatedUser, err := h.db.UpdateUser(ctx, newData)
 	if err != nil {
 		return &service.UpdateUserResponse{
-			Code:    constants.UserUpdateUserErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to update user, err:%s", err.Error()),
 		}, nil
 	}
 
 	return &service.UpdateUserResponse{
-		Code: 0,
+		Code: constants.SuccessCode,
 		User: h.convertToUserResponse(updatedUser),
 	}, nil
 }
 
 // 关注功能相关方法
 func (h *UserHandler) FollowUser(ctx context.Context, req *service.FollowUserRequest) (*service.FollowUserResponse, error) {
-	// 不能关注自己
-	if req.UserId == req.TargetUserId {
+	// 参数验证
+	validationErrors := middleware.ValidateFollowOperation(ctx, req.UserId, req.TargetUserId)
+	if len(validationErrors) > 0 {
+		errorMsg := "参数验证失败: "
+		for _, ve := range validationErrors {
+			errorMsg += fmt.Sprintf("%s: %s; ", ve.Field, ve.Message)
+		}
 		return &service.FollowUserResponse{
-			Code:    constants.UserFollowUserErrCode,
-			Message: constants.MsgCannotFollowSelf,
+			Code:    constants.ValidationErrorCode,
+			Message: errorMsg,
 		}, nil
 	}
+
 	err := h.db.FollowUser(ctx, req.UserId, req.TargetUserId)
 	if err != nil {
+		// 根据错误类型返回不同的错误码
+		if strings.Contains(err.Error(), "target user not found") {
+			return &service.FollowUserResponse{
+				Code:    constants.UserNotFoundCode,
+				Message: constants.GetErrorMessage(constants.UserNotFoundCode),
+			}, nil
+		}
+		if strings.Contains(err.Error(), "already following") {
+			return &service.FollowUserResponse{
+				Code:    constants.FollowAlreadyExistsCode,
+				Message: constants.GetErrorMessage(constants.FollowAlreadyExistsCode),
+			}, nil
+		}
 		return &service.FollowUserResponse{
-			Code:    constants.UserFollowUserErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to follow user, err:%s", err.Error()),
 		}, nil
 	}
 
 	return &service.FollowUserResponse{
-		Code: 0,
+		Code: constants.SuccessCode,
 	}, nil
 }
 
 func (h *UserHandler) UnfollowUser(ctx context.Context, req *service.UnfollowUserRequest) (*service.UnfollowUserResponse, error) {
+	// 参数验证
+	validationErrors := middleware.ValidateFollowOperation(ctx, req.UserId, req.TargetUserId)
+	if len(validationErrors) > 0 {
+		errorMsg := "参数验证失败: "
+		for _, ve := range validationErrors {
+			errorMsg += fmt.Sprintf("%s: %s; ", ve.Field, ve.Message)
+		}
+		return &service.UnfollowUserResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: errorMsg,
+		}, nil
+	}
+
 	err := h.db.UnfollowUser(ctx, req.UserId, req.TargetUserId)
 	if err != nil {
 		return &service.UnfollowUserResponse{
-			Code:    constants.UserUnfollowUserErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to unfollow user, err:%s", err.Error()),
 		}, nil
 	}
 
 	return &service.UnfollowUserResponse{
-		Code: 0,
+		Code: constants.SuccessCode,
 	}, nil
 }
 
 // 获取粉丝列表
 func (h *UserHandler) GetFollowers(ctx context.Context, req *service.GetFollowersRequest) (*service.GetFollowersResponse, error) {
+	// 参数验证
+	if req.UserId == "" {
+		return &service.GetFollowersResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+		}, nil
+	}
+
 	followers, err := h.db.GetFollowerList(ctx, req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &service.GetFollowersResponse{
-			Code:    constants.UserGetFollowersErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to get followers, err:%s", err.Error()),
 		}, nil
 	}
@@ -184,7 +272,7 @@ func (h *UserHandler) GetFollowers(ctx context.Context, req *service.GetFollower
 	}
 
 	return &service.GetFollowersResponse{
-		Code:  0,
+		Code:  constants.SuccessCode,
 		Users: userResponses,
 		Total: int32(len(followers)),
 	}, nil
@@ -192,10 +280,18 @@ func (h *UserHandler) GetFollowers(ctx context.Context, req *service.GetFollower
 
 // 获取关注列表
 func (h *UserHandler) GetFollowing(ctx context.Context, req *service.GetFollowingRequest) (*service.GetFollowingResponse, error) {
+	// 参数验证
+	if req.UserId == "" {
+		return &service.GetFollowingResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+		}, nil
+	}
+
 	following, err := h.db.GetFollowingList(ctx, req.UserId, req.Page, req.PageSize)
 	if err != nil {
 		return &service.GetFollowingResponse{
-			Code:    constants.UserGetFollowingErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to get following list, err:%s", err.Error()),
 		}, nil
 	}
@@ -207,7 +303,7 @@ func (h *UserHandler) GetFollowing(ctx context.Context, req *service.GetFollowin
 	}
 
 	return &service.GetFollowingResponse{
-		Code:  0,
+		Code:  constants.SuccessCode,
 		Users: userResponses,
 		Total: int32(len(following)),
 	}, nil
@@ -215,6 +311,14 @@ func (h *UserHandler) GetFollowing(ctx context.Context, req *service.GetFollowin
 
 // 匿名马甲管理相关方法
 func (h *UserHandler) CreateAnonymousProfile(ctx context.Context, req *service.CreateAnonymousProfileRequest) (*service.CreateAnonymousProfileResponse, error) {
+	// 参数验证
+	if req.UserId == "" || req.AnonymousName == "" {
+		return &service.CreateAnonymousProfileResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+		}, nil
+	}
+
 	avatar := &models.AnonymousAvatar{
 		UserID:   req.UserId,
 		Name:     req.AnonymousName,
@@ -225,13 +329,13 @@ func (h *UserHandler) CreateAnonymousProfile(ctx context.Context, req *service.C
 	err := h.db.CreateAnonymousAvatar(ctx, avatar)
 	if err != nil {
 		return &service.CreateAnonymousProfileResponse{
-			Code:    constants.UserCreateAnonymousErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to create anonymous avatar, err:%s", err.Error()),
 		}, nil
 	}
 
 	return &service.CreateAnonymousProfileResponse{
-		Code: 0,
+		Code: constants.SuccessCode,
 		Profile: &service.AnonymousProfile{
 			Id:            avatar.ID,
 			UserId:        avatar.UserID,
@@ -244,10 +348,18 @@ func (h *UserHandler) CreateAnonymousProfile(ctx context.Context, req *service.C
 }
 
 func (h *UserHandler) GetAnonymousProfiles(ctx context.Context, req *service.GetAnonymousProfilesRequest) (*service.GetAnonymousProfilesResponse, error) {
+	// 参数验证
+	if req.UserId == "" {
+		return &service.GetAnonymousProfilesResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+		}, nil
+	}
+
 	avatars, err := h.db.GetAnonymousAvatarList(ctx, req.UserId)
 	if err != nil {
 		return &service.GetAnonymousProfilesResponse{
-			Code:    constants.UserGetAnonymousErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to get anonymous avatar list, err:%s", err.Error()),
 		}, nil
 	}
@@ -266,17 +378,25 @@ func (h *UserHandler) GetAnonymousProfiles(ctx context.Context, req *service.Get
 	}
 
 	return &service.GetAnonymousProfilesResponse{
-		Code:     0,
+		Code:     constants.SuccessCode,
 		Profiles: avatarResponses,
 	}, nil
 }
 
 func (h *UserHandler) UpdateAnonymousProfile(ctx context.Context, req *service.UpdateAnonymousProfileRequest) (*service.UpdateAnonymousProfileResponse, error) {
+	// 参数验证
+	if req.ProfileId == "" {
+		return &service.UpdateAnonymousProfileResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+		}, nil
+	}
+
 	// 先获取现有的匿名头像
 	avatar, err := h.db.GetAnonymousAvatar(ctx, req.ProfileId)
 	if err != nil {
 		return &service.UpdateAnonymousProfileResponse{
-			Code:    constants.UserGetAnonymousErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to get anonymous avatar, err:%s", err.Error()),
 		}, nil
 	}
@@ -295,28 +415,36 @@ func (h *UserHandler) UpdateAnonymousProfile(ctx context.Context, req *service.U
 	err = h.db.UpdateAnonymousAvatar(ctx, avatar)
 	if err != nil {
 		return &service.UpdateAnonymousProfileResponse{
-			Code:    constants.UserUpdateAnonymousErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to update anonymous avatar, err:%s", err.Error()),
 		}, nil
 	}
 
 	return &service.UpdateAnonymousProfileResponse{
-		Code: 0,
+		Code: constants.SuccessCode,
 	}, nil
 }
 
 // 用户统计相关方法
 func (h *UserHandler) GetUserStats(ctx context.Context, req *service.GetUserStatsRequest) (*service.GetUserStatsResponse, error) {
+	// 参数验证
+	if req.UserId == "" {
+		return &service.GetUserStatsResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: constants.GetErrorMessage(constants.ValidationErrorCode),
+		}, nil
+	}
+
 	stats, err := h.db.GetUserStats(ctx, req.UserId)
 	if err != nil {
 		return &service.GetUserStatsResponse{
-			Code:    constants.UserGetUserStatusErrCode,
+			Code:    constants.DatabaseErrorCode,
 			Message: fmt.Sprintf("failed to get user stats, err:%s", err.Error()),
 		}, nil
 	}
 
 	return &service.GetUserStatsResponse{
-		Code:           0,
+		Code:           constants.SuccessCode,
 		PostCount:      stats.PostCount,
 		CommentCount:   stats.CommentCount,
 		LikeCount:      stats.LikeCount,

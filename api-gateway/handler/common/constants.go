@@ -157,7 +157,7 @@ func LogError(operation, traceID string, err string) {
 // HandleServiceError 处理服务调用错误
 func HandleServiceError(c *app.RequestContext, operation, traceID string, code int32, errMsg string) {
 	LogError(operation, traceID, errMsg)
-	ErrorResponseFunc(c, constants.HTTPStatusInternalServerError, code, constants.ErrCodeToMsg(code))
+	ErrorResponseFunc(c, constants.HTTPStatusInternalServerError, code, constants.GetErrorMessage(code))
 }
 
 func HandleRpcError(c *app.RequestContext, operation, traceID string) {

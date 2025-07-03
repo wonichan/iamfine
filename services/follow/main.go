@@ -31,14 +31,13 @@ func main() {
 	}
 
 	// 初始化Redis
-	redisClient, err := utils.NewRedisClient(context.Background())
+	_, err = utils.NewRedisClient(context.Background())
 	if err != nil {
 		log.GetLogger().Fatalf("Failed to init redis: %v", err)
 	}
-	rdb := redisClient.UnderlyingClient()
 
 	// 创建服务处理器
-	followHandler := handler.NewFollowHandler(db, rdb)
+	followHandler := handler.NewFollowHandler(db)
 
 	// 创建服务器
 	addr, _ := net.ResolveTCPAddr("tcp", config.GlobalConfig.Services.Follow.Host+":"+config.GlobalConfig.Services.Follow.Port)
