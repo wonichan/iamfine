@@ -11,6 +11,14 @@ import (
 	"gorm.io/gorm"
 )
 
+func CloseDB() error {
+	db, err := instance.DB()
+	if err != nil {
+		return err
+	}
+	return db.Close()
+}
+
 func InitDB() error {
 	// 设置默认时区为北京时间
 	loc, _ := time.LoadLocation("Asia/Shanghai")

@@ -49,6 +49,10 @@ func GetRedisClient() *RedisClient {
 	return redisClient
 }
 
+func CloseRedisClient() error {
+	return redisClient.client.Close()
+}
+
 // --- String Commands ---
 
 // Set 设置键值对，expiration 为过期时间，0 表示不过期

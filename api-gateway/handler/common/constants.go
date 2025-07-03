@@ -162,7 +162,7 @@ func HandleServiceError(c *app.RequestContext, operation, traceID string, code i
 
 func HandleRpcError(c *app.RequestContext, operation, traceID string) {
 	LogError(operation, traceID, constants.MsgServerError)
-	HandleServiceError(c, operation, traceID, constants.InternalErrCode, constants.MsgServerError)
+	HandleServiceError(c, operation, traceID, constants.InternalServerErrorCode, constants.MsgServerError)
 }
 
 // ValidateRequiredParam 验证必需参数
@@ -297,7 +297,7 @@ func CallService(c *app.RequestContext, serviceCall ServiceCall, operation, erro
 	// 执行服务调用
 	result, err := serviceCall()
 	if err != nil {
-		HandleServiceError(c, operation, traceID, constants.InternalErrCode, errorMsg)
+		HandleServiceError(c, operation, traceID, constants.InternalServerErrorCode, errorMsg)
 		return
 	}
 

@@ -95,7 +95,7 @@ func Login(ctx context.Context, c *app.RequestContext) {
 	token, err := utils.GenerateToken(resp.User.Id, resp.User.Username, resp.User.Role)
 	if err != nil {
 		logger.Errorf("Generate token failed: %v", err)
-		common.HandleServiceError(c, "Login", traceId.(string), constants.UserLoginErrCode, constants.MsgLoginFailed)
+		common.HandleServiceError(c, "Login", traceId.(string), constants.InternalServerErrorCode, constants.MsgLoginFailed)
 	}
 	tokenHeader := fmt.Sprintf("Bearer %s", token)
 	c.Header("Authorization", tokenHeader)

@@ -9,6 +9,7 @@ import (
 	"hupu/api-gateway/handler/common"
 	"hupu/kitex_gen/comment"
 	"hupu/shared/constants"
+	"hupu/shared/log"
 )
 
 // CreateCommentRequest 创建评论请求结构
@@ -21,6 +22,10 @@ type CreateCommentRequest struct {
 // GetCommentList 获取评论列表
 // GET /api/comments
 func GetCommentList(ctx context.Context, c *app.RequestContext) {
+	// 获取trace ID
+	traceId := c.GetString("trace_id")
+	log.GetLogger().Infof("[%s] GetCommentList request started", traceId)
+
 	// 获取帖子ID参数
 	postID, ok := common.ValidatePostIDParam(c, "postId")
 	if !ok {
@@ -53,14 +58,25 @@ func GetCommentList(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用评论服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetCommentClient().GetCommentList(ctx, req)
-	}), constants.GetCommentListMethodName, constants.MsgGetCommentListFailed)
+	resp, err := handler.GetCommentClient().GetCommentList(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "GetCommentList", traceId)
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "GetCommentList", traceId, resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // CreateComment 创建评论
 // POST /api/comments
 func CreateComment(ctx context.Context, c *app.RequestContext) {
+	// 获取trace ID
+	traceId := c.GetString("trace_id")
+	log.GetLogger().Infof("[%s] CreateComment request started", traceId)
+
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
@@ -87,14 +103,25 @@ func CreateComment(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用评论服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetCommentClient().CreateComment(ctx, req)
-	}), constants.CreateCommentMethodName, constants.MsgCreateCommentFailed)
+	resp, err := handler.GetCommentClient().CreateComment(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "CreateComment", traceId)
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "CreateComment", traceId, resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
 
 // DeleteComment 删除评论
 // DELETE /api/comments/{id}
 func DeleteComment(ctx context.Context, c *app.RequestContext) {
+	// 获取trace ID
+	traceId := c.GetString("trace_id")
+	log.GetLogger().Infof("[%s] DeleteComment request started", traceId)
+
 	// 需要认证
 	userID, ok := common.RequireAuth(c)
 	if !ok {
@@ -116,7 +143,14 @@ func DeleteComment(ctx context.Context, c *app.RequestContext) {
 	}
 
 	// 调用评论服务
-	common.CallService(c, common.ServiceCall(func() (any, error) {
-		return handler.GetCommentClient().DeleteComment(ctx, req)
-	}), constants.DeleteCommentMethodName, constants.MsgDeleteCommentFailed)
+	resp, err := handler.GetCommentClient().DeleteComment(ctx, req)
+	if err != nil {
+		common.HandleRpcError(c, "DeleteComment", traceId)
+		return
+	}
+	if resp.Code != constants.SuccessCode {
+		common.HandleServiceError(c, "DeleteComment", traceId, resp.Code, resp.Message)
+		return
+	}
+	common.RespondWithSuccess(c, resp)
 }
