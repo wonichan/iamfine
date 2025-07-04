@@ -17,7 +17,7 @@ func main() {
 	config.Init("../../config.yaml")
 
 	// 初始化日志
-	log.InitLogger("api-gateway", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
+	log.InitLogger("api-gateway.log", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
 
 	// 创建Hertz服务器
 	h := server.Default(

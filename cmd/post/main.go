@@ -22,7 +22,7 @@ func main() {
 	config.Init("../../config.yaml")
 
 	// 初始化日志
-	log.InitLogger("post", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
+	log.InitLogger("post.log", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
 
 	// 初始化数据库
 	err := utils.InitDB()
