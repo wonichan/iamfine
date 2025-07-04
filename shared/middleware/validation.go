@@ -184,7 +184,7 @@ func ValidateUserRegistration(username, password, email, phone string) []Validat
 	}
 
 	// 验证手机号
-	phoneValidator := &PhoneValidator{Required: false}
+	phoneValidator := &PhoneValidator{Required: true}
 	if err := phoneValidator.Validate(phone); err != nil {
 		if ve, ok := err.(ValidationError); ok {
 			ve.Field = "phone"
