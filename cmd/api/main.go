@@ -14,7 +14,7 @@ import (
 
 func main() {
 	// 初始化配置
-	config.Init("../config.yaml")
+	config.Init("../../config.yaml")
 
 	// 初始化日志
 	log.InitLogger("api-gateway", config.GlobalConfig.Log.Path, config.GlobalConfig.Log.Level)
