@@ -380,6 +380,7 @@ struct GetUserRatingResponse {
     2: string message
     3: optional double score
     4: bool is_rated
+    5: optional string comment
 }
 
 // 更新评分请求响应

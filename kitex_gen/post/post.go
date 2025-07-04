@@ -17867,6 +17867,7 @@ type GetUserRatingResponse struct {
 	Message string   `thrift:"message,2" frugal:"2,default,string" json:"message"`
 	Score   *float64 `thrift:"score,3,optional" frugal:"3,optional,double" json:"score,omitempty"`
 	IsRated bool     `thrift:"is_rated,4" frugal:"4,default,bool" json:"is_rated"`
+	Comment *string  `thrift:"comment,5,optional" frugal:"5,optional,string" json:"comment,omitempty"`
 }
 
 func NewGetUserRatingResponse() *GetUserRatingResponse {
@@ -17896,6 +17897,15 @@ func (p *GetUserRatingResponse) GetScore() (v float64) {
 func (p *GetUserRatingResponse) GetIsRated() (v bool) {
 	return p.IsRated
 }
+
+var GetUserRatingResponse_Comment_DEFAULT string
+
+func (p *GetUserRatingResponse) GetComment() (v string) {
+	if !p.IsSetComment() {
+		return GetUserRatingResponse_Comment_DEFAULT
+	}
+	return *p.Comment
+}
 func (p *GetUserRatingResponse) SetCode(val int32) {
 	p.Code = val
 }
@@ -17908,16 +17918,24 @@ func (p *GetUserRatingResponse) SetScore(val *float64) {
 func (p *GetUserRatingResponse) SetIsRated(val bool) {
 	p.IsRated = val
 }
+func (p *GetUserRatingResponse) SetComment(val *string) {
+	p.Comment = val
+}
 
 var fieldIDToName_GetUserRatingResponse = map[int16]string{
 	1: "code",
 	2: "message",
 	3: "score",
 	4: "is_rated",
+	5: "comment",
 }
 
 func (p *GetUserRatingResponse) IsSetScore() bool {
 	return p.Score != nil
+}
+
+func (p *GetUserRatingResponse) IsSetComment() bool {
+	return p.Comment != nil
 }
 
 func (p *GetUserRatingResponse) Read(iprot thrift.TProtocol) (err error) {
@@ -17966,6 +17984,14 @@ func (p *GetUserRatingResponse) Read(iprot thrift.TProtocol) (err error) {
 		case 4:
 			if fieldTypeId == thrift.BOOL {
 				if err = p.ReadField4(iprot); err != nil {
+					goto ReadFieldError
+				}
+			} else if err = iprot.Skip(fieldTypeId); err != nil {
+				goto SkipFieldError
+			}
+		case 5:
+			if fieldTypeId == thrift.STRING {
+				if err = p.ReadField5(iprot); err != nil {
 					goto ReadFieldError
 				}
 			} else if err = iprot.Skip(fieldTypeId); err != nil {
@@ -18044,6 +18070,17 @@ func (p *GetUserRatingResponse) ReadField4(iprot thrift.TProtocol) error {
 	p.IsRated = _field
 	return nil
 }
+func (p *GetUserRatingResponse) ReadField5(iprot thrift.TProtocol) error {
+
+	var _field *string
+	if v, err := iprot.ReadString(); err != nil {
+		return err
+	} else {
+		_field = &v
+	}
+	p.Comment = _field
+	return nil
+}
 
 func (p *GetUserRatingResponse) Write(oprot thrift.TProtocol) (err error) {
 
@@ -18066,6 +18103,10 @@ func (p *GetUserRatingResponse) Write(oprot thrift.TProtocol) (err error) {
 		}
 		if err = p.writeField4(oprot); err != nil {
 			fieldId = 4
+			goto WriteFieldError
+		}
+		if err = p.writeField5(oprot); err != nil {
+			fieldId = 5
 			goto WriteFieldError
 		}
 	}
@@ -18156,6 +18197,25 @@ WriteFieldEndError:
 	return thrift.PrependError(fmt.Sprintf("%T write field 4 end error: ", p), err)
 }
 
+func (p *GetUserRatingResponse) writeField5(oprot thrift.TProtocol) (err error) {
+	if p.IsSetComment() {
+		if err = oprot.WriteFieldBegin("comment", thrift.STRING, 5); err != nil {
+			goto WriteFieldBeginError
+		}
+		if err := oprot.WriteString(*p.Comment); err != nil {
+			return err
+		}
+		if err = oprot.WriteFieldEnd(); err != nil {
+			goto WriteFieldEndError
+		}
+	}
+	return nil
+WriteFieldBeginError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 begin error: ", p), err)
+WriteFieldEndError:
+	return thrift.PrependError(fmt.Sprintf("%T write field 5 end error: ", p), err)
+}
+
 func (p *GetUserRatingResponse) String() string {
 	if p == nil {
 		return "<nil>"
@@ -18180,6 +18240,9 @@ func (p *GetUserRatingResponse) DeepEqual(ano *GetUserRatingResponse) bool {
 		return false
 	}
 	if !p.Field4DeepEqual(ano.IsRated) {
+		return false
+	}
+	if !p.Field5DeepEqual(ano.Comment) {
 		return false
 	}
 	return true
@@ -18214,6 +18277,18 @@ func (p *GetUserRatingResponse) Field3DeepEqual(src *float64) bool {
 func (p *GetUserRatingResponse) Field4DeepEqual(src bool) bool {
 
 	if p.IsRated != src {
+		return false
+	}
+	return true
+}
+func (p *GetUserRatingResponse) Field5DeepEqual(src *string) bool {
+
+	if p.Comment == src {
+		return true
+	} else if p.Comment == nil || src == nil {
+		return false
+	}
+	if strings.Compare(*p.Comment, *src) != 0 {
 		return false
 	}
 	return true

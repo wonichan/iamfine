@@ -9,7 +9,10 @@ import (
 	"hupu/shared/log"
 	"hupu/shared/middleware"
 	"hupu/shared/models"
+	"hupu/shared/utils"
 	"strings"
+
+	"gorm.io/gorm"
 )
 
 type PostHandler struct {
@@ -356,6 +359,23 @@ func (h *PostHandler) RatePost(ctx context.Context, req *post.RatePostRequest) (
 		}, nil
 	}
 
+	// 检查帖子是否存在并获取帖子信息
+	postInfo, err := h.db.GetPost(ctx, req.PostId)
+	if err != nil {
+		return &post.RatePostResponse{
+			Code:    constants.PostNotFoundCode,
+			Message: fmt.Sprintf("failed to rate post: %s", constants.GetErrorMessage(constants.PostNotFoundCode)),
+		}, nil
+	}
+
+	// 防止用户给自己的帖子评分
+	if postInfo.UserID == req.UserId {
+		return &post.RatePostResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: "不能给自己的帖子评分",
+		}, nil
+	}
+
 	rating := &models.PostRating{
 		UserID:  req.UserId,
 		PostID:  req.PostId,
@@ -363,7 +383,7 @@ func (h *PostHandler) RatePost(ctx context.Context, req *post.RatePostRequest) (
 		Comment: req.Comment,      // req.Comment已经是*string类型
 	}
 
-	err := h.db.RatePost(ctx, rating)
+	err = h.db.RatePost(ctx, rating)
 	if err != nil {
 		return &post.RatePostResponse{
 			Code:    constants.PostRatingFailCode,
@@ -371,12 +391,19 @@ func (h *PostHandler) RatePost(ctx context.Context, req *post.RatePostRequest) (
 		}, nil
 	}
 
-	// TODO: 计算平均分和总评分数
-	// 这里需要从数据库查询相关统计信息
+	// 获取帖子的评分统计信息
+	averageScore, totalRatings, err := h.db.GetPostRatingStats(ctx, req.PostId)
+	if err != nil {
+		return &post.RatePostResponse{
+			Code:    constants.PostRatingFailCode,
+			Message: fmt.Sprintf("failed to get rating stats: %s", err),
+		}, nil
+	}
+
 	return &post.RatePostResponse{
 		Code:         constants.SuccessCode,
-		AverageScore: req.Score, // 临时返回当前评分
-		TotalRatings: 1,         // 临时返回1
+		AverageScore: averageScore,
+		TotalRatings: totalRatings,
 	}, nil
 }
 
@@ -628,11 +655,29 @@ func (h *PostHandler) GetUserRating(ctx context.Context, req *post.GetUserRating
 		}, nil
 	}
 
-	// TODO: 实现获取用户评分逻辑
+	// 获取用户评分
+	rating, err := h.db.GetUserRating(ctx, req.UserId, req.PostId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &post.GetUserRatingResponse{
+				Code:    constants.PostRatingNotFoundCode,
+				Message: "用户未对该帖子评分",
+				IsRated: false,
+			}, nil
+		}
+		return &post.GetUserRatingResponse{
+			Code:    constants.PostRatingFailCode,
+			Message: fmt.Sprintf("failed to get user rating: %s", err),
+			IsRated: false,
+		}, nil
+	}
+
 	return &post.GetUserRatingResponse{
 		Code:    constants.SuccessCode,
 		Message: "获取成功",
-		IsRated: false,
+		IsRated: true,
+		Score:   utils.Float64Ptr(float64(rating.Score)),
+		Comment: rating.Comment,
 	}, nil
 }
 
@@ -646,12 +691,61 @@ func (h *PostHandler) UpdateRating(ctx context.Context, req *post.UpdateRatingRe
 		}, nil
 	}
 
-	// TODO: 实现更新评分逻辑
+	// 检查帖子是否存在并获取帖子信息
+	postInfo, err := h.db.GetPost(ctx, req.PostId)
+	if err != nil {
+		return &post.UpdateRatingResponse{
+			Code:    constants.PostNotFoundCode,
+			Message: fmt.Sprintf("failed to update rating: %s", constants.GetErrorMessage(constants.PostNotFoundCode)),
+		}, nil
+	}
+
+	// 防止用户给自己的帖子评分
+	if postInfo.UserID == req.UserId {
+		return &post.UpdateRatingResponse{
+			Code:    constants.ValidationErrorCode,
+			Message: "不能给自己的帖子评分",
+		}, nil
+	}
+
+	// 检查用户是否已经评分过
+	_, err = h.db.GetUserRating(ctx, req.UserId, req.PostId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &post.UpdateRatingResponse{
+				Code:    constants.PostRatingNotFoundCode,
+				Message: "用户未对该帖子评分，无法更新",
+			}, nil
+		}
+		return &post.UpdateRatingResponse{
+			Code:    constants.PostRatingFailCode,
+			Message: fmt.Sprintf("failed to check existing rating: %s", err),
+		}, nil
+	}
+
+	// 更新评分
+	err = h.db.UpdateRating(ctx, req.UserId, req.PostId, int32(req.Score), req.Comment)
+	if err != nil {
+		return &post.UpdateRatingResponse{
+			Code:    constants.PostRatingFailCode,
+			Message: fmt.Sprintf("failed to update rating: %s", err),
+		}, nil
+	}
+
+	// 获取更新后的评分统计信息
+	averageScore, totalRatings, err := h.db.GetPostRatingStats(ctx, req.PostId)
+	if err != nil {
+		return &post.UpdateRatingResponse{
+			Code:    constants.PostRatingFailCode,
+			Message: fmt.Sprintf("failed to get rating stats: %s", err),
+		}, nil
+	}
+
 	return &post.UpdateRatingResponse{
 		Code:         constants.SuccessCode,
 		Message:      "更新成功",
-		AverageScore: 0,
-		TotalRatings: 0,
+		AverageScore: averageScore,
+		TotalRatings: totalRatings,
 	}, nil
 }
 
@@ -665,11 +759,43 @@ func (h *PostHandler) DeleteRating(ctx context.Context, req *post.DeleteRatingRe
 		}, nil
 	}
 
-	// TODO: 实现删除评分逻辑
+	// 检查用户是否已经评分过
+	_, err := h.db.GetUserRating(ctx, req.UserId, req.PostId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return &post.DeleteRatingResponse{
+				Code:    constants.PostRatingNotFoundCode,
+				Message: "用户未对该帖子评分，无法删除",
+			}, nil
+		}
+		return &post.DeleteRatingResponse{
+			Code:    constants.PostRatingFailCode,
+			Message: fmt.Sprintf("failed to check existing rating: %s", err),
+		}, nil
+	}
+
+	// 删除评分
+	err = h.db.DeleteRating(ctx, req.UserId, req.PostId)
+	if err != nil {
+		return &post.DeleteRatingResponse{
+			Code:    constants.PostRatingFailCode,
+			Message: fmt.Sprintf("failed to delete rating: %s", err),
+		}, nil
+	}
+
+	// 获取删除后的评分统计信息
+	averageScore, totalRatings, err := h.db.GetPostRatingStats(ctx, req.PostId)
+	if err != nil {
+		return &post.DeleteRatingResponse{
+			Code:    constants.PostRatingFailCode,
+			Message: fmt.Sprintf("failed to get rating stats: %s", err),
+		}, nil
+	}
+
 	return &post.DeleteRatingResponse{
 		Code:         constants.SuccessCode,
 		Message:      "删除成功",
-		AverageScore: 0,
-		TotalRatings: 0,
+		AverageScore: averageScore,
+		TotalRatings: totalRatings,
 	}, nil
 }

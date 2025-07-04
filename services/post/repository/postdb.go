@@ -336,3 +336,58 @@ func (r *PostRepository) GetAnonymousAvatar(ctx context.Context, avatarID string
 	}
 	return &avatar, nil
 }
+
+// GetUserRating 获取用户对帖子的评分
+func (r *PostRepository) GetUserRating(ctx context.Context, userID, postID string) (*models.PostRating, error) {
+	var rating models.PostRating
+	err := r.db.WithContext(ctx).
+		Where("user_id = ? AND post_id = ?", userID, postID).
+		First(&rating).Error
+	if err != nil {
+		return nil, err
+	}
+	return &rating, nil
+}
+
+// UpdateRating 更新评分
+func (r *PostRepository) UpdateRating(ctx context.Context, userID, postID string, score int32, comment *string) error {
+	updateData := map[string]interface{}{
+		"score":      score,
+		"updated_at": time.Now(),
+	}
+	if comment != nil {
+		updateData["comment"] = *comment
+	}
+
+	return r.db.WithContext(ctx).
+		Model(&models.PostRating{}).
+		Where("user_id = ? AND post_id = ?", userID, postID).
+		Updates(updateData).Error
+}
+
+// DeleteRating 删除评分
+func (r *PostRepository) DeleteRating(ctx context.Context, userID, postID string) error {
+	return r.db.WithContext(ctx).
+		Where("user_id = ? AND post_id = ?", userID, postID).
+		Delete(&models.PostRating{}).Error
+}
+
+// GetPostRatingStats 获取帖子评分统计信息
+func (r *PostRepository) GetPostRatingStats(ctx context.Context, postID string) (float64, int32, error) {
+	var result struct {
+		AverageScore float64
+		TotalRatings int32
+	}
+
+	err := r.db.WithContext(ctx).
+		Model(&models.PostRating{}).
+		Select("AVG(score) as average_score, COUNT(*) as total_ratings").
+		Where("post_id = ?", postID).
+		Scan(&result).Error
+
+	if err != nil {
+		return 0, 0, err
+	}
+
+	return result.AverageScore, result.TotalRatings, nil
+}

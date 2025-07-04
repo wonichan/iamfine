@@ -52,8 +52,9 @@ const (
 	PostFavoriteFailCode     = 3010
 	PostUnfavoriteFailCode   = 3011
 	PostRatingFailCode       = 3012
-	PostViewCountFailCode    = 3013
-	PostRatingRankFailCode   = 3014
+	PostRatingNotFoundCode   = 3013
+	PostViewCountFailCode    = 3014
+	PostRatingRankFailCode   = 3015
 )
 
 // 话题相关错误码 (4000-4999)
@@ -168,6 +169,7 @@ var ErrorCodeMessage = map[int32]string{
 	PostFavoriteFailCode:     "收藏帖子失败",
 	PostUnfavoriteFailCode:   "取消收藏失败",
 	PostRatingFailCode:       "帖子评分失败",
+	PostRatingNotFoundCode:   "评分记录不存在",
 	PostViewCountFailCode:    "浏览次数更新失败",
 	PostRatingRankFailCode:   "帖子排名获取失败",
 
