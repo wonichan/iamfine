@@ -58,6 +58,9 @@ func InitDB() error {
 		&models.Like{},
 		&models.Follow{},
 		&models.Notification{},
+		&models.PostFavorite{},
+		&models.PostRating{},
+		&models.Topic{},
 	)
 	if err != nil {
 		return err
