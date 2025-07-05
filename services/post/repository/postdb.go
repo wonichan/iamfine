@@ -391,3 +391,432 @@ func (r *PostRepository) GetPostRatingStats(ctx context.Context, postID string) 
 
 	return result.AverageScore, result.TotalRatings, nil
 }
+
+// GetHighScorePosts 获取高分帖子
+func (r *PostRepository) GetHighScorePosts(ctx context.Context, page, pageSize int32, category, tag string) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select("posts.*, AVG(post_ratings.score) as avg_score, COUNT(post_ratings.id) as rating_count").
+		Joins("LEFT JOIN post_ratings ON posts.id = post_ratings.post_id").
+		Group("posts.id").
+		Having("rating_count >= ? AND avg_score >= ?", 3, 3.5) // 至少3个评分且平均分>=3.5
+
+	// 添加分类筛选
+	if category != "" {
+		query = query.Where("posts.category = ?", category)
+	}
+
+	// 添加标签筛选
+	if tag != "" {
+		query = query.Where("JSON_CONTAINS(posts.tags, ?)", fmt.Sprintf(`"%s"`, tag))
+	}
+
+	err := query.
+		Order("avg_score DESC, rating_count DESC, posts.created_at DESC").
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// GetTodayHighScorePosts 获取今日高分帖子
+func (r *PostRepository) GetTodayHighScorePosts(ctx context.Context, page, pageSize int32, category, tag string) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	// 今日零点时间
+	today := time.Now().Truncate(24 * time.Hour)
+
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select("posts.*, AVG(post_ratings.score) as avg_score, COUNT(post_ratings.id) as rating_count").
+		Joins("LEFT JOIN post_ratings ON posts.id = post_ratings.post_id").
+		Where("posts.created_at >= ?", today).
+		Group("posts.id").
+		Having("rating_count >= ? AND avg_score >= ?", 2, 3.5) // 今日帖子要求稍微降低
+
+	// 添加分类筛选
+	if category != "" {
+		query = query.Where("posts.category = ?", category)
+	}
+
+	// 添加标签筛选
+	if tag != "" {
+		query = query.Where("JSON_CONTAINS(posts.tags, ?)", fmt.Sprintf(`"%s"`, tag))
+	}
+
+	err := query.
+		Order("avg_score DESC, rating_count DESC, posts.created_at DESC").
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// GetLowScorePosts 获取低分帖子
+func (r *PostRepository) GetLowScorePosts(ctx context.Context, page, pageSize int32, category, tag string) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select("posts.*, AVG(post_ratings.score) as avg_score, COUNT(post_ratings.id) as rating_count").
+		Joins("LEFT JOIN post_ratings ON posts.id = post_ratings.post_id").
+		Group("posts.id").
+		Having("rating_count >= ? AND avg_score <= ?", 3, 2.5) // 至少3个评分且平均分<=2.5
+
+	// 添加分类筛选
+	if category != "" {
+		query = query.Where("posts.category = ?", category)
+	}
+
+	// 添加标签筛选
+	if tag != "" {
+		query = query.Where("JSON_CONTAINS(posts.tags, ?)", fmt.Sprintf(`"%s"`, tag))
+	}
+
+	err := query.
+		Order("avg_score ASC, rating_count DESC, posts.created_at DESC").
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// GetTodayLowScorePosts 获取今日低分帖子
+func (r *PostRepository) GetTodayLowScorePosts(ctx context.Context, page, pageSize int32, category, tag string) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	// 今日零点时间
+	today := time.Now().Truncate(24 * time.Hour)
+
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select("posts.*, AVG(post_ratings.score) as avg_score, COUNT(post_ratings.id) as rating_count").
+		Joins("LEFT JOIN post_ratings ON posts.id = post_ratings.post_id").
+		Where("posts.created_at >= ?", today).
+		Group("posts.id").
+		Having("rating_count >= ? AND avg_score <= ?", 2, 2.5) // 今日帖子要求稍微降低
+
+	// 添加分类筛选
+	if category != "" {
+		query = query.Where("posts.category = ?", category)
+	}
+
+	// 添加标签筛选
+	if tag != "" {
+		query = query.Where("JSON_CONTAINS(posts.tags, ?)", fmt.Sprintf(`"%s"`, tag))
+	}
+
+	err := query.
+		Order("avg_score ASC, rating_count DESC, posts.created_at DESC").
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// GetControversialPosts 获取争议帖子 (评分差异大)
+func (r *PostRepository) GetControversialPosts(ctx context.Context, page, pageSize int32, category, tag string) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	// 争议帖子的定义：评分数量多且评分分布分散（标准差大）
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select(`posts.*, 
+			AVG(post_ratings.score) as avg_score, 
+			COUNT(post_ratings.id) as rating_count,
+			STDDEV_POP(post_ratings.score) as score_stddev,
+			SUM(CASE WHEN post_ratings.score <= 2 THEN 1 ELSE 0 END) as low_ratings,
+			SUM(CASE WHEN post_ratings.score >= 4 THEN 1 ELSE 0 END) as high_ratings`).
+		Joins("LEFT JOIN post_ratings ON posts.id = post_ratings.post_id").
+		Group("posts.id").
+		Having("rating_count >= ? AND score_stddev >= ? AND low_ratings > 0 AND high_ratings > 0", 5, 1.2) // 至少5个评分，标准差>=1.2，且有高分和低分
+
+	// 添加分类筛选
+	if category != "" {
+		query = query.Where("posts.category = ?", category)
+	}
+
+	// 添加标签筛选
+	if tag != "" {
+		query = query.Where("JSON_CONTAINS(posts.tags, ?)", fmt.Sprintf(`"%s"`, tag))
+	}
+
+	err := query.
+		Order("score_stddev DESC, rating_count DESC, posts.created_at DESC").
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// GetTodayControversialPosts 获取今日争议帖子
+func (r *PostRepository) GetTodayControversialPosts(ctx context.Context, page, pageSize int32, category, tag string) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	// 今日零点时间
+	today := time.Now().Truncate(24 * time.Hour)
+
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select(`posts.*, 
+			AVG(post_ratings.score) as avg_score, 
+			COUNT(post_ratings.id) as rating_count,
+			STDDEV_POP(post_ratings.score) as score_stddev,
+			SUM(CASE WHEN post_ratings.score <= 2 THEN 1 ELSE 0 END) as low_ratings,
+			SUM(CASE WHEN post_ratings.score >= 4 THEN 1 ELSE 0 END) as high_ratings`).
+		Joins("LEFT JOIN post_ratings ON posts.id = post_ratings.post_id").
+		Where("posts.created_at >= ?", today).
+		Group("posts.id").
+		Having("rating_count >= ? AND score_stddev >= ? AND low_ratings > 0 AND high_ratings > 0", 3, 1.0) // 今日帖子要求稍微降低
+
+	// 添加分类筛选
+	if category != "" {
+		query = query.Where("posts.category = ?", category)
+	}
+
+	// 添加标签筛选
+	if tag != "" {
+		query = query.Where("JSON_CONTAINS(posts.tags, ?)", fmt.Sprintf(`"%s"`, tag))
+	}
+
+	err := query.
+		Order("score_stddev DESC, rating_count DESC, posts.created_at DESC").
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// SearchPosts 搜索帖子
+func (r *PostRepository) SearchPosts(ctx context.Context, keyword string, page, pageSize int32, category, sortType string) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select("posts.*, AVG(post_ratings.score) as avg_score, COUNT(post_ratings.id) as rating_count")
+
+	// 构建搜索条件
+	searchCondition := "posts.title LIKE ? OR posts.content LIKE ?"
+	searchKeyword := "%" + keyword + "%"
+
+	// 支持标签搜索
+	if len(keyword) > 0 {
+		searchCondition += " OR JSON_CONTAINS(posts.tags, ?)"
+		query = query.Joins("LEFT JOIN post_ratings ON posts.id = post_ratings.post_id").
+			Where(searchCondition, searchKeyword, searchKeyword, fmt.Sprintf(`"%s"`, keyword))
+	} else {
+		query = query.Joins("LEFT JOIN post_ratings ON posts.id = post_ratings.post_id").
+			Where(searchCondition, searchKeyword, searchKeyword)
+	}
+
+	// 添加分类筛选
+	if category != "" {
+		query = query.Where("posts.category = ?", category)
+	}
+
+	query = query.Group("posts.id")
+
+	// 设置排序
+	switch sortType {
+	case "hot":
+		query = query.Order("posts.like_count DESC, posts.comment_count DESC, posts.created_at DESC")
+	case "score":
+		query = query.Order("avg_score DESC, rating_count DESC, posts.created_at DESC")
+	case "latest":
+		fallthrough
+	default:
+		query = query.Order("posts.created_at DESC")
+	}
+
+	err := query.
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// AdvancedSearchPosts 高级搜索帖子（为后续扩展准备）
+func (r *PostRepository) AdvancedSearchPosts(ctx context.Context, conditions map[string]interface{}, page, pageSize int32) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select("posts.*, AVG(post_ratings.score) as avg_score, COUNT(post_ratings.id) as rating_count").
+		Joins("LEFT JOIN post_ratings ON posts.id = post_ratings.post_id")
+
+	// 动态构建查询条件
+	for key, value := range conditions {
+		if value == nil || value == "" {
+			continue
+		}
+
+		switch key {
+		case "keyword":
+			keyword := fmt.Sprintf("%%%s%%", value)
+			query = query.Where("posts.title LIKE ? OR posts.content LIKE ?", keyword, keyword)
+		case "category":
+			query = query.Where("posts.category = ?", value)
+		case "user_id":
+			query = query.Where("posts.user_id = ?", value)
+		case "topic_id":
+			query = query.Where("posts.topic_id = ?", value)
+		case "is_anonymous":
+			query = query.Where("posts.is_anonymous = ?", value)
+		case "min_score":
+			query = query.Having("avg_score >= ?", value)
+		case "max_score":
+			query = query.Having("avg_score <= ?", value)
+		case "date_from":
+			query = query.Where("posts.created_at >= ?", value)
+		case "date_to":
+			query = query.Where("posts.created_at <= ?", value)
+		case "tags":
+			if tags, ok := value.([]string); ok {
+				for _, tag := range tags {
+					query = query.Where("JSON_CONTAINS(posts.tags, ?)", fmt.Sprintf(`"%s"`, tag))
+				}
+			}
+		}
+	}
+
+	query = query.Group("posts.id")
+
+	// 默认按相关性和时间排序
+	sortType := conditions["sort_type"]
+	if sortType == nil {
+		sortType = "latest"
+	}
+
+	switch sortType {
+	case "hot":
+		query = query.Order("posts.like_count DESC, posts.comment_count DESC, posts.created_at DESC")
+	case "score":
+		query = query.Order("avg_score DESC, rating_count DESC, posts.created_at DESC")
+	case "latest":
+		fallthrough
+	default:
+		query = query.Order("posts.created_at DESC")
+	}
+
+	err := query.
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// GetHotPosts 获取热门帖子
+func (r *PostRepository) GetHotPosts(ctx context.Context, page, pageSize int32, category, tag string) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	// 热门度计算：点赞数*0.5 + 评论数*0.3 + 浏览数*0.1 + 分享数*0.1
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select("posts.*, (like_count * 0.5 + comment_count * 0.3 + view_count * 0.1 + share_count * 0.1) as hot_score").
+		Where("posts.created_at > ?", time.Now().AddDate(0, 0, -30)) // 只考虑30天内的帖子
+
+	// 添加分类筛选
+	if category != "" {
+		query = query.Where("posts.category = ?", category)
+	}
+
+	// 添加标签筛选
+	if tag != "" {
+		query = query.Where("JSON_CONTAINS(posts.tags, ?)", fmt.Sprintf(`"%s"`, tag))
+	}
+
+	err := query.
+		Order("hot_score DESC, posts.created_at DESC").
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// GetRecommendPosts 获取推荐帖子
+func (r *PostRepository) GetRecommendPosts(ctx context.Context, userID string, page, pageSize int32) ([]*models.Post, error) {
+	var posts []*models.Post
+	offset := (page - 1) * pageSize
+
+	// 简单的推荐算法：基于用户的互动历史和热门度
+	query := r.db.WithContext(ctx).
+		Table("posts").
+		Select(`posts.*, 
+			(posts.like_count * 0.4 + posts.comment_count * 0.3 + posts.view_count * 0.2 + posts.share_count * 0.1) as recommend_score`).
+		Where("posts.created_at > ?", time.Now().AddDate(0, 0, -7)) // 只推荐7天内的帖子
+
+	// 排除用户自己的帖子
+	if userID != "" {
+		query = query.Where("posts.user_id != ?", userID)
+	}
+
+	err := query.
+		Order("recommend_score DESC, posts.created_at DESC").
+		Offset(int(offset)).
+		Limit(int(pageSize)).
+		Find(&posts).Error
+
+	return posts, err
+}
+
+// GetPostsWithCache 带缓存的帖子获取（预留接口）
+// 后续可以集成Redis或其他缓存系统
+func (r *PostRepository) GetPostsWithCache(ctx context.Context, cacheKey string, queryFunc func() ([]*models.Post, error)) ([]*models.Post, error) {
+	// TODO: 集成缓存逻辑
+	// 1. 先从缓存获取
+	// 2. 缓存未命中时从数据库获取
+	// 3. 将结果写入缓存
+
+	// 目前直接执行数据库查询
+	return queryFunc()
+}
+
+// InvalidatePostCache 失效帖子相关缓存（预留接口）
+func (r *PostRepository) InvalidatePostCache(ctx context.Context, postID string) error {
+	// TODO: 实现缓存失效逻辑
+	// 当帖子被更新、删除或评分时调用
+	return nil
+}
+
+// GetSearchSuggestions 获取搜索建议（预留接口，为ElasticSearch准备）
+func (r *PostRepository) GetSearchSuggestions(ctx context.Context, keyword string, limit int) ([]string, error) {
+	// TODO: 实现搜索建议功能
+	// 可以基于热门搜索词、标签等生成建议
+	return []string{}, nil
+}
+
+// GetRelatedPosts 获取相关帖子（预留接口）
+func (r *PostRepository) GetRelatedPosts(ctx context.Context, postID string, limit int) ([]*models.Post, error) {
+	// TODO: 基于标签、分类、内容相似度等实现相关帖子推荐
+	// 可以集成机器学习算法或ElasticSearch的more_like_this功能
+	return []*models.Post{}, nil
+}
+
+// OptimizeDatabase 数据库优化方法
+func (r *PostRepository) OptimizeDatabase(ctx context.Context) error {
+	// TODO: 数据库优化操作
+	// 1. 清理过期数据
+	// 2. 重建索引
+	// 3. 统计信息更新
+	return nil
+}

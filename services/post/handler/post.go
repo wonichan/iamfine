@@ -492,80 +492,284 @@ func (h *PostHandler) DeletePost(ctx context.Context, req *post.DeletePostReques
 
 // GetRecommendPosts 获取推荐帖子
 func (h *PostHandler) GetRecommendPosts(ctx context.Context, req *post.GetRecommendPostsRequest) (*post.GetRecommendPostsResponse, error) {
-	// TODO: 实现获取推荐帖子逻辑
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("GetRecommendPosts req: %v", req)
+
+	// 参数验证
+	if req.Page <= 0 {
+		req.Page = 1
+	}
+	if req.PageSize <= 0 || req.PageSize > 100 {
+		req.PageSize = 20
+	}
+
+	// 从上下文或其他地方获取用户ID，这里先用空字符串
+	userID := ""
+
+	posts, err := h.db.GetRecommendPosts(ctx, userID, req.Page, req.PageSize)
+	if err != nil {
+		logger.Errorf("GetRecommendPosts failed: %s", err)
+		return &post.GetRecommendPostsResponse{
+			Code:    constants.DatabaseErrorCode,
+			Message: fmt.Sprintf("failed to get recommend posts: %s", err),
+		}, nil
+	}
+
+	// 转换数据格式
+	var postList []*post.Post
+	for _, p := range posts {
+		// 获取帖子的平均评分
+		avgScore, _, _ := h.db.GetPostRatingStats(ctx, p.ID)
+
+		postList = append(postList, &post.Post{
+			Id:           p.ID,
+			UserId:       p.UserID,
+			TopicId:      p.TopicID,
+			Title:        p.Title,
+			Content:      p.Content,
+			Images:       []string(p.Images),
+			Category:     post.PostCategory(p.Category),
+			IsAnonymous:  p.IsAnonymous,
+			LikeCount:    p.LikeCount,
+			CommentCount: p.CommentCount,
+			ViewCount:    p.ViewCount,
+			ShareCount:   p.ShareCount,
+			CollectCount: p.FavoriteCount,
+			Score:        avgScore,
+			CreatedAt:    p.CreatedAt.Unix(),
+			UpdatedAt:    p.UpdatedAt.Unix(),
+		})
+	}
+
+	hasMore := len(postList) >= int(req.PageSize)
+
 	return &post.GetRecommendPostsResponse{
 		Code:    constants.SuccessCode,
 		Message: "获取成功",
-		Posts:   []*post.Post{},
-		Total:   0,
-		HasMore: false,
+		Posts:   postList,
+		Total:   int32(len(postList)),
+		HasMore: hasMore,
 	}, nil
 }
 
 // GetHotPosts 获取热门帖子
 func (h *PostHandler) GetHotPosts(ctx context.Context, req *post.GetHotPostsRequest) (*post.GetHotPostsResponse, error) {
-	// TODO: 实现获取热门帖子逻辑
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("GetHotPosts req: %v", req)
+
+	// 参数验证
+	if req.Page <= 0 {
+		req.Page = 1
+	}
+	if req.PageSize <= 0 || req.PageSize > 100 {
+		req.PageSize = 20
+	}
+
+	category := ""
+	if req.Category != nil {
+		category = *req.Category
+	}
+	tag := ""
+	if req.Tag != nil {
+		tag = *req.Tag
+	}
+
+	posts, err := h.db.GetHotPosts(ctx, req.Page, req.PageSize, category, tag)
+	if err != nil {
+		logger.Errorf("GetHotPosts failed: %s", err)
+		return &post.GetHotPostsResponse{
+			Code:    constants.DatabaseErrorCode,
+			Message: fmt.Sprintf("failed to get hot posts: %s", err),
+		}, nil
+	}
+
+	// 转换数据格式
+	var postList []*post.Post
+	for _, p := range posts {
+		postList = append(postList, &post.Post{
+			Id:           p.ID,
+			UserId:       p.UserID,
+			TopicId:      p.TopicID,
+			Title:        p.Title,
+			Content:      p.Content,
+			Images:       []string(p.Images),
+			Category:     post.PostCategory(p.Category),
+			IsAnonymous:  p.IsAnonymous,
+			LikeCount:    p.LikeCount,
+			CommentCount: p.CommentCount,
+			ViewCount:    p.ViewCount,
+			ShareCount:   p.ShareCount,
+			CollectCount: p.FavoriteCount,
+			CreatedAt:    p.CreatedAt.Unix(),
+			UpdatedAt:    p.UpdatedAt.Unix(),
+		})
+	}
+
+	hasMore := len(postList) >= int(req.PageSize)
+
 	return &post.GetHotPostsResponse{
 		Code:    constants.SuccessCode,
 		Message: "获取成功",
-		Posts:   []*post.Post{},
-		Total:   0,
-		HasMore: false,
+		Posts:   postList,
+		Total:   int32(len(postList)),
+		HasMore: hasMore,
 	}, nil
 }
 
 // GetHighScorePosts 获取高分帖子
 func (h *PostHandler) GetHighScorePosts(ctx context.Context, req *post.GetHighScorePostsRequest) (*post.GetHighScorePostsResponse, error) {
-	// TODO: 实现获取高分帖子逻辑
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("GetHighScorePosts req: %v", req)
+
+	// 参数验证
+	req.Page, req.PageSize = h.validatePaginationParams(req.Page, req.PageSize)
+
+	category := ""
+	if req.Category != nil {
+		category = *req.Category
+	}
+	tag := ""
+	if req.Tag != nil {
+		tag = *req.Tag
+	}
+
+	posts, err := h.db.GetHighScorePosts(ctx, req.Page, req.PageSize, category, tag)
+	if err != nil {
+		logger.Errorf("GetHighScorePosts failed: %s", err)
+		return &post.GetHighScorePostsResponse{
+			Code:    constants.DatabaseErrorCode,
+			Message: fmt.Sprintf("获取高分帖子失败: %s", err),
+		}, nil
+	}
+
+	// 转换数据格式
+	postList := h.convertPostsToResponse(ctx, posts)
+	hasMore := len(postList) >= int(req.PageSize)
+
 	return &post.GetHighScorePostsResponse{
 		Code:    constants.SuccessCode,
 		Message: "获取成功",
-		Posts:   []*post.Post{},
-		Total:   0,
-		HasMore: false,
+		Posts:   postList,
+		Total:   int32(len(postList)),
+		HasMore: hasMore,
 	}, nil
 }
 
 // GetLowScorePosts 获取低分帖子
 func (h *PostHandler) GetLowScorePosts(ctx context.Context, req *post.GetLowScorePostsRequest) (*post.GetLowScorePostsResponse, error) {
-	// TODO: 实现获取低分帖子逻辑
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("GetLowScorePosts req: %v", req)
+
+	// 参数验证
+	req.Page, req.PageSize = h.validatePaginationParams(req.Page, req.PageSize)
+
+	category := ""
+	if req.Category != nil {
+		category = *req.Category
+	}
+	tag := ""
+	if req.Tag != nil {
+		tag = *req.Tag
+	}
+
+	posts, err := h.db.GetLowScorePosts(ctx, req.Page, req.PageSize, category, tag)
+	if err != nil {
+		logger.Errorf("GetLowScorePosts failed: %s", err)
+		return &post.GetLowScorePostsResponse{
+			Code:    constants.DatabaseErrorCode,
+			Message: fmt.Sprintf("获取低分帖子失败: %s", err),
+		}, nil
+	}
+
+	// 转换数据格式
+	postList := h.convertPostsToResponse(ctx, posts)
+	hasMore := len(postList) >= int(req.PageSize)
+
 	return &post.GetLowScorePostsResponse{
 		Code:    constants.SuccessCode,
 		Message: "获取成功",
-		Posts:   []*post.Post{},
-		Total:   0,
-		HasMore: false,
+		Posts:   postList,
+		Total:   int32(len(postList)),
+		HasMore: hasMore,
 	}, nil
 }
 
 // GetControversialPosts 获取争议帖子
 func (h *PostHandler) GetControversialPosts(ctx context.Context, req *post.GetControversialPostsRequest) (*post.GetControversialPostsResponse, error) {
-	// TODO: 实现获取争议帖子逻辑
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("GetControversialPosts req: %v", req)
+
+	// 参数验证
+	req.Page, req.PageSize = h.validatePaginationParams(req.Page, req.PageSize)
+
+	category := ""
+	if req.Category != nil {
+		category = *req.Category
+	}
+	tag := ""
+	if req.Tag != nil {
+		tag = *req.Tag
+	}
+
+	posts, err := h.db.GetControversialPosts(ctx, req.Page, req.PageSize, category, tag)
+	if err != nil {
+		logger.Errorf("GetControversialPosts failed: %s", err)
+		return &post.GetControversialPostsResponse{
+			Code:    constants.DatabaseErrorCode,
+			Message: fmt.Sprintf("获取争议帖子失败: %s", err),
+		}, nil
+	}
+
+	// 转换数据格式
+	postList := h.convertPostsToResponse(ctx, posts)
+	hasMore := len(postList) >= int(req.PageSize)
+
 	return &post.GetControversialPostsResponse{
 		Code:    constants.SuccessCode,
 		Message: "获取成功",
-		Posts:   []*post.Post{},
-		Total:   0,
-		HasMore: false,
+		Posts:   postList,
+		Total:   int32(len(postList)),
+		HasMore: hasMore,
 	}, nil
 }
 
 // SearchPosts 搜索帖子
 func (h *PostHandler) SearchPosts(ctx context.Context, req *post.SearchPostsRequest) (*post.SearchPostsResponse, error) {
+	logger := log.GetLogger().WithField(constants.TraceIdKey, ctx.Value(constants.TraceIdKey).(string))
+	logger.Infof("SearchPosts req: %v", req)
+
 	// 参数验证
 	if req.Keyword == "" {
 		return &post.SearchPostsResponse{
 			Code:    constants.ValidationErrorCode,
-			Message: fmt.Sprintf("failed to search posts: %s", constants.GetErrorMessage(constants.ValidationErrorCode)),
+			Message: "搜索关键词不能为空",
 		}, nil
 	}
 
-	// TODO: 实现搜索帖子逻辑
+	// 参数校验和默认值设置
+	req.Page, req.PageSize = h.validatePaginationParams(req.Page, req.PageSize)
+
+	// 搜索参数
+	category := ""       // 后续可以从req中获取
+	sortType := "latest" // 后续可以从req中获取
+
+	posts, err := h.db.SearchPosts(ctx, req.Keyword, req.Page, req.PageSize, category, sortType)
+	if err != nil {
+		logger.Errorf("SearchPosts failed: %s", err)
+		return &post.SearchPostsResponse{
+			Code:    constants.DatabaseErrorCode,
+			Message: fmt.Sprintf("搜索失败: %s", err),
+		}, nil
+	}
+
+	// 转换数据格式
+	postList := h.convertPostsToResponse(ctx, posts)
+
 	return &post.SearchPostsResponse{
 		Code:    constants.SuccessCode,
 		Message: "搜索成功",
-		Posts:   []*post.Post{},
-		Total:   0,
+		Posts:   postList,
+		Total:   int32(len(postList)),
 	}, nil
 }
 
@@ -798,4 +1002,49 @@ func (h *PostHandler) DeleteRating(ctx context.Context, req *post.DeleteRatingRe
 		AverageScore: averageScore,
 		TotalRatings: totalRatings,
 	}, nil
+}
+
+// convertPostToResponse 转换帖子数据为响应格式的通用方法
+func (h *PostHandler) convertPostToResponse(ctx context.Context, p *models.Post) *post.Post {
+	// 获取帖子的平均评分
+	avgScore, _, _ := h.db.GetPostRatingStats(ctx, p.ID)
+
+	return &post.Post{
+		Id:           p.ID,
+		UserId:       p.UserID,
+		TopicId:      p.TopicID,
+		Title:        p.Title,
+		Content:      p.Content,
+		Images:       []string(p.Images),
+		Category:     post.PostCategory(p.Category),
+		IsAnonymous:  p.IsAnonymous,
+		LikeCount:    p.LikeCount,
+		CommentCount: p.CommentCount,
+		ViewCount:    p.ViewCount,
+		ShareCount:   p.ShareCount,
+		CollectCount: p.FavoriteCount,
+		Score:        avgScore,
+		CreatedAt:    p.CreatedAt.Unix(),
+		UpdatedAt:    p.UpdatedAt.Unix(),
+	}
+}
+
+// convertPostsToResponse 批量转换帖子数据为响应格式
+func (h *PostHandler) convertPostsToResponse(ctx context.Context, posts []*models.Post) []*post.Post {
+	var postList []*post.Post
+	for _, p := range posts {
+		postList = append(postList, h.convertPostToResponse(ctx, p))
+	}
+	return postList
+}
+
+// validatePaginationParams 验证分页参数
+func (h *PostHandler) validatePaginationParams(page, pageSize int32) (int32, int32) {
+	if page <= 0 {
+		page = 1
+	}
+	if pageSize <= 0 || pageSize > 100 {
+		pageSize = 20
+	}
+	return page, pageSize
 }
